@@ -105,7 +105,7 @@ const menuItemStyle = css`
 const selectedMainMenuStyle = css`
   font-weight: bold;
   color: #4f79a5;
-  border-bottom: 2px solid #4f79a5; //[질문] 이렇게 해도 언더바와 똑같아 보인다..
+  border-bottom: 2px solid #4f79a5; // [질문] 언더바랑 크게 다르지 않습니다
 `;
 
 const horizontalSubMenuStyle = css`
