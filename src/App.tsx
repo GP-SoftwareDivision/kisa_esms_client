@@ -1,7 +1,5 @@
-/** @jsxImportSource @emotion/react */
 import React, { useState } from 'react';
 import NavBar from './NavBar';
-import { css } from '@emotion/react';
 
 const App: React.FC = () => {
 
@@ -32,7 +30,7 @@ const App: React.FC = () => {
   ];
 
   return (
-    <div css={appStyle}>
+    <div>
       <NavBar menus={menus} onSubMenuSelect={onSubMenuSelect} />
       <h1>대시보드</h1>
       <p>전달된 메뉴: {selectedSubMenu}</p>
@@ -40,9 +38,5 @@ const App: React.FC = () => {
     </div>
   );
 };
-
-const appStyle = css`
-  padding-top: 8rem
-`;
 
 export default App;

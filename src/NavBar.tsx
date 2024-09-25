@@ -82,13 +82,13 @@ const NavBar: React.FC<Props> = ({ menus, onSubMenuSelect }) => {
 
 const navBarStyle = css`
   background-color: white;
-  position: fixed;
+  position: sticky;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 1000;
   justify-content: space-around;
-  padding: 10px 0;
+  padding: 5px 0;
 `;
 
 const menuListStyle = css`
@@ -132,7 +132,7 @@ const subMenuListStyle = (isActive: boolean) => css`
 `;
 
 const subMenuItemStyle = css`
-padding: 0rem 2rem;
+  padding: 0rem 2rem;
   cursor: pointer;
 `;
 
