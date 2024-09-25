@@ -87,6 +87,8 @@ const navBarStyle = css`
   left: 0;
   width: 100%;
   z-index: 1000;
+  justify-content: space-around;
+  padding: 10px 0;
 `;
 
 const menuListStyle = css`
@@ -105,7 +107,7 @@ const menuItemStyle = css`
 const selectedMainMenuStyle = css`
   font-weight: bold;
   color: #4f79a5;
-  border-bottom: 2px solid #4f79a5; // [질문] 언더바랑 크게 다르지 않습니다
+  border-bottom: 1px solid #4f79a5; // [질문] 언더바랑 크게 다르지 않습니다
 `;
 
 const horizontalSubMenuStyle = css`
