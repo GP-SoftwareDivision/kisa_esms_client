@@ -1,5 +1,5 @@
 ## KISA_DashBoard
-NavBar 컴포넌트 만들기
+### NavBar 컴포넌트 만들기
 
 - 패키지매니저 yarn 사용
 - 개발 툴 Vite 사용

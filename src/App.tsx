@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import NavBar from './NavBar';
+import NavBar from './components/NavBar';
 
 const App: React.FC = () => {
 
@@ -34,7 +34,6 @@ const App: React.FC = () => {
       <NavBar menus={menus} onSubMenuSelect={onSubMenuSelect} />
       <h1>대시보드</h1>
       <p>전달된 메뉴: {selectedSubMenu}</p>
-      <p>메인 컴포넌트가 NavBar에 가려지지 않도록 수정하기</p>
     </div>
   );
 };
