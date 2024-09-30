@@ -6,7 +6,6 @@ const App: React.FC = () => {
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(null);
 
   const onSubMenuSelect = (subItem: string | null) => {
-    console.log('부모 컴포넌트에서 받은 메뉴: ', subItem);
     setSelectedSubMenu(subItem);
   };
 

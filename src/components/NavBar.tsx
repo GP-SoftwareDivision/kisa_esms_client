@@ -16,24 +16,18 @@ interface Props {
 const NavBar: React.FC<Props> = ({ menus, onSubMenuSelect }) => {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(null);
-  const [selectedMainMenu, setSelectedMainMenu] = useState<string | null>(null);
 
-  const handleSubMenuClick = (subItem: string) => {
-    console.log('sub: ', subItem);
-    setSelectedSubMenu(subItem);
-
-    if (onSubMenuSelect) {
-      onSubMenuSelect(subItem);
+  const handleMenuClick = (menuTitle: string, subItem?: string) => {
+    setActiveMenu(menuTitle);
+    if (subItem) {
+      setSelectedSubMenu(subItem);
+      onSubMenuSelect?.(subItem);
     }
   };
 
-  const handleMainMenuClick = (menuTitle: string) => {
-    console.log('main: ', menuTitle);
-    setSelectedMainMenu(menuTitle);
-    setActiveMenu(menuTitle);
-    
-    // [질문] 첫 번째 서브메뉴 자동 선택 로직 추가?!
-  
+  const subMenuPosition = (index: number) => {
+    const position = [5, 117, 270, 430]
+    return position [index ?? 0]
   };
 
   return (
@@ -43,10 +37,10 @@ const NavBar: React.FC<Props> = ({ menus, onSubMenuSelect }) => {
           <li
             key={menu.title}
             onMouseEnter={() => setActiveMenu(menu.title)}
-            onClick={() => handleMainMenuClick(menu.title)} 
+            onClick={() => handleMenuClick(menu.title)} 
             css={[
               menuItemStyle,
-              selectedMainMenu === menu.title && selectedMainMenuStyle, // 메인 메뉴 스타일 적용
+              activeMenu === menu.title && selectedMainMenuStyle, // 메인 메뉴 스타일 적용
             ]}
           >
             {menu.title}
@@ -54,24 +48,23 @@ const NavBar: React.FC<Props> = ({ menus, onSubMenuSelect }) => {
         ))}
       </ul>
        <ul css={horizontalSubMenuStyle}> {/*서브 메뉴 */}
-        {menus.map((menu) => (
+        {menus.map((menu, index) => (
           <li
             key={menu.title}
-            css={subMenuListStyle(activeMenu === menu.title)}
+            css={subMenuListStyle(activeMenu === menu.title, subMenuPosition(index))}
           >
             {activeMenu === menu.title && menu.subMenu?.items.map((subItem) => ( //활성화된 메인 메뉴 하위에 있는지 확인
-              <ul
+              <div
                 key={subItem}
                 onClick={() => {
-                  handleSubMenuClick(subItem)
-                  handleMainMenuClick(menu.title)}} // 서브 메뉴 선택시 상위 메인 메뉴 자동 선택
+                  handleMenuClick(menu.title, subItem)}}
                 css={[
                   subMenuItemStyle,
                   selectedSubMenu === subItem && selectedSubMenuStyle, // 선택된 서브 메뉴 스타일 적용
                 ]}
               >
                 {subItem}
-              </ul>
+              </div>
             ))}
           </li>
         ))}
@@ -94,20 +87,22 @@ const navBarStyle = css`
 const menuListStyle = css`
   list-style: none;
   display: flex;
-  gap: 2.5em;
+  gap: 2.5rem;
 `;
 
 const menuItemStyle = css`
   position: relative;
+  margin: 0rem 1rem;
   color: black;
   cursor: pointer;
   font-weight: bold;
+  font-size: 18px; 
 `;
 
 const selectedMainMenuStyle = css`
   font-weight: bold;
   color: #4f79a5;
-  border-bottom: 1px solid #4f79a5; // [질문] 언더바랑 크게 다르지 않습니다
+  border-bottom: 1px solid #4f79a5; 
 `;
 
 const horizontalSubMenuStyle = css`
@@ -116,24 +111,24 @@ const horizontalSubMenuStyle = css`
   background-color: #f5f5f5;
   white-space: nowrap;
   width: 100%;
-  margin: 0;  // 서브메뉴바의 margin 제거
+  margin: 0; 
 `;
 
-const subMenuListStyle = (isActive: boolean) => css`
-  list-style: none;
-  position: relative;
-  left: -35px; //[질문] 서브 메뉴를 정렬할 더 정돈된 방법이 없을지..
+const subMenuListStyle = (isActive: boolean, index: number) => css`
   display: flex;
-  height: 1rem;  // 서브메뉴바의 고정 높이 설정
+  position: relative;
+  left: ${ index }px;
+  padding: 1.5rem 0rem;
+  gap: 2.5rem;
+  height: 1rem;  
   visibility: ${isActive ? 'visible' : 'hidden'};
   opacity: ${isActive ? 1 : 0};
   transition: opacity 0.3s ease;
-  padding: 1.5rem;
 `;
 
 const subMenuItemStyle = css`
-padding: 0rem 2rem;
-  cursor: pointer;
+  cursor: pointer; 
+  padding-left: 10px;
 `;
 
 const selectedSubMenuStyle = css`
