@@ -1,4 +1,3 @@
-import React from 'react'
 import { Suspense } from 'react'
 import {
   BrowserRouter as Router,
@@ -8,8 +7,9 @@ import {
 } from 'react-router-dom'
 import Wrapper from '@/layouts/Wrapper'
 import MainPage from '@/pages/main'
+import LoginPage from '@/pages/login'
 
-const App: React.FC = () => {
+const App = () => {
   const Layout = () => {
     return (
       <Wrapper>
@@ -22,6 +22,7 @@ const App: React.FC = () => {
     <Router>
       <Suspense fallback={<div></div>}>
         <Routes>
+          <Route path='/login' element={<LoginPage />} />
           <Route element={<Layout />}>
             <Route path='/' element={<MainPage />} />
           </Route>
