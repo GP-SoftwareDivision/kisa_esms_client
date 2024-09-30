@@ -20,7 +20,7 @@ const useTimer = (initialTime: number) => {
     setIsRunning(false)
   }
 
-  return { timeLeft, isRunning, startTimer, resetTimer }
+  return { timeLeft, startTimer, resetTimer }
 }
 
 export default useTimer
