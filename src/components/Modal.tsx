@@ -6,7 +6,7 @@ import { IoMdClose } from 'react-icons/io'
 interface Modal {
   title: string
   isOpen: boolean
-  onOk: () => void
+  onOk?: () => void
   onCancel: () => void
   content: React.ReactNode
 }

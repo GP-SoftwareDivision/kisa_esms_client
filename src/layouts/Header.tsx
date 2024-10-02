@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from '@emotion/styled'
 
 import NavBar from '@/components/NavBar.tsx'
@@ -7,9 +7,14 @@ const Header = () => {
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(null)
 
   const onSubMenuSelect = (subItem: string | null) => {
-    console.log('부모 컴포넌트에서 받은 메뉴: ', selectedSubMenu)
     setSelectedSubMenu(subItem)
   }
+
+  useEffect(() => {
+    if(selectedSubMenu) {
+      console.log('부모 컴포넌트에서 받은 메뉴: ', selectedSubMenu)
+    } 
+  },[selectedSubMenu])
 
   const menus = [
     {
