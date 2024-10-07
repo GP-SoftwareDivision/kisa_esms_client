@@ -10,7 +10,7 @@ const Header = () => {
 
   const onSubMenuSelect = (subItemKey: string | null) => {
     setSelectedSubMenu(subItemKey)
-    if (subItemKey && subItemKey !== 'all') {
+    if (subItemKey) {
       navigate(`/${subItemKey}`) // 서브 메뉴 클릭 시 도메인 변경
     }
   }
@@ -38,7 +38,6 @@ const Header = () => {
       subMenu: { 
         title: '데이터 조회', 
         items: [
-          {label:'전체', key:'all'},
           {label:'다크웹', key:'darkweb'},
           {label:'텔레그램', key:'telegram'},
         ],
