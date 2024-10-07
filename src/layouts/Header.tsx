@@ -6,8 +6,8 @@ import NavBar from '@/components/NavBar.tsx'
 const Header = () => {
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(null)
 
-  const onSubMenuSelect = (subItem: string | null) => {
-    setSelectedSubMenu(subItem)
+  const onSubMenuSelect = (subItemKey: string | null) => {
+    setSelectedSubMenu(subItemKey)
   }
 
   useEffect(() => {
@@ -19,26 +19,37 @@ const Header = () => {
   const menus = [
     {
       title: '메인',
-      subMenu: { title: '메인', items: ['대시보드'] },
+      key: 'mainMenu',
+      subMenu: { title: '메인', items: [{ label: '대시보드', key: 'main'}] },
     },
     {
       title: '이슈 대응',
-      subMenu: { title: '이슈 대응', items: ['대응 이력'] },
+      key : 'issue',
+      subMenu: { title: '이슈 대응', items: [{label: '대응 이력', key: 'history'}] },
     },
     {
       title: '데이터 조회',
-      subMenu: { title: '데이터 조회', items: ['전체', '다크웹', '텔레그램'] },
+      key: 'data',
+      subMenu: { 
+        title: '데이터 조회', 
+        items: [
+          {label:'전체', key:'all'},
+          {label:'다크웹', key:'darkweb'},
+          {label:'텔레그램', key:'telegram'},
+        ],
+       },
     },
     {
       title: '관리',
+      key: 'management',
       subMenu: {
         title: '관리',
         items: [
-          '유저 관리',
-          '알림 관리',
-          '수집 키워드 관리',
-          '룰셋 관리',
-          '스케줄 관리',
+          { label: '유저 관리', key: 'user' },
+          { label: '알림 관리', key: 'alert' },
+          { label: '수집 키워드 관리', key: 'keyword' },
+          { label: '룰셋 관리', key: 'ruleset' },
+          { label: '스케줄 관리', key: 'schedule' },
         ],
       },
     },

@@ -4,12 +4,12 @@ import { css } from '@emotion/react'
 
 interface SubMenu {
   title: string
-  items: string[]
+  items:  { label: string; key: string }[] //label(한글), key(영어)
 }
 
 interface Props {
-  menus: { title: string; subMenu?: SubMenu }[]
-  onSubMenuSelect?: (subItem: string | null) => void // 선택된 서브 메뉴를 부모 컴포넌트로 전달하는 콜백 함수
+  menus: { title: string; key: string; subMenu?: SubMenu }[]
+  onSubMenuSelect?: (subItemKey: string | null) => void // 선택된 서브 메뉴를 부모 컴포넌트로 전달하는 콜백 함수
 }
 
 const NavBar = ({ menus, onSubMenuSelect }: Props) => {
@@ -65,16 +65,16 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
                   subItem //활성화된 메인 메뉴 하위에 있는지 확인
                 ) => (
                   <ul
-                    key={subItem}
+                    key={subItem.key}
                     onClick={() => {
-                      handleMenuClick(menu.title, subItem)
+                      handleMenuClick(menu.title, subItem.key)
                     }} // 서브 메뉴 선택시 상위 메인 메뉴 자동 선택
                     css={[
                       subMenuItemStyle,
-                      selectedSubMenu === subItem && selectedSubMenuStyle, // 선택된 서브 메뉴 스타일 적용
+                      selectedSubMenu === subItem.key && selectedSubMenuStyle, // 선택된 서브 메뉴 스타일 적용
                     ]}
                   >
-                    {subItem}
+                    {subItem.label}
                   </ul>
                 )
               )}
