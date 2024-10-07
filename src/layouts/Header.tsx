@@ -10,7 +10,7 @@ const Header = () => {
 
   const onSubMenuSelect = (subItemKey: string | null) => {
     setSelectedSubMenu(subItemKey)
-    if (subItemKey) {
+    if (subItemKey && subItemKey !== 'all') {
       navigate(`/${subItemKey}`) // 서브 메뉴 클릭 시 도메인 변경
     }
   }

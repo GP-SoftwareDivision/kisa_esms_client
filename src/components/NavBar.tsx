@@ -124,6 +124,7 @@ const subMenuListStyle = (isActive: boolean, index: number) => css`
   display: flex;
   list-style: none;
   position: relative;
+  height: 1rem;  // 서브메뉴 높이 고정
   visibility: ${isActive ? 'visible' : 'hidden'};
   transition: opacity 0.3s ease;
   padding: 1rem 0;
