@@ -4,25 +4,23 @@ import { css } from '@emotion/react'
 
 interface SubMenu {
   title: string
-  items:  { label: string; key: string }[] //label(한글), key(영어)
+  items: { label: string; key: string }[] // 아이템에 label(한글), key(영어) 추가
 }
 
 interface Props {
   menus: { title: string; key: string; subMenu?: SubMenu }[]
-  onSubMenuSelect?: (subItemKey: string | null) => void // 선택된 서브 메뉴를 부모 컴포넌트로 전달하는 콜백 함수
+  onSubMenuSelect?: (subItemKey: string | null) => void // 영어로 선택된 서브메뉴의 키를 전달
 }
 
 const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   const [activeMenu, setActiveMenu] = useState<string | null>('메인')
-  const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(
-    '대시보드'
-  )
+  const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>('main')
 
-  const handleMenuClick = (menuTitle: string, subItem?: string) => {
-    setActiveMenu(menuTitle)
-    if (subItem) {
-      setSelectedSubMenu(subItem)
-      onSubMenuSelect?.(subItem)
+  const handleMenuClick = (menuKey: string, subItemKey?: string) => {
+    setActiveMenu(menuKey)
+    if (subItemKey) {
+      setSelectedSubMenu(subItemKey)
+      onSubMenuSelect?.(subItemKey)
     }
   }
 
@@ -34,15 +32,15 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   return (
     <nav css={navBarStyle}>
       <ul css={menuListStyle}>
-        {/*메인 메뉴 */}
+        {/* 메인 메뉴 */}
         {menus.map((menu) => (
           <li
-            key={menu.title}
-            onMouseEnter={() => setActiveMenu(menu.title)}
-            onClick={() => handleMenuClick(menu.title)}
+            key={menu.key}
+            onMouseEnter={() => setActiveMenu(menu.key)}
+            onClick={() => handleMenuClick(menu.key)}
             css={[
               menuItemStyle,
-              activeMenu === menu.title && selectedMainMenuStyle, // 메인 메뉴 스타일 적용
+              activeMenu === menu.key && selectedMainMenuStyle, // 메인 메뉴 스타일 적용
             ]}
           >
             {menu.title}
@@ -50,25 +48,23 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
         ))}
       </ul>
       <ul css={horizontalSubMenuStyle}>
-        {/*서브 메뉴 */}
+        {/* 서브 메뉴 */}
         {menus.map((menu, index) => (
           <li
-            key={menu.title}
+            key={menu.key}
             css={subMenuListStyle(
-              activeMenu === menu.title,
+              activeMenu === menu.key,
               handlePositionSubMenu(index)
             )}
           >
-            {activeMenu === menu.title &&
+            {activeMenu === menu.key &&
               menu.subMenu?.items.map(
-                (
-                  subItem //활성화된 메인 메뉴 하위에 있는지 확인
-                ) => (
+                (subItem) => (
                   <ul
                     key={subItem.key}
                     onClick={() => {
-                      handleMenuClick(menu.title, subItem.key)
-                    }} // 서브 메뉴 선택시 상위 메인 메뉴 자동 선택
+                      handleMenuClick(menu.key, subItem.key)
+                    }} // 서브 메뉴 선택 시
                     css={[
                       subMenuItemStyle,
                       selectedSubMenu === subItem.key && selectedSubMenuStyle, // 선택된 서브 메뉴 스타일 적용
@@ -136,7 +132,6 @@ const subMenuListStyle = (isActive: boolean, index: number) => css`
 `
 
 const subMenuItemStyle = css`
-  //padding: 0 1rem;
   cursor: pointer;
 `
 

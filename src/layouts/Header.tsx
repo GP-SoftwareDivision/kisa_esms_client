@@ -2,12 +2,17 @@ import { useState, useEffect } from 'react'
 import styled from '@emotion/styled'
 
 import NavBar from '@/components/NavBar.tsx'
+import { useNavigate } from 'react-router-dom'
 
 const Header = () => {
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(null)
+  const navigate = useNavigate();
 
   const onSubMenuSelect = (subItemKey: string | null) => {
     setSelectedSubMenu(subItemKey)
+    if (subItemKey) {
+      navigate(`/${subItemKey}`) // 서브 메뉴 클릭 시 도메인 변경
+    }
   }
 
   useEffect(() => {
