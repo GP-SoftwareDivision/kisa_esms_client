@@ -1,39 +1,59 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from '@emotion/styled'
 
 import NavBar from '@/components/NavBar.tsx'
+import { useNavigate } from 'react-router-dom'
 
 const Header = () => {
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(null)
+  const navigate = useNavigate();
 
-  const onSubMenuSelect = (subItem: string | null) => {
-    console.log('부모 컴포넌트에서 받은 메뉴: ', selectedSubMenu)
-    setSelectedSubMenu(subItem)
+  const onSubMenuSelect = (subItemKey: string | null) => {
+    setSelectedSubMenu(subItemKey)
+    if (subItemKey) {
+      navigate(`/${subItemKey}`) // 서브 메뉴 클릭 시 도메인 변경
+    }
   }
+
+  useEffect(() => {
+    if(selectedSubMenu) {
+      console.log('부모 컴포넌트에서 받은 메뉴: ', selectedSubMenu)
+    } 
+  },[selectedSubMenu])
 
   const menus = [
     {
       title: '메인',
-      subMenu: { title: '메인', items: ['대시보드'] },
+      key: 'mainMenu',
+      subMenu: { title: '메인', items: [{ label: '대시보드', key: 'main'}] },
     },
     {
       title: '이슈 대응',
-      subMenu: { title: '이슈 대응', items: ['대응 이력'] },
+      key : 'issue',
+      subMenu: { title: '이슈 대응', items: [{label: '대응 이력', key: 'history'}] },
     },
     {
       title: '데이터 조회',
-      subMenu: { title: '데이터 조회', items: ['전체', '다크웹', '텔레그램'] },
+      key: 'data',
+      subMenu: { 
+        title: '데이터 조회', 
+        items: [
+          {label:'다크웹', key:'darkweb'},
+          {label:'텔레그램', key:'telegram'},
+        ],
+       },
     },
     {
       title: '관리',
+      key: 'management',
       subMenu: {
         title: '관리',
         items: [
-          '유저 관리',
-          '알림 관리',
-          '수집 키워드 관리',
-          '룰셋 관리',
-          '스케줄 관리',
+          { label: '유저 관리', key: 'user' },
+          { label: '알림 관리', key: 'alert' },
+          { label: '수집 키워드 관리', key: 'keyword' },
+          { label: '룰셋 관리', key: 'ruleset' },
+          { label: '스케줄 관리', key: 'schedule' },
         ],
       },
     },
