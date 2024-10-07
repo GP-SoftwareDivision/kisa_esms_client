@@ -1,18 +1,16 @@
 import styled from '@emotion/styled'
-// import { Modal, Button } from 'antd'
 import Modal from '@mui/material/Modal'
 import { IoMdClose } from 'react-icons/io'
 
-interface Modal {
+interface ModalType {
   title: string
   isOpen: boolean
-  onOk?: () => void
   onCancel: () => void
   content: React.ReactNode
 }
 
-const CustomModal = (props: Modal) => {
-  const { title, content, isOpen, onOk, onCancel } = props
+const CustomModal = (props: ModalType) => {
+  const { title, content, isOpen, onCancel } = props
 
   return (
     <Modal
@@ -38,7 +36,7 @@ const ModalContainer = styled.div`
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 400px;
+  max-width: 420px;
   outline: none;
 `
 

@@ -12,7 +12,6 @@ interface Props {
   onSubMenuSelect?: (subItem: string | null) => void // 선택된 서브 메뉴를 부모 컴포넌트로 전달하는 콜백 함수
 }
 
-
 const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   const [activeMenu, setActiveMenu] = useState<string | null>('메인')
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(
@@ -20,16 +19,15 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   )
 
   const handleMenuClick = (menuTitle: string, subItem?: string) => {
-    setActiveMenu(menuTitle);
+    setActiveMenu(menuTitle)
     if (subItem) {
-      setSelectedSubMenu(subItem);
-      onSubMenuSelect?.(subItem);
+      setSelectedSubMenu(subItem)
+      onSubMenuSelect?.(subItem)
     }
   }
 
   const handlePositionSubMenu = (num: number): number => {
-    //const positions = [0, 68, 170, 280]
-    const positions = [10, 120, 265, 420]
+    const positions = [10, 115, 250, 390]
     return positions[num] ?? 0
   }
 
@@ -41,7 +39,7 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
           <li
             key={menu.title}
             onMouseEnter={() => setActiveMenu(menu.title)}
-            onClick={() => handleMenuClick(menu.title)} 
+            onClick={() => handleMenuClick(menu.title)}
             css={[
               menuItemStyle,
               activeMenu === menu.title && selectedMainMenuStyle, // 메인 메뉴 스타일 적용
