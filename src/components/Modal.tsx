@@ -2,14 +2,14 @@ import styled from '@emotion/styled'
 import Modal from '@mui/material/Modal'
 import { IoMdClose } from 'react-icons/io'
 
-interface Modal {
+interface ModalType {
   title: string
   isOpen: boolean
   onCancel: () => void
   content: React.ReactNode
 }
 
-const CustomModal = (props: Modal) => {
+const CustomModal = (props: ModalType) => {
   const { title, content, isOpen, onCancel } = props
 
   return (
