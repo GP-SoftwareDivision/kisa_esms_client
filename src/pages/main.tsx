@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx'
 import axios from 'axios'
 
 const MainPage = () => {
+  const API_URL = import.meta.env.VITE_API_URL
   const uploadExcel = async (
     data: string,
     filename: string,
@@ -14,7 +15,7 @@ const MainPage = () => {
       uploader: 'syjin',
     }
     const res = await axios.post(
-      'http://183.111.225.195:1214/WebESMSUploadService.svc/UploadAccountData',
+      `${API_URL}/WebESMSUploadService.svc/UploadAccountData`,
       req
       // {
       //   withCredentials: true,
