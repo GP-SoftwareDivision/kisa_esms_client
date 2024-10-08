@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 
 const Header = () => {
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(null)
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const onSubMenuSelect = (subItemKey: string | null) => {
     setSelectedSubMenu(subItemKey)
@@ -16,32 +16,35 @@ const Header = () => {
   }
 
   useEffect(() => {
-    if(selectedSubMenu) {
+    if (selectedSubMenu) {
       console.log('부모 컴포넌트에서 받은 메뉴: ', selectedSubMenu)
-    } 
-  },[selectedSubMenu])
+    }
+  }, [selectedSubMenu])
 
   const menus = [
     {
       title: '메인',
       key: 'mainMenu',
-      subMenu: { title: '메인', items: [{ label: '대시보드', key: 'main'}] },
+      subMenu: { title: '메인', items: [{ label: '대시보드', key: 'main' }] },
     },
     {
       title: '이슈 대응',
-      key : 'issue',
-      subMenu: { title: '이슈 대응', items: [{label: '대응 이력', key: 'history'}] },
+      key: 'issue',
+      subMenu: {
+        title: '이슈 대응',
+        items: [{ label: '대응 이력', key: 'history' }],
+      },
     },
     {
       title: '데이터 조회',
       key: 'data',
-      subMenu: { 
-        title: '데이터 조회', 
+      subMenu: {
+        title: '데이터 조회',
         items: [
-          {label:'다크웹', key:'darkweb'},
-          {label:'텔레그램', key:'telegram'},
+          { label: '다크웹', key: 'darkweb' },
+          { label: '텔레그램', key: 'telegram' },
         ],
-       },
+      },
     },
     {
       title: '관리',
@@ -61,6 +64,9 @@ const Header = () => {
 
   return (
     <HeaderContainer>
+      <HeaderLogo>
+        <img src={'/logo.jpeg'} alt='logo' />
+      </HeaderLogo>
       <NavBar menus={menus} onSubMenuSelect={onSubMenuSelect} />
     </HeaderContainer>
   )
@@ -71,7 +77,22 @@ export default Header
 const HeaderContainer = styled.header`
   display: flex;
   position: fixed;
-  left: 12rem;
+  //left: 12rem;
   top: 0;
   width: 100%;
+`
+
+const HeaderLogo = styled.div`
+  background-color: #fff;
+  padding: 8px 16px;
+  height: 6.2rem;
+  //width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 8rem;
+    height: 3rem;
+  }
 `
