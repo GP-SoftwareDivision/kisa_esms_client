@@ -23,18 +23,18 @@ const Header = () => {
 
   const menus = [
     {
-      title: '메인',
+      label: '메인',
       key: 'mainMenu',
       subMenu: { title: '메인', items: [{ label: '대시보드', key: 'main'}] },
     },
     {
-      title: '이슈 대응',
-      key : 'issue',
-      subMenu: { title: '이슈 대응', items: [{label: '대응 이력', key: 'history'}] },
+      label: '이슈 대응',
+      key : 'issueResponse',
+      subMenu: { title: '이슈 대응', items: [{label: '대응 이력', key: 'responseHistory'}] },
     },
     {
-      title: '데이터 조회',
-      key: 'data',
+      label: '데이터 조회',
+      key: 'dataLookup',
       subMenu: { 
         title: '데이터 조회', 
         items: [
@@ -44,7 +44,7 @@ const Header = () => {
        },
     },
     {
-      title: '관리',
+      label: '관리',
       key: 'management',
       subMenu: {
         title: '관리',

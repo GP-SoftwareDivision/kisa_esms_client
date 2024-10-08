@@ -8,7 +8,7 @@ interface SubMenu {
 }
 
 interface Props {
-  menus: { title: string; key: string; subMenu?: SubMenu }[]
+  menus: { label: string; key: string; subMenu?: SubMenu }[]
   onSubMenuSelect?: (subItemKey: string | null) => void // 영어로 선택된 서브메뉴의 키를 전달
 }
 
@@ -43,7 +43,7 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
               activeMenu === menu.key && selectedMainMenuStyle, // 메인 메뉴 스타일 적용
             ]}
           >
-            {menu.title}
+            {menu.label}
           </li>
         ))}
       </ul>
