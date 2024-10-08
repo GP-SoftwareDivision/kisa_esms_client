@@ -101,7 +101,7 @@ const LoginPage = () => {
             </ModalDescription>
             <Descriptions
               bordered
-              column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 1 }}
+              column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 1, xxl: 1 }}
               items={items}
             />
             <ModalDescription>
