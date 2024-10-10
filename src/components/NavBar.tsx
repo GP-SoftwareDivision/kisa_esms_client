@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { css } from '@emotion/react'
+import { useLocation } from 'react-router-dom'
 
 interface SubMenu {
   title: string
@@ -16,6 +17,8 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   const [activeMenu, setActiveMenu] = useState<string | null>('메인')
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>('main')
 
+  const location = useLocation()
+
   const handleMenuClick = (menuKey: string, subItemKey?: string) => {
     setActiveMenu(menuKey)
     if (subItemKey) {
@@ -23,6 +26,22 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
       onSubMenuSelect?.(subItemKey)
     }
   }
+
+  // URL에서 현재 경로를 가져오고, 메뉴와 서브메뉴의 상태를 설정한다.
+  useEffect(() => {
+    const path = location.pathname.split('/')[1] // URL의 경로 가져오기
+    if (path) {
+      // URL에 맞는 메뉴와 서브 메뉴 찾기
+      const matchingMenu = menus.find(menu =>
+        menu.subMenu?.items.some(subItem => subItem.key === path)
+      )
+
+      if (matchingMenu) { //상태 동기화
+        setActiveMenu(matchingMenu.key)
+        setSelectedSubMenu(path) 
+      }
+    }
+  }, [location])
 
   const handlePositionSubMenu = (num: number): number => {
     const positions = [10, 115, 250, 390]
