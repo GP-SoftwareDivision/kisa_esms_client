@@ -29,8 +29,8 @@ const Header = () => {
     },
     {
       label: '이슈 대응',
-      key : 'issueResponse',
-      subMenu: { title: '이슈 대응', items: [{label: '대응 이력', key: 'responseHistory'}] },
+      key : 'issue',
+      subMenu: { title: '이슈 대응', items: [{label: '대응 이력', key: 'tracking'}] },
     },
     {
       label: '데이터 조회',

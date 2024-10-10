@@ -25,8 +25,8 @@ const App = () => {
         <Routes>
           <Route path='/login' element={<LoginPage />} />
           <Route element={<Layout />}>
-          <Route path='/' element={<MainPage />} />
-          {routes.map((route, index) => (
+            <Route path='/' element={<MainPage />} />
+            {routes.map((route, index) => (
               <Route key={index} path={route.path} element={route.element} />
             ))}
           </Route>
