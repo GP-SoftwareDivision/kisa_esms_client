@@ -16,8 +16,8 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }))
 const upload = multer({
   dest: 'uploads/',
   storage: multer.diskStorage({
-    filename: function (req, file, cb) {
-      console.log(req)
+    filename: function (_req, file, cb) {
+      // console.log(req)
       file.originalname = Buffer.from(file.originalname, 'latin1').toString(
         'utf8'
       )
@@ -56,22 +56,18 @@ async function uploadFileToFTP(
 app.post('/upload', upload.single('file'), async (req: any, res: any) => {
   const file = req.file
   if (!file) {
-    return res.status(400).send('업로드된 파일이 없습니다.')
+    return res.status(400).send({ msg: '업로드된 파일이 없습니다.' })
   }
 
-  console.log(file)
   const localFilePath = file.path
   const fileName = file.originalname
-
   try {
     await uploadFileToFTP(localFilePath, fileName)
-
     fs.unlinkSync(localFilePath)
-
-    res.send('업로드 성공')
+    res.send({ msg: '업로드 성공' })
   } catch (error) {
     console.error('업로드 처리 중 오류 발생:', error)
-    res.status(500).send('업로드 실패.')
+    res.status(500).send({ msg: '업로드 실패.' })
   }
 })
 
