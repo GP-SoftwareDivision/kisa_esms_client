@@ -34,7 +34,7 @@ const Header = () => {
     },
     {
       label: '데이터 조회',
-      key: 'dataLookup',
+      key: 'retrieve',
       subMenu: { 
         title: '데이터 조회', 
         items: [
