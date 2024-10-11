@@ -1,12 +1,12 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { Descriptions, DescriptionsProps } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
 
 import useModal from '@/hooks/useModal'
-import CustomModal from '@/components/Modal'
+import CustomModal from '@/components/elements/Modal.tsx'
 import useTimer from '@/hooks/useTimer'
-import CustomButton from '@/components/Button'
+import CustomButton from '@/components/elements/Button.tsx'
 
 const LoginPage = () => {
   const navigate = useNavigate()

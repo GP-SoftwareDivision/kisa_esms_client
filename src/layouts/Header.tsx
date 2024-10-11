@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import styled from '@emotion/styled'
 
-import NavBar from '@/components/NavBar.tsx'
+import NavBar from '@/components/elements/NavBar.tsx'
 import { useNavigate } from 'react-router-dom'
 
 const Header = () => {
@@ -29,14 +29,17 @@ const Header = () => {
     },
     {
       label: '이슈 대응',
-      key : 'issue',
-      subMenu: { title: '이슈 대응', items: [{label: '대응 이력', key: 'tracking'}] },
+      key: 'issue',
+      subMenu: {
+        title: '이슈 대응',
+        items: [{ label: '대응 이력', key: 'tracking' }],
+      },
     },
     {
       label: '데이터 조회',
       key: 'retrieve',
-      subMenu: { 
-        title: '데이터 조회', 
+      subMenu: {
+        title: '데이터 조회',
         items: [
           { label: '다크웹', key: 'darkweb' },
           { label: '텔레그램', key: 'telegram' },
@@ -61,10 +64,12 @@ const Header = () => {
 
   return (
     <HeaderContainer>
-      <HeaderLogo>
-        <img src={'/logo.jpeg'} alt='logo' />
-      </HeaderLogo>
-      <NavBar menus={menus} onSubMenuSelect={onSubMenuSelect} />
+      <HeaderContent>
+        <HeaderLogo>
+          <img src={'/logo.jpeg'} alt='logo' />
+        </HeaderLogo>
+        <NavBar menus={menus} onSubMenuSelect={onSubMenuSelect} />
+      </HeaderContent>
     </HeaderContainer>
   )
 }
@@ -72,24 +77,31 @@ const Header = () => {
 export default Header
 
 const HeaderContainer = styled.header`
+  width: 100%;
   display: flex;
   position: fixed;
-  //left: 12rem;
   top: 0;
-  width: 100%;
+  left: 0;
+  border-bottom: 1px solid #f5f5f5;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
+  background-color: #fff;
+  z-index: 1;
+`
+
+const HeaderContent = styled.div`
+  display: flex;
+  padding: 0 4rem;
 `
 
 const HeaderLogo = styled.div`
-  background-color: #fff;
   padding: 8px 16px;
-  height: 6.2rem;
-  //width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 
   img {
-    width: 8rem;
-    height: 3rem;
+    width: 9rem;
+    height: 3.5rem;
   }
 `
+// #061f5c

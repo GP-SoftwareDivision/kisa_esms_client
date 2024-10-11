@@ -30,18 +30,20 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   // URL에서 현재 경로를 가져오고, 메뉴와 서브메뉴의 상태를 설정한다.
   useEffect(() => {
     const path = location.pathname.split('/')[1] // URL의 경로 가져오기
+    console.log(path)
     if (path) {
       // URL에 맞는 메뉴와 서브 메뉴 찾기
-      const matchingMenu = menus.find(menu =>
-        menu.subMenu?.items.some(subItem => subItem.key === path)
+      const matchingMenu = menus.find((menu) =>
+        menu.subMenu?.items.some((subItem) => subItem.key === path)
       )
-
-      if (matchingMenu) { //상태 동기화
+      console.log(matchingMenu)
+      if (matchingMenu) {
+        //상태 동기화
         setActiveMenu(matchingMenu.key)
-        setSelectedSubMenu(path) 
+        setSelectedSubMenu(path)
       }
     }
-  }, [location])
+  }, [menus, location])
 
   const handlePositionSubMenu = (num: number): number => {
     const positions = [10, 115, 250, 390]
@@ -77,22 +79,20 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
             )}
           >
             {activeMenu === menu.key &&
-              menu.subMenu?.items.map(
-                (subItem) => (
-                  <ul
-                    key={subItem.key}
-                    onClick={() => {
-                      handleMenuClick(menu.key, subItem.key)
-                    }} // 서브 메뉴 선택 시
-                    css={[
-                      subMenuItemStyle,
-                      selectedSubMenu === subItem.key && selectedSubMenuStyle, // 선택된 서브 메뉴 스타일 적용
-                    ]}
-                  >
-                    {subItem.label}
-                  </ul>
-                )
-              )}
+              menu.subMenu?.items.map((subItem) => (
+                <ul
+                  key={subItem.key}
+                  onClick={() => {
+                    handleMenuClick(menu.key, subItem.key)
+                  }} // 서브 메뉴 선택 시
+                  css={[
+                    subMenuItemStyle,
+                    selectedSubMenu === subItem.key && selectedSubMenuStyle, // 선택된 서브 메뉴 스타일 적용
+                  ]}
+                >
+                  {subItem.label}
+                </ul>
+              ))}
           </li>
         ))}
       </ul>
@@ -115,12 +115,12 @@ const menuListStyle = css`
   list-style: none;
   display: flex;
   gap: 2.5em;
-  padding: 0 1rem;
+  padding: 1rem;
 `
 
 const menuItemStyle = css`
   position: relative;
-  margin: 0rem 1rem;
+  margin: 0 1rem;
   color: black;
   cursor: pointer;
   font-weight: bold;
@@ -135,7 +135,8 @@ const selectedMainMenuStyle = css`
 const horizontalSubMenuStyle = css`
   list-style: none;
   display: flex;
-  background-color: #f5f5f5;
+  //background-color: #f5f5f5;
+  //border-bottom: 1px solid #f5f5f5;
   padding: 0 1rem;
 `
 
@@ -143,7 +144,7 @@ const subMenuListStyle = (isActive: boolean, index: number) => css`
   display: flex;
   list-style: none;
   position: relative;
-  height: 1rem;  // 서브메뉴 높이 고정
+  height: 1rem; // 서브메뉴 높이 고정
   visibility: ${isActive ? 'visible' : 'hidden'};
   transition: opacity 0.3s ease;
   padding: 1rem 0;
