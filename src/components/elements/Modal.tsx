@@ -36,7 +36,7 @@ const ModalContainer = styled.div`
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  max-width: 420px;
+  width: 420px;
   outline: none;
 `
 

@@ -15,7 +15,7 @@ export const routes = [
   { path: '/tracking', element: <Tracking /> },
   { path: '/darkweb', element: <DarkWeb /> },
   { path: '/telegram', element: <Telegram /> },
-  { path: '/user', element: <User /> },
+  { path: '/auth', element: <User /> },
   { path: '/alert', element: <Alert /> },
   { path: '/keyword', element: <Keyword /> },
   { path: '/ruleset', element: <Ruleset /> },

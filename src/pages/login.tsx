@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Descriptions, DescriptionsProps } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
@@ -7,14 +7,29 @@ import useModal from '@/hooks/useModal'
 import CustomModal from '@/components/elements/Modal.tsx'
 import useTimer from '@/hooks/useTimer'
 import CustomButton from '@/components/elements/Button.tsx'
+import { useApiHandler } from '@/hooks/useApiHandler.tsx'
+
+interface WarningType {
+  id: boolean
+  password: boolean
+}
 
 const LoginPage = () => {
   const navigate = useNavigate()
   const [id, setId] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const [phoneNum, setPhoneNum] = useState<string>('')
+  const [authNum, setAuthNum] = useState<string>('')
+
+  const [warning, setWarning] = useState<WarningType>({
+    id: false,
+    password: false,
+  })
 
   const { openModal, closeModal, isOpen } = useModal()
-  const { timeLeft, startTimer } = useTimer(180) // 3분(180초) 타이머
+  const { timeLeft, startTimer, resetTimer } = useTimer(180) // 3분(180초) 타이머
+  const loginMutation = useApiHandler('login')
+  const authCheckMutation = useApiHandler('authCheck')
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
@@ -22,70 +37,155 @@ const LoginPage = () => {
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`
   }
 
+  // 인증번호 입력 팝업 open
+  const handleOnLogin = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (validateForm()) {
+      loginMutation.mutate({
+        method: 'POST',
+        url: '/login/selectMember',
+        data: { id, password },
+      })
+    }
+  }
+
+  // 인증번호 확인
+  const handleOnAuthCheck = () => {
+    authCheckMutation.mutate({
+      method: 'POST',
+      url: '/WebNewService.svc/Login',
+      data: { phonenum: phoneNum, authnum: authNum },
+    })
+  }
+
+  // 재전송
+  const reAuthCheck = () => {
+    console.log('test')
+    resetTimer()
+    // handleOnAuthCheck()
+  }
+
   const items: DescriptionsProps['items'] = [
     {
       label: '핸드폰 번호',
-      children: '010-0000-0000',
+      children: phoneNum,
     },
     {
       label: '인증번호 입력',
       children: (
         <VerificationBox>
-          <VerificationInput type='number' />
+          <VerificationInput
+            type='number'
+            value={authNum}
+            onChange={(e) => setAuthNum(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleOnAuthCheck()}
+          />
           <span>{formatTime(timeLeft)}</span>
-          <VerificationButton onClick={startTimer}>재전송</VerificationButton>
+          <VerificationButton onClick={reAuthCheck}>재전송</VerificationButton>
         </VerificationBox>
       ),
     },
   ]
 
-  // 로그인 API 연결
-  const useLogin = () => {
-    navigate('/')
+  // 유효성 검사
+  const validateForm = (): boolean => {
+    const newWarning = {
+      id: id.trim() === '',
+      password: password.trim() === '',
+    }
+
+    setWarning(newWarning)
+    return !newWarning.id && !newWarning.password
   }
 
-  // 인증번호 입력 팝업 open
-  const handleOnOpenModal = (
-    event: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
-    event.preventDefault()
-    openModal('login')
+  const handleOnChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { id, value } = event.target
+      if (id === 'id' || id === 'password') {
+        const setter = id === 'id' ? setId : setPassword
+        setter(value)
 
-    // 모달이 열릴 때 타이머 시작
-    startTimer()
-  }
+        if (value.trim()) {
+          setWarning((prev) => ({ ...prev, [id]: false }))
+        }
+      }
+    },
+    []
+  )
+
+  // 인증 번호 성공 시
+  useEffect(() => {
+    if (!authCheckMutation.isSuccess || !authCheckMutation.data) return
+
+    const { message, data } = authCheckMutation.data
+
+    switch (message) {
+      case 'success':
+        navigate('/')
+        console.log(data)
+        break
+      case 'timeout':
+        alert('인증 시간이 지났습니다. 재전송을 눌러주세요.')
+        break
+      case 'fail':
+        alert('인증번호가 일치하지 않습니다.')
+        break
+      default:
+        console.warn(`Unexpected message: ${message}`)
+        alert('잠시 후 다시 시도해주세요.')
+    }
+  }, [authCheckMutation.isSuccess, authCheckMutation.data])
+
+  // 로그인 성공 실패 여부
+  useEffect(() => {
+    if (!loginMutation.isSuccess || !loginMutation.data) return
+
+    const { message, data } = loginMutation.data
+
+    switch (message) {
+      case 'success':
+        openModal('login')
+        startTimer()
+        setPhoneNum(data.phonenum)
+        break
+      case 'fail':
+        alert('아이디나 비밀번호가 일치하지 않습니다.')
+        break
+      default:
+        console.warn(`Unexpected message: ${message}`)
+        alert('잠시 후 다시 시도해주세요.')
+    }
+  }, [loginMutation.isSuccess, loginMutation.data])
 
   // 타이머가 변할 때마다 렌더링 트리거
   useEffect(() => {
     if (timeLeft === 0) {
       // 인증번호 기입 시간 종료 알림
+      alert('인증번호 시간이 만료되었습니다. 재전송버튼을 눌러주세요.')
     }
   }, [timeLeft])
-
-  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = event.target
-    if (id === 'id') setId(value)
-    if (id === 'pw') setPassword(value)
-  }
 
   return (
     <LoginContainer>
       <LoginContent>
         <LoginLogo src='/logo_login.png' alt='logo' />
-        <StyledForm>
+        <StyledForm onSubmit={(e) => handleOnLogin(e)}>
           <StyledInput
             id='id'
             value={id}
             placeholder='사용자ID'
             onChange={(e) => handleOnChange(e)}
+            variant={warning.id ? 'warning' : 'default'}
           />
           <StyledInput
-            id='pw'
+            id='password'
             value={password}
             placeholder='비밀번호'
             onChange={(e) => handleOnChange(e)}
+            type={'password'}
+            variant={warning.password ? 'warning' : 'default'}
           />
-          <StyledButton type='submit' onClick={(e) => handleOnOpenModal(e)}>
+          <StyledButton type='submit' onClick={() => handleOnLogin}>
             로그인
           </StyledButton>
         </StyledForm>
@@ -112,11 +212,15 @@ const LoginPage = () => {
               관리자에게 문의하세요.
             </ModalDescription>
             <ButtonWrapper>
-              <CustomButton type='primary' text='확인' onClick={useLogin} />
               <CustomButton
                 type='secondary'
                 text='취소'
                 onClick={() => closeModal('login')}
+              />
+              <CustomButton
+                type='primary'
+                text='확인'
+                onClick={() => handleOnAuthCheck()}
               />
             </ButtonWrapper>
           </ModalContents>
@@ -159,12 +263,13 @@ const StyledForm = styled.form`
   width: 24rem;
 `
 
-const StyledInput = styled.input`
+const StyledInput = styled.input<{ variant: 'default' | 'warning' }>`
   height: 40px;
-  border-radius: 2px;
-  border: 1px solid #c7c7c7;
-  padding-left: 10px;
+  border-radius: 4px;
+  border: ${(props) =>
+    props.variant === 'default' ? '1px solid #c7c7c7' : '1px solid #ef4444'};
   outline: none;
+  padding-left: 10px;
 `
 
 const StyledButton = styled.button`

@@ -1,10 +1,10 @@
 import styled from '@emotion/styled'
+import type { TableColumnsType } from 'antd'
 
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Bar from '@/components/charts/Bar.tsx'
 import Pie from '@/components/charts/Pie.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
-import type { TableColumnsType } from 'antd'
 import CustomList from '@/components/charts/List.tsx'
 
 interface DateSituationType {

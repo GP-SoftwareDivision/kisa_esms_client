@@ -1,8 +1,9 @@
+import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import styled from '@emotion/styled'
 
 import NavBar from '@/components/elements/NavBar.tsx'
-import { useNavigate } from 'react-router-dom'
+import { mq } from '@/utils/mediaQueries.ts'
 
 const Header = () => {
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(null)
@@ -90,7 +91,21 @@ const HeaderContainer = styled.header`
 
 const HeaderContent = styled.div`
   display: flex;
-  padding: 0 4rem;
+  width: 100%;
+  margin: 0 auto;
+  max-width: 1240px;
+
+  ${mq.xxl} {
+    max-width: 1400px;
+  }
+
+  ${mq.lg} {
+    max-width: 960px;
+  }
+
+  ${mq.md} {
+    max-width: 720px;
+  }
 `
 
 const HeaderLogo = styled.div`
@@ -104,4 +119,3 @@ const HeaderLogo = styled.div`
     height: 3.5rem;
   }
 `
-// #061f5c

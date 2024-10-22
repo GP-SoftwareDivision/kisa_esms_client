@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
@@ -17,6 +18,7 @@
       "@/styles/*": ["./src/styles/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/utils/*": ["./src/utils/*"],
+      "@/data/*": ["./src/data/*"],
       "@/pages/*": ["./src/pages/*"]
     },
     /* Bundler mode */
