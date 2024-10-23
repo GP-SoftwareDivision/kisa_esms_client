@@ -105,7 +105,7 @@ const User = () => {
   return (
     <>
       <PageTitle text={'유저관리'} />
-      <CustomTable data={data} columns={columns} />
+      <CustomTable data={data} columns={columns} pagination={true} />
     </>
   )
 }

@@ -60,6 +60,6 @@ const DarkWeb = () => {
     },
   ]
 
-  return <CustomTable data={data} columns={columns} />
+  return <CustomTable data={data} columns={columns} pagination={true} />
 }
 export default DarkWeb
