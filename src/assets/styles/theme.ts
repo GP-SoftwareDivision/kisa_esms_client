@@ -29,7 +29,7 @@ export const theme = {
       marginBottom: '0.5em',
     },
     body: {
-      fontSize: '0.875rem',
+      fontSize: '0.925rem',
       lineHeight: 1.5,
       fontWeight: 400,
     },
@@ -45,7 +45,7 @@ export const theme = {
       letterSpacing: '0.01rem',
     },
     subtitle: {
-      fontSize: '0.825rem',
+      fontSize: '0.875rem',
       lineHeight: 1.45,
       fontWeight: 700,
       letterSpacing: '0rem',

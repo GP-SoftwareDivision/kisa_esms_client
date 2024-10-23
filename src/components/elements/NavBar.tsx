@@ -4,6 +4,7 @@ import { css } from '@emotion/react'
 import { useLocation } from 'react-router-dom'
 import styled from '@emotion/styled'
 import { mq } from '@/utils/mediaQueries.ts'
+import Button from '@/components/elements/Button.tsx'
 
 interface SubMenu {
   title: string
@@ -46,7 +47,7 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   }, [menus, location])
 
   const handlePositionSubMenu = (num: number): number => {
-    const positions = [20, 118, 250, 391]
+    const positions = [12, 108, 242, 383]
     return positions[num] ?? 0
   }
 
@@ -71,10 +72,10 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
             </div>
           ))}
         </div>
-        <div>
-          <span>admin</span>
-          <button>로그아웃</button>
-        </div>
+        <UserInfoContainerStyle>
+          <UserNameStyle>admin님</UserNameStyle>
+          <Button type={'primary'} text={'로그아웃'} />
+        </UserInfoContainerStyle>
       </div>
       <div css={horizontalSubMenuStyle}>
         <div css={SublistStyle}>
@@ -211,5 +212,15 @@ const HeaderLogo = styled.div`
     width: 6.5rem;
     height: 2.7rem;
   }
+`
+
+const UserInfoContainerStyle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+`
+
+const UserNameStyle = styled.span`
+  ${({ theme }) => theme.typography.body};
 `
 export default NavBar

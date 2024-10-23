@@ -21,8 +21,8 @@ const StyledButton = styled.div<{ type: 'primary' | 'secondary' }>`
   border: ${(props) =>
     props.type === 'primary' ? 'none' : '1px solid #c7c7c7'};
   color: ${(props) => (props.type === 'primary' ? '#fff' : '#000')};
-  font-size: 0.857rem;
-  padding: 8px 20px;
-  border-radius: 2px;
+  ${({ theme }) => theme.typography.caption1};
+  padding: 4px 8px;
+  border-radius: 4px;
   cursor: pointer;
 `

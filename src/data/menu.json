@@ -2,7 +2,7 @@
   {
     "label": "메인",
     "key": "main",
-    "subMenu": { "title": "메인", "items": [{ "label": "대시보드", "key": "dashboard" },{ "label": "알림", "key": "alert" }
+    "subMenu": { "title": "메인", "items": [{ "label": "대시보드", "key": "dashboard" },{ "label": "알림내역", "key": "alert" }
     ]}
   },
   {
