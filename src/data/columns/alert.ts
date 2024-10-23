@@ -1,39 +1,29 @@
 import { TableColumnsType } from 'antd'
 
-export const column: TableColumnsType = [
+export const Alertcolumn: TableColumnsType = [
   {
-    title: '구분',
-    dataIndex: 'type',
+    title: '발송시간',
+    dataIndex: 'send_date',
     align: 'center',
   },
   {
-    title: '카테고리',
-    dataIndex: 'category',
+    title: '발송내용',
+    dataIndex: 'send_content',
     align: 'center',
   },
   {
-    title: '키워드',
-    dataIndex: 'keyword',
+    title: '발송 그룹',
+    dataIndex: 'send_group',
     align: 'center',
   },
   {
-    title: 'URL',
-    dataIndex: 'url',
+    title: '발송 방법',
+    dataIndex: 'send_method',
     align: 'center',
   },
   {
-    title: '제목/채팅방명',
-    dataIndex: 'title',
-    align: 'center',
-  },
-  {
-    title: '내용',
-    dataIndex: 'content',
-    align: 'center',
-  },
-  {
-    title: '작성일시',
-    dataIndex: 'writeTime',
+    title: '대상 채널',
+    dataIndex: 'channel_name',
     align: 'center',
   },
 ]
