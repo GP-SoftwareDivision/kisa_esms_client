@@ -20,7 +20,7 @@ function CustomTable<T extends Record<string, any>>({
       line-height: 1.5;
       font-weight: 500;
       padding: 8px 12px;
-      font-family: 'PretendardR', sans-serif !important;
+      font-family: PretendardR, sans-serif !important;
     }
 
     .ant-table-tbody > tr > td {
@@ -28,7 +28,7 @@ function CustomTable<T extends Record<string, any>>({
       line-height: 1.5;
       font-weight: 400;
       padding: 12px 12px;
-      font-family: 'PretendardR', sans-serif !important;
+      font-family: PretendardR, sans-serif !important;
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;

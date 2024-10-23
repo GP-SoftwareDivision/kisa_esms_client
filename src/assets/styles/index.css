@@ -1,23 +1,23 @@
 @font-face {
   font-family: "PretendardL";
   font-style: normal;
-  src: url("../fonts/Pretendard-Light.subset.woff") format("font-woff2");
+  src: url("@/assets/fonts/Pretendard-Light.subset.woff") format("font-woff");
 }
 
 @font-face {
   font-family: "PretendardR";
   font-style: normal;
-  src: url("../fonts/Pretendard-Regular.subset.woff") format("font-woff2");
+  src: url("@/assets/fonts/Pretendard-Regular.subset.woff") format("font-woff");
 }
 
 @font-face {
   font-family: "PretendardM";
   font-style: normal;
-  src: url("../fonts/Pretendard-Medium.subset.woff") format("font-woff2");
+  src: url("@/assets/fonts/Pretendard-Medium.subset.woff") format("font-woff");
 }
 
 body {
-  font-family: "PretendardR", sans-serif;
+  font-family: PretendardR, sans-serif;
   margin: 0;
 }
 
