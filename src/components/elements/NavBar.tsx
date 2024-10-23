@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import { css } from '@emotion/react'
 import { useLocation } from 'react-router-dom'
+import styled from '@emotion/styled'
+import { mq } from '@/utils/mediaQueries.ts'
 
 interface SubMenu {
   title: string
@@ -14,29 +16,27 @@ interface Props {
 }
 
 const NavBar = ({ menus, onSubMenuSelect }: Props) => {
-  const [activeMenu, setActiveMenu] = useState<string | null>('메인')
-  const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>('main')
-
   const location = useLocation()
-
+  const pathname = location.pathname.split('/')
+  const [activeMenu, setActiveMenu] = useState<string | null>(pathname[1])
+  const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(
+    pathname[2]
+  )
   const handleMenuClick = (menuKey: string, subItemKey?: string) => {
     setActiveMenu(menuKey)
     if (subItemKey) {
       setSelectedSubMenu(subItemKey)
-      onSubMenuSelect?.(subItemKey)
+      onSubMenuSelect?.(`${menuKey}/${subItemKey}`)
     }
   }
 
-  // URL에서 현재 경로를 가져오고, 메뉴와 서브메뉴의 상태를 설정한다.
   useEffect(() => {
-    const path = location.pathname.split('/')[1] // URL의 경로 가져오기
+    const path = location.pathname.split('/')[1]
     console.log(path)
     if (path) {
-      // URL에 맞는 메뉴와 서브 메뉴 찾기
       const matchingMenu = menus.find((menu) =>
         menu.subMenu?.items.some((subItem) => subItem.key === path)
       )
-      console.log(matchingMenu)
       if (matchingMenu) {
         //상태 동기화
         setActiveMenu(matchingMenu.key)
@@ -46,56 +46,65 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   }, [menus, location])
 
   const handlePositionSubMenu = (num: number): number => {
-    const positions = [10, 115, 250, 390]
+    const positions = [20, 118, 250, 391]
     return positions[num] ?? 0
   }
 
   return (
     <nav css={navBarStyle}>
-      <ul css={menuListStyle}>
-        {/* 메인 메뉴 */}
-        {menus.map((menu) => (
-          <li
-            key={menu.key}
-            onMouseEnter={() => setActiveMenu(menu.key)}
-            onClick={() => handleMenuClick(menu.key)}
-            css={[
-              menuItemStyle,
-              activeMenu === menu.key && selectedMainMenuStyle, // 메인 메뉴 스타일 적용
-            ]}
-          >
-            {menu.label}
-          </li>
-        ))}
-      </ul>
-      <ul css={horizontalSubMenuStyle}>
-        {/* 서브 메뉴 */}
-        {menus.map((menu, index) => (
-          <li
-            key={menu.key}
-            css={subMenuListStyle(
-              activeMenu === menu.key,
-              handlePositionSubMenu(index)
-            )}
-          >
-            {activeMenu === menu.key &&
-              menu.subMenu?.items.map((subItem) => (
-                <ul
-                  key={subItem.key}
-                  onClick={() => {
-                    handleMenuClick(menu.key, subItem.key)
-                  }} // 서브 메뉴 선택 시
-                  css={[
-                    subMenuItemStyle,
-                    selectedSubMenu === subItem.key && selectedSubMenuStyle, // 선택된 서브 메뉴 스타일 적용
-                  ]}
-                >
-                  {subItem.label}
-                </ul>
-              ))}
-          </li>
-        ))}
-      </ul>
+      <div css={menuListStyle}>
+        <HeaderLogo>
+          <img src={'/logo.jpeg'} alt='logo' />
+        </HeaderLogo>
+        <div css={listStyle}>
+          {menus.map((menu) => (
+            <div
+              key={menu.key}
+              onMouseEnter={() => setActiveMenu(menu.key)}
+              onClick={() => handleMenuClick(menu.key)}
+              css={[
+                menuItemStyle,
+                activeMenu === menu.key && selectedMainMenuStyle, // 메인 메뉴 스타일 적용
+              ]}
+            >
+              {menu.label}
+            </div>
+          ))}
+        </div>
+        <div>
+          <span>admin</span>
+          <button>로그아웃</button>
+        </div>
+      </div>
+      <div css={horizontalSubMenuStyle}>
+        <div css={SublistStyle}>
+          {menus.map((menu, index) => (
+            <div
+              key={menu.key}
+              css={subMenuListStyle(
+                activeMenu === menu.key,
+                handlePositionSubMenu(index)
+              )}
+            >
+              {activeMenu === menu.key &&
+                menu.subMenu?.items.map((subItem) => (
+                  <div
+                    key={subItem.key}
+                    onClick={() => {
+                      handleMenuClick(menu.key, subItem.key)
+                    }} // 서브 메뉴 선택 시
+                    css={[
+                      subMenuItemStyle,
+                      selectedSubMenu === subItem.key && selectedSubMenuStyle, // 선택된 서브 메뉴 스타일 적용
+                    ]}
+                  >
+                    {subItem.label}
+                  </div>
+                ))}
+            </div>
+          ))}
+        </div>
+      </div>
     </nav>
   )
 }
@@ -107,20 +116,43 @@ const navBarStyle = css`
   left: 0;
   width: 100%;
   z-index: 1000;
-  justify-content: space-around;
-  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `
 
-const menuListStyle = css`
+const menuListStyle = () => css`
+  width: 100%;
   list-style: none;
   display: flex;
-  gap: 2.5em;
-  padding: 1rem;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0.5rem 0;
+  font-size: 16px;
+  margin: 0 auto;
+  max-width: 1240px;
+
+  ${mq.xxl} {
+    max-width: 1400px;
+  }
+
+  ${mq.lg} {
+    max-width: 960px;
+  }
+
+  ${mq.md} {
+    max-width: 720px;
+  }
+`
+
+const listStyle = css`
+  display: flex;
+  justify-content: space-between;
+  width: 25rem;
 `
 
 const menuItemStyle = css`
   position: relative;
-  margin: 0 1rem;
   color: black;
   cursor: pointer;
   font-weight: bold;
@@ -135,21 +167,30 @@ const selectedMainMenuStyle = css`
 const horizontalSubMenuStyle = css`
   list-style: none;
   display: flex;
-  //background-color: #f5f5f5;
-  //border-bottom: 1px solid #f5f5f5;
-  padding: 0 1rem;
+  width: 100%;
+  justify-content: center;
+  background-color: #f5f5f5;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
+  position: relative;
+  height: 40px;
+  align-items: center;
 `
 
 const subMenuListStyle = (isActive: boolean, index: number) => css`
   display: flex;
   list-style: none;
   position: relative;
-  height: 1rem; // 서브메뉴 높이 고정
   visibility: ${isActive ? 'visible' : 'hidden'};
   transition: opacity 0.3s ease;
-  padding: 1rem 0;
-  gap: 2rem;
+  padding: 0.5rem 0;
+  gap: 1.5rem;
   left: ${index}px;
+  font-size: 14px;
+`
+
+const SublistStyle = css`
+  display: flex;
+  width: 26rem;
 `
 
 const subMenuItemStyle = css`
@@ -160,5 +201,15 @@ const selectedSubMenuStyle = css`
   font-weight: bold;
   color: #4f79a5;
 `
+const HeaderLogo = styled.div`
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
+  img {
+    width: 6.5rem;
+    height: 2.7rem;
+  }
+`
 export default NavBar

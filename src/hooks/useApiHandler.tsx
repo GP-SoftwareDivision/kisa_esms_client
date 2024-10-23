@@ -23,8 +23,5 @@ export const useApiHandler = (requestId: string) => {
     onError: (error) => {
       console.error(`오류 발생 (${requestId}):`, error)
     },
-    onSuccess: (data) => {
-      console.log(`통신 성공 (${requestId}):`, data)
-    },
   })
 }

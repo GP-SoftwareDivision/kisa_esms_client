@@ -1,0 +1,40 @@
+{"list" : [
+  {
+    "label": "메인",
+    "key": "main",
+    "subMenu": { "title": "메인", "items": [{ "label": "대시보드", "key": "dashboard" },{ "label": "알림", "key": "alert" }
+    ]}
+  },
+  {
+    "label": "이슈 대응",
+    "key": "issue",
+    "subMenu": {
+      "title": "이슈 대응",
+      "items": [{ "label": "이슈 대응 이력", "key": "tracking" }, { "label": "침해 정보 판별", "key": "Infringement" }]
+    }
+  },
+  {
+    "label": "데이터 조회",
+    "key": "retrieve",
+    "subMenu": {
+      "title": "데이터 조회",
+      "items": [
+        { "label": "다크웹", "key": "darkweb" },
+        { "label": "텔레그램", "key": "telegram" }
+      ]
+    }
+  },
+  {
+    "label": "관리",
+    "key": "manage",
+    "subMenu": {
+      "title": "관리",
+      "items": [
+        { "label": "유저 관리", "key": "user" },
+        { "label": "수집 키워드 관리", "key": "keyword" },
+        { "label": "룰셋 관리", "key": "ruleset" },
+        { "label": "스케줄 관리", "key": "schedule" }
+      ]
+    }
+  }
+]}

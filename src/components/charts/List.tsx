@@ -10,7 +10,7 @@ const CustomList = (props: ListType) => {
     <StyledList>
       <StyledLabel>{label}</StyledLabel>
       <StyledValue>
-        <span>{value}</span>건
+        <span>{value} </span>건
       </StyledValue>
     </StyledList>
   )
@@ -24,9 +24,11 @@ const StyledList = styled.div`
 `
 const StyledLabel = styled.div`
   display: flex;
+  ${({ theme }) => theme.typography.body2};
 `
 const StyledValue = styled.div`
   display: flex;
+  ${({ theme }) => theme.typography.body2};
 
   span {
     color: dodgerblue;

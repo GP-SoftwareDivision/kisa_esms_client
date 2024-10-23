@@ -14,7 +14,7 @@ const Wrapper = ({ children }: { children: ReactNode }) => {
 export default Wrapper
 
 const MainContainer = styled.div`
-  margin: 10rem 1rem 1rem 1rem;
+  margin: 8rem 1rem 1rem 1rem;
 `
 
 const BodyContainer = styled.div`

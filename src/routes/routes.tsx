@@ -1,23 +1,23 @@
 import { lazy } from 'react'
 
-const MainPage = lazy(() => import('@/pages/main'))
+const MainPage = lazy(() => import('@/pages/main/dashboard.tsx'))
 const User = lazy(() => import('@/pages/manage/user'))
 const Tracking = lazy(() => import('@/pages/issue/tracking'))
 const DarkWeb = lazy(() => import('@/pages/retrieve/darkweb'))
 const Telegram = lazy(() => import('@/pages/retrieve/telegram'))
-const Alert = lazy(() => import('@/pages/manage/alert'))
+const Alert = lazy(() => import('@/pages/main/alert.tsx'))
 const Keyword = lazy(() => import('@/pages/manage/keyword'))
 const Ruleset = lazy(() => import('@/pages/manage/ruleset'))
 const Schedule = lazy(() => import('@/pages/manage/schedule'))
 
 export const routes = [
-  { path: '/main', element: <MainPage /> },
-  { path: '/tracking', element: <Tracking /> },
-  { path: '/darkweb', element: <DarkWeb /> },
-  { path: '/telegram', element: <Telegram /> },
-  { path: '/auth', element: <User /> },
-  { path: '/alert', element: <Alert /> },
-  { path: '/keyword', element: <Keyword /> },
-  { path: '/ruleset', element: <Ruleset /> },
-  { path: '/schedule', element: <Schedule /> },
+  { path: '/main/dashboard', element: <MainPage /> },
+  { path: '/main//alert', element: <Alert /> },
+  { path: '/issue/tracking', element: <Tracking /> },
+  { path: '/retrieve/darkweb', element: <DarkWeb /> },
+  { path: '/retrieve/telegram', element: <Telegram /> },
+  { path: '/manage/user', element: <User /> },
+  { path: '/manage/keyword', element: <Keyword /> },
+  { path: '/manage/ruleset', element: <Ruleset /> },
+  { path: '/manage/schedule', element: <Schedule /> },
 ]
