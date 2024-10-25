@@ -1,6 +1,8 @@
 import type { TableColumnsType } from 'antd'
 import CustomTable from '@/components/charts/Table.tsx'
 import data from '@/data/dark.json'
+import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
+import PageTitle from '@/components/elements/PageTitle.tsx'
 
 const DarkWeb = () => {
   const columns: TableColumnsType = [
@@ -60,6 +62,13 @@ const DarkWeb = () => {
     },
   ]
 
-  return <CustomTable data={data} columns={columns} pagination={true} />
+  return (
+    <ContentContainer>
+      <PageTitle text={'다크웹 데이터'} />
+      <ContentBox>
+        <CustomTable data={data} columns={columns} pagination={true} />
+      </ContentBox>
+    </ContentContainer>
+  )
 }
 export default DarkWeb

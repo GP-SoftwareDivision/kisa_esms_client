@@ -17,6 +17,7 @@ import Button from '@/components/elements/Button.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import styled from '@emotion/styled'
 import { convertXlsxToCsv, getFileName } from '@/utils/fileHelpers.ts'
+import PageTitle from '@/components/elements/PageTitle.tsx'
 
 const Infringement = () => {
   const [file, setFile] = useState<File | null>(null)
@@ -206,11 +207,17 @@ const Infringement = () => {
 
   return (
     <ContentContainer>
+      <PageTitle text={'침해 정보 판별'} />
       <UploadContainer>
         <StyledDragger {...props}>
           {!fileName && '업로드할 파일 놓기 또는 파일 선택'}
         </StyledDragger>
-        <Button text={'파일 업로드'} type={'primary'} onClick={handleUpload} />
+        <Button
+          text={'파일 업로드'}
+          type={fileName ? 'primary' : 'disabled'}
+          disabled={!fileName}
+          onClick={handleUpload}
+        />
       </UploadContainer>
       <SelectContainer gutter={[16, 16]}>
         <Col xs={24} sm={12} md={8} lg={6}>
@@ -282,7 +289,7 @@ export default Infringement
 
 const UploadContainer = styled.div`
   display: flex;
-  margin: 1rem 0;
+  margin: 0.5rem 0 1rem 0;
   gap: 1rem;
   position: relative;
 
@@ -293,4 +300,5 @@ const UploadContainer = styled.div`
 
 const StyledDragger = styled(Dragger)`
   width: 100%;
+  ${({ theme }) => theme.typography.body2};
 `

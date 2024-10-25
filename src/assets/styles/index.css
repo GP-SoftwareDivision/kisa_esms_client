@@ -31,6 +31,10 @@ p {
   margin: 0;
 }
 
+table {
+  table-layout: fixed !important;
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -63,3 +67,4 @@ input::-webkit-inner-spin-button {
 .ant-upload-wrapper .ant-upload-list .ant-upload-list-item {
   margin: 0 !important;
 }
+
