@@ -18,7 +18,7 @@ export const useApiHandler = (requestId: string) => {
         url,
         data,
       })
-      return JSON.parse(res.data)
+      return res.data
     },
     onError: (error) => {
       console.error(`오류 발생 (${requestId}):`, error)

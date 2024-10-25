@@ -1,35 +1,40 @@
+import React from 'react'
 import styled from '@emotion/styled'
-import Modal from '@mui/material/Modal'
 import { IoMdClose } from 'react-icons/io'
 
 interface ModalType {
   title: string
   isOpen: boolean
   onCancel: () => void
-  content: React.ReactNode
+  content?: React.ReactNode
 }
 
 const CustomModal = (props: ModalType) => {
   const { title, content, isOpen, onCancel } = props
 
   return (
-    <Modal
-      open={isOpen!}
-      onClose={onCancel}
-      aria-labelledby='modal-modal-title'
-      aria-describedby='modal-modal-description'
-    >
-      <ModalContainer>
-        <StyledHeader>
-          <span>{title}</span>
-          <IoMdClose onClick={() => onCancel()} />
-        </StyledHeader>
-        <StyledContent>{content}</StyledContent>
-      </ModalContainer>
-    </Modal>
+    isOpen && (
+      <StyledModal>
+        <ModalContainer>
+          <StyledHeader>
+            <span>{title}</span>
+            <IoMdClose onClick={() => onCancel()} />
+          </StyledHeader>
+          <StyledContent>{content}</StyledContent>
+        </ModalContainer>
+      </StyledModal>
+    )
   )
 }
 export default CustomModal
+
+const StyledModal = styled.div`
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+`
 
 const ModalContainer = styled.div`
   position: absolute;

@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 
 interface ButtonType {
   text: string
-  type: 'primary' | 'secondary'
+  type: 'primary' | 'outline' | 'download'
   onClick?: () => void
 }
 
@@ -16,13 +16,28 @@ const CustomButton = (props: ButtonType) => {
 }
 export default CustomButton
 
-const StyledButton = styled.div<{ type: 'primary' | 'secondary' }>`
-  background: ${(props) => (props.type === 'primary' ? '#061f5c' : '#fff')};
+const getButtonColor = (type: string) => {
+  switch (type) {
+    case 'outline':
+      return '#ffffff'
+    case 'download':
+      return '#36A210'
+    default:
+      return '#061f5c'
+  }
+}
+
+const StyledButton = styled.div<{ type: 'primary' | 'outline' | 'download' }>`
+  background: ${(props) => getButtonColor(props.type)};
   border: ${(props) =>
-    props.type === 'primary' ? 'none' : '1px solid #c7c7c7'};
-  color: ${(props) => (props.type === 'primary' ? '#fff' : '#000')};
-  ${({ theme }) => theme.typography.caption1};
-  padding: 4px 8px;
+    props.type === 'outline' ? '1px solid #c7c7c7' : 'none'};
+  color: ${(props) => (props.type === 'outline' ? '#000' : '#fff')};
+  ${({ theme }) => theme.typography.body2};
+  padding: 5px 8px;
   border-radius: 4px;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: fit-content;
 `

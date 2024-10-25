@@ -16,8 +16,8 @@ interface WarningType {
 
 const LoginPage = () => {
   const navigate = useNavigate()
-  const [id, setId] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
+  const [id, setId] = useState<string>('syjin')
+  const [password, setPassword] = useState<string>('1234')
   const [phoneNum, setPhoneNum] = useState<string>('')
   const [authNum, setAuthNum] = useState<string>('')
 
@@ -190,6 +190,7 @@ const LoginPage = () => {
           </StyledButton>
         </StyledForm>
       </LoginContent>
+
       <CustomModal
         isOpen={isOpen('login')}
         title='사용자 인증'
@@ -213,7 +214,7 @@ const LoginPage = () => {
             </ModalDescription>
             <ButtonWrapper>
               <CustomButton
-                type='secondary'
+                type='outline'
                 text='취소'
                 onClick={() => closeModal('login')}
               />

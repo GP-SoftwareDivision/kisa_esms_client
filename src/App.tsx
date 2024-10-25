@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider } from '@emotion/react'
-
 import {
   BrowserRouter as Router,
   Routes,
@@ -20,17 +19,19 @@ const queryClient = new QueryClient()
 const App = () => {
   const Layout = () => {
     return (
-      <Wrapper>
-        <Outlet />
-      </Wrapper>
+      <>
+        <Wrapper>
+          <Outlet />
+        </Wrapper>
+      </>
     )
   }
 
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <ThemeProvider theme={theme}>
-          <Suspense fallback={<div></div>}>
+        <Suspense fallback={<div></div>}>
+          <ThemeProvider theme={theme}>
             <Routes>
               <Route
                 path='/'
@@ -47,8 +48,8 @@ const App = () => {
                 ))}
               </Route>
             </Routes>
-          </Suspense>
-        </ThemeProvider>
+          </ThemeProvider>
+        </Suspense>
       </Router>
     </QueryClientProvider>
   )

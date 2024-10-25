@@ -1,95 +1,144 @@
+import React, { useState } from 'react'
+import { Col } from 'antd'
 import PageTitle from '@/components/elements/PageTitle.tsx'
-import styled from '@emotion/styled'
 import CustomTable from '@/components/charts/Table.tsx'
-import { TableColumnsType } from 'antd'
+import { issueTrackingcolumns } from '@/data/columns/tracking.ts'
+import CustomInput from '@/components/elements/Input.tsx'
+import CustomSelect from '@/components/elements/Select.tsx'
+import CustomDatePicker from '@/components/elements/DatePicker.tsx'
+import {
+  ButtonContainer,
+  ContentBox,
+  ContentContainer,
+  SelectContainer,
+} from '@/assets/styles/global.ts'
+import Button from '@/components/elements/Button.tsx'
 
 const Tracking = () => {
+  const [title, setTitle] = useState<string>('')
+
   const data = [
     {
-      type: '다크웹',
-      category: 'tourl',
-      keyword: 'co.kr',
-      url: 'http://3bbad7fauor/',
-      title: 'Terminal High Altitude Al ',
-      content: 'Terminal High Altitude Al ',
-      writeTime: '2021.11.3',
+      api_type: 'DT',
+      title: 'Terminal High Altitude Area Defense',
+      write_time: '2024-02-04 09:12:44',
+      hacked_organization: '기관',
+      incident_type: '사고유형',
+      response_status: '잔행중',
+      leaked_data: '개인정보',
+      target_type: '기업',
     },
     {
-      type: '다크웹',
-      category: 'tourl',
-      keyword: 'co.kr',
-      url: 'http://3bbad7fauor/',
-      title: 'Terminal High Altitude Al ',
-      content: 'Terminal High Altitude Area Defense - The Hidden Wiki ',
-      writeTime: '2021.11.3',
+      api_type: 'DT',
+      title: 'Terminal High Altitude Area Defense',
+      write_time: '2024-02-04 09:12:44',
+      hacked_organization: '기관',
+      incident_type: '사고유형',
+      response_status: '진행중',
+      leaked_data: '개인정보',
+      target_type: '기업',
     },
     {
-      type: '텔레그램',
-      category: 'tourl',
-      keyword: 'co.kr',
-      url: 'http://3bbad7fauor/',
-      title: 'Terminal High Altitude Al ',
-      content: 'Terminal High Altitude Area Defense - The Hidden Wiki',
-      writeTime: '2021.11.3',
+      api_type: 'DT',
+      title: 'Terminal High Altitude Area Defense',
+      write_time: '2024-02-04 09:12:44',
+      hacked_organization: '기관명',
+      incident_type: '사고유형',
+      response_status: '진행중',
+      leaked_data: '개인정보',
+      target_type: '기업',
     },
   ]
 
-  const columns: TableColumnsType = [
-    {
-      title: '구분',
-      dataIndex: 'type',
-      align: 'center',
-    },
-    {
-      title: '카테고리',
-      dataIndex: 'category',
-      align: 'center',
-    },
-    {
-      title: '키워드',
-      dataIndex: 'keyword',
-      align: 'center',
-    },
-    {
-      title: 'URL',
-      dataIndex: 'url',
-      align: 'center',
-    },
-    {
-      title: '제목/채팅방명',
-      dataIndex: 'title',
-      align: 'center',
-    },
-    {
-      title: '내용',
-      dataIndex: 'content',
-      align: 'center',
-    },
-    {
-      title: '작성일시',
-      dataIndex: 'writeTime',
-      align: 'center',
-    },
-  ]
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault()
+    setTitle(e.target.value)
+  }
+
+  const handleOnSelectChange = () => {}
+
   return (
-    <StyledTracking>
+    <ContentContainer>
       <PageTitle text={'이슈 대응 이력'} />
-      <StyledBox>
-        <CustomTable data={data} columns={columns} pagination={true} />
-      </StyledBox>
-    </StyledTracking>
+      <SelectContainer gutter={[16, 16]}>
+        <Col xs={24} sm={12} md={8} lg={6}>
+          <CustomDatePicker label={'조회 기간'} />
+        </Col>
+        <Col xs={24} sm={12} md={8} lg={6}>
+          <CustomSelect
+            label={'API 타입'}
+            onchange={handleOnSelectChange}
+            options={[
+              { value: '전체', label: '전체' },
+              { value: 'DT', label: 'DT' },
+              { value: 'TT', label: 'TT' },
+            ]}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={8} lg={6}>
+          <CustomSelect
+            label={'사고유형'}
+            onchange={handleOnSelectChange}
+            options={[
+              { value: '전체', label: '전체' },
+              { value: '정보유출', label: '정보유출' },
+              { value: '서버해킹', label: '서버해킹' },
+              { value: '기타', label: '기타' },
+            ]}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={8} lg={6}>
+          <CustomSelect
+            label={'상태'}
+            onchange={handleOnSelectChange}
+            options={[
+              { value: '전체', label: '전체' },
+              { value: '대기', label: '대기' },
+              { value: '진행중', label: '진행중' },
+              { value: '완료', label: '완료' },
+            ]}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={8} lg={6}>
+          <CustomInput
+            label={'제목'}
+            placeholder={'내용을 입력하세요.'}
+            value={title}
+            onchange={handleOnChange}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={8} lg={6}>
+          <CustomInput
+            label={'피해기관'}
+            placeholder={'내용을 입력하세요.'}
+            value={title}
+            onchange={handleOnChange}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={8} lg={6}></Col>
+        <Col xs={24} sm={12} md={8} lg={6}>
+          <ButtonContainer>
+            <Button
+              type={'primary'}
+              onClick={handleOnSelectChange}
+              text={'조회'}
+            />
+            <Button
+              type={'download'}
+              onClick={handleOnSelectChange}
+              text={'엑셀 다운로드'}
+            />
+          </ButtonContainer>
+        </Col>
+      </SelectContainer>
+      <ContentBox>
+        <CustomTable
+          data={data}
+          columns={issueTrackingcolumns}
+          pagination={true}
+        />
+      </ContentBox>
+    </ContentContainer>
   )
 }
 export default Tracking
-
-const StyledTracking = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-`
-
-const StyledBox = styled.div`
-  border: 1px solid ${({ theme }) => theme.color.gray100};
-  border-radius: 4px;
-  padding: 1rem;
-`

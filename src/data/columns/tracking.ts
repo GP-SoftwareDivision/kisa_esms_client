@@ -3,42 +3,46 @@ import { TableColumnsType } from 'antd'
 export const issueTrackingcolumns: TableColumnsType = [
   {
     title: 'API 타입',
-    dataIndex: 'type',
+    dataIndex: 'api_type',
     align: 'center',
   },
   {
     title: '제목',
-    dataIndex: 'category',
+    dataIndex: 'title',
     align: 'center',
+    responsive: ['md'],
   },
   {
     title: '인지날짜',
-    dataIndex: 'keyword',
+    dataIndex: 'write_time',
     align: 'center',
+    responsive: ['lg'],
   },
   {
     title: '피해기관',
-    dataIndex: 'url',
+    dataIndex: 'hacked_organization',
     align: 'center',
   },
   {
     title: '사고유형',
-    dataIndex: 'title',
+    dataIndex: 'incident_type',
     align: 'center',
   },
   {
     title: '상태',
-    dataIndex: 'content',
+    dataIndex: 'response_status',
     align: 'center',
   },
   {
     title: '유출정보',
-    dataIndex: 'writeTime',
+    dataIndex: 'leaked_data',
     align: 'center',
+    responsive: ['lg'],
   },
   {
     title: '대상구분',
-    dataIndex: 'writeTime',
+    dataIndex: 'target_type',
     align: 'center',
+    responsive: ['lg'],
   },
 ]

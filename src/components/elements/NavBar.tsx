@@ -61,7 +61,7 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
           {menus.map((menu) => (
             <div
               key={menu.key}
-              onMouseEnter={() => setActiveMenu(menu.key)}
+              // onMouseEnter={() => setActiveMenu(menu.key)}
               onClick={() => handleMenuClick(menu.key)}
               css={[
                 menuItemStyle,
