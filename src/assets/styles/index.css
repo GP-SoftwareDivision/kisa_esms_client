@@ -31,9 +31,6 @@ p {
   margin: 0;
 }
 
-table {
-  table-layout: fixed !important;
-}
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -68,3 +65,6 @@ input::-webkit-inner-spin-button {
   margin: 0 !important;
 }
 
+.ant-table-content table {
+  table-layout: fixed !important;
+}

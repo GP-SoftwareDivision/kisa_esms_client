@@ -1,11 +1,11 @@
 import { TableColumnsType } from 'antd'
-import CustomTable from '@/components/charts/Table.tsx'
+import styled from '@emotion/styled'
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
+import CustomTable from '@/components/charts/Table.tsx'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
-import styled from '@emotion/styled'
 
-const User = () => {
+const Group = () => {
   const columns: TableColumnsType = [
     {
       title: '그룹명',
@@ -13,18 +13,18 @@ const User = () => {
       align: 'center',
     },
     {
-      title: '이름',
-      dataIndex: 'name',
+      title: '설명',
+      dataIndex: 'comment',
       align: 'center',
     },
     {
-      title: '번호',
-      dataIndex: 'phone',
+      title: '알람방식',
+      dataIndex: 'alarm_method',
       align: 'center',
     },
     {
-      title: '이메일',
-      dataIndex: 'email',
+      title: '자동발송여부',
+      dataIndex: 'auto_send',
       align: 'center',
     },
     {
@@ -47,21 +47,21 @@ const User = () => {
   const data = [
     {
       group: '골든플래닛',
-      name: '홍길동',
-      phone: '010-0000-0000',
-      email: 'hong@goldenplanet.co.kr',
+      comment: '-',
+      alarm_method: '-',
+      auto_send: '자동',
     },
     {
       group: '골든플래닛',
-      name: '홍길동',
-      phone: '010-0000-0000',
-      email: 'hong@goldenplanet.co.kr',
+      comment: '-',
+      alarm_method: '-',
+      auto_send: '자동',
     },
     {
       group: '골든플래닛',
-      name: '홍길동',
-      phone: '010-0000-0000',
-      email: 'hong@goldenplanet.co.kr',
+      comment: '-',
+      alarm_method: '-',
+      auto_send: '자동',
     },
   ]
 
@@ -83,7 +83,7 @@ const User = () => {
     </ContentContainer>
   )
 }
-export default User
+export default Group
 
 const TableButtonWrapper = styled.div`
   width: 100%;

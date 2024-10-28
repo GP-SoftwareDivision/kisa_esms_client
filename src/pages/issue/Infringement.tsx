@@ -65,13 +65,11 @@ const Infringement = () => {
       title: '파일형식',
       dataIndex: 'file_type',
       align: 'center',
-      responsive: ['md'],
     },
     {
       title: '파일명',
       dataIndex: 'file_name',
       align: 'center',
-      responsive: ['md'],
     },
     {
       title: '업로드 날짜',
@@ -114,11 +112,13 @@ const Infringement = () => {
       align: 'center',
       responsive: ['lg'],
       render: (_: any, record: any) => (
-        <Button
-          type={'download'}
-          text={'다운로드'}
-          onClick={() => console.log(record)}
-        />
+        <ButtonWrapper>
+          <Button
+            type={'download'}
+            text={'다운로드'}
+            onClick={() => console.log(record)}
+          />
+        </ButtonWrapper>
       ),
     },
   ]
@@ -150,6 +150,7 @@ const Infringement = () => {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
+          withCredentials: true,
         }
       )
       if (response.status === 200) {
@@ -301,4 +302,10 @@ const UploadContainer = styled.div`
 const StyledDragger = styled(Dragger)`
   width: 100%;
   ${({ theme }) => theme.typography.body2};
+`
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: center;
 `

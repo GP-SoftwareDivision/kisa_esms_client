@@ -28,7 +28,7 @@ const TitleContainer = styled.div`
 `
 
 const StyledTitle = styled.h4`
-  padding: 0 0 0.5rem 0.5rem;
+  padding-bottom: 0.5rem;
   margin: 0;
   ${({ theme }) => theme.typography.title}
 `

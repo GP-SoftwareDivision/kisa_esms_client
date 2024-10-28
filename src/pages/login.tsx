@@ -40,6 +40,7 @@ const LoginPage = () => {
   // 인증번호 입력 팝업 open
   const handleOnLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
     if (validateForm()) {
       loginMutation.mutate({
         method: 'POST',
@@ -117,12 +118,11 @@ const LoginPage = () => {
   useEffect(() => {
     if (!authCheckMutation.isSuccess || !authCheckMutation.data) return
 
-    const { message, data } = authCheckMutation.data
+    const { message } = authCheckMutation.data
 
     switch (message) {
       case 'success':
         navigate('/')
-        console.log(data)
         break
       case 'timeout':
         alert('인증 시간이 지났습니다. 재전송을 눌러주세요.')

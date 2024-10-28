@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useState, useEffect } from 'react'
 import { css } from '@emotion/react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
 import { mq } from '@/utils/mediaQueries.ts'
 import Button from '@/components/elements/Button.tsx'
@@ -18,6 +18,8 @@ interface Props {
 
 const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   const location = useLocation()
+  const navigate = useNavigate()
+
   const pathname = location.pathname.split('/')
   const [activeMenu, setActiveMenu] = useState<string | null>(pathname[1])
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(
@@ -55,7 +57,7 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
     <nav css={navBarStyle}>
       <div css={menuListStyle}>
         <HeaderLogo>
-          <img src={'/logo.jpeg'} alt='logo' />
+          <img src={'/logo.jpeg'} alt='logo' onClick={() => navigate('/')} />
         </HeaderLogo>
         <div css={listStyle}>
           {menus.map((menu) => (
@@ -211,6 +213,7 @@ const HeaderLogo = styled.div`
   img {
     width: 6.5rem;
     height: 2.7rem;
+    cursor: pointer;
   }
 `
 

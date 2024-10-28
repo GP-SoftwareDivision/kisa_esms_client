@@ -9,7 +9,7 @@ const Telegram = lazy(() => import('@/pages/retrieve/telegram'))
 const Alert = lazy(() => import('@/pages/main/alert.tsx'))
 const Keyword = lazy(() => import('@/pages/manage/keyword'))
 const Ruleset = lazy(() => import('@/pages/manage/ruleset'))
-const Schedule = lazy(() => import('@/pages/manage/schedule'))
+const Group = lazy(() => import('@/pages/manage/group.tsx'))
 
 export const routes = [
   { path: '/main/dashboard', element: <MainPage /> },
@@ -21,5 +21,5 @@ export const routes = [
   { path: '/manage/user', element: <User /> },
   { path: '/manage/keyword', element: <Keyword /> },
   { path: '/manage/ruleset', element: <Ruleset /> },
-  { path: '/manage/schedule', element: <Schedule /> },
+  { path: '/manage/group', element: <Group /> },
 ]
