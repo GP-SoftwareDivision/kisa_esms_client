@@ -4,12 +4,28 @@ import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
 import styled from '@emotion/styled'
+import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
+
+interface UserListType {
+  seqidx: number
+  email: string
+  usertype: string
+  name: string
+  phonenum: string
+  groupcode: string
+  groupname: string
+}
 
 const User = () => {
+  const userList = useQueryHandler<{ data: UserListType[] }>({
+    method: 'POST',
+    url: '/api/manage/userList',
+  })
+
   const columns: TableColumnsType = [
     {
       title: '그룹명',
-      dataIndex: 'group',
+      dataIndex: 'groupname',
       align: 'center',
     },
     {
@@ -19,7 +35,7 @@ const User = () => {
     },
     {
       title: '번호',
-      dataIndex: 'phone',
+      dataIndex: 'phonenum',
       align: 'center',
     },
     {
@@ -44,27 +60,6 @@ const User = () => {
     },
   ]
 
-  const data = [
-    {
-      group: '골든플래닛',
-      name: '홍길동',
-      phone: '010-0000-0000',
-      email: 'hong@goldenplanet.co.kr',
-    },
-    {
-      group: '골든플래닛',
-      name: '홍길동',
-      phone: '010-0000-0000',
-      email: 'hong@goldenplanet.co.kr',
-    },
-    {
-      group: '골든플래닛',
-      name: '홍길동',
-      phone: '010-0000-0000',
-      email: 'hong@goldenplanet.co.kr',
-    },
-  ]
-
   const handleOnSelectChange = () => {}
 
   return (
@@ -78,7 +73,13 @@ const User = () => {
         />
       </ButtonWrapper>
       <ContentBox>
-        <CustomTable data={data} columns={columns} pagination={true} />
+        {userList.isSuccess && (
+          <CustomTable
+            data={userList.data.data}
+            columns={columns}
+            pagination={true}
+          />
+        )}
       </ContentBox>
     </ContentContainer>
   )

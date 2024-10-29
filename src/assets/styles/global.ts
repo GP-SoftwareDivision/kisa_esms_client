@@ -22,11 +22,11 @@ export const SelectBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.3rem;
 `
 
 export const SelectLabel = styled.label`
-  min-width: 50px;
+  min-width: 60px;
   text-align: left;
   ${({ theme }) => theme.typography.body2};
 `

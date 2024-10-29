@@ -9,16 +9,16 @@ interface UseApiRequestParams {
   data: object
 }
 
-export const useApiHandler = (requestId: string) => {
+export const useMutationHandler = (requestId: string) => {
   return useMutation<any, Error, UseApiRequestParams>({
     mutationKey: [requestId],
     mutationFn: async ({ method, url, data }: UseApiRequestParams) => {
-      const res = await instance({
+      const response = await instance({
         method,
         url,
         data,
       })
-      return res.data
+      return response.data
     },
     onError: (error) => {
       console.error(`오류 발생 (${requestId}):`, error)

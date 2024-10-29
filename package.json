@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "node --loader ts-node/esm server/server.ts",
+    "prod": "vite --mode production",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:prod": "vite preview --mode production"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",

@@ -35,7 +35,6 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
 
   useEffect(() => {
     const path = location.pathname.split('/')[1]
-    console.log(path)
     if (path) {
       const matchingMenu = menus.find((menu) =>
         menu.subMenu?.items.some((subItem) => subItem.key === path)

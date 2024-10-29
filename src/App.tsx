@@ -10,7 +10,7 @@ import {
 } from 'react-router-dom'
 
 import Wrapper from '@/layouts/Wrapper'
-import LoginPage from '@/pages/login'
+import LoginPage from '@/pages/user/login.tsx'
 import { routes } from './routes/routes'
 import { theme } from '@/assets/styles/theme.ts'
 

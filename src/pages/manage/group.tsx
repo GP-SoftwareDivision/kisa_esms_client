@@ -4,12 +4,30 @@ import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
 import CustomTable from '@/components/charts/Table.tsx'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
+import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
+
+interface groupList {
+  groupcode: number
+  groupname: string
+  comment: string
+  alram: string
+  autosendflag: string
+  kakaoflag: string
+  emailflag: string
+  useflag: string
+  updatedate: string
+}
 
 const Group = () => {
+  const groupList = useQueryHandler<{ data: groupList[] }>({
+    method: 'POST',
+    url: '/api/manage/groupList',
+  })
+
   const columns: TableColumnsType = [
     {
       title: '그룹명',
-      dataIndex: 'group',
+      dataIndex: 'groupname',
       align: 'center',
     },
     {
@@ -19,14 +37,14 @@ const Group = () => {
     },
     {
       title: '알람방식',
-      dataIndex: 'alarm_method',
+      dataIndex: 'alram',
       align: 'center',
     },
-    {
-      title: '자동발송여부',
-      dataIndex: 'auto_send',
-      align: 'center',
-    },
+    // {
+    //   title: '자동발송여부',
+    //   dataIndex: 'autosendflag',
+    //   align: 'center',
+    // },
     {
       title: '',
       dataIndex: '',
@@ -44,27 +62,6 @@ const Group = () => {
     },
   ]
 
-  const data = [
-    {
-      group: '골든플래닛',
-      comment: '-',
-      alarm_method: '-',
-      auto_send: '자동',
-    },
-    {
-      group: '골든플래닛',
-      comment: '-',
-      alarm_method: '-',
-      auto_send: '자동',
-    },
-    {
-      group: '골든플래닛',
-      comment: '-',
-      alarm_method: '-',
-      auto_send: '자동',
-    },
-  ]
-
   const handleOnSelectChange = () => {}
 
   return (
@@ -78,7 +75,13 @@ const Group = () => {
         />
       </ButtonWrapper>
       <ContentBox>
-        <CustomTable data={data} columns={columns} pagination={true} />
+        {groupList.isSuccess && (
+          <CustomTable
+            data={groupList.data.data}
+            columns={columns}
+            pagination={true}
+          />
+        )}
       </ContentBox>
     </ContentContainer>
   )

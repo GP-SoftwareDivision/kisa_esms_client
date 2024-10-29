@@ -3,11 +3,11 @@ import { Descriptions, DescriptionsProps } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
 
-import useModal from '@/hooks/useModal'
+import useModal from '@/hooks/useModal.tsx'
 import CustomModal from '@/components/elements/Modal.tsx'
-import useTimer from '@/hooks/useTimer'
+import useTimer from '@/hooks/useTimer.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
-import { useApiHandler } from '@/hooks/useApiHandler.tsx'
+import { useMutationHandler } from '@/hooks/useMutationHandler.tsx'
 
 interface WarningType {
   id: boolean
@@ -16,7 +16,7 @@ interface WarningType {
 
 const LoginPage = () => {
   const navigate = useNavigate()
-  const [id, setId] = useState<string>('syjin')
+  const [id, setId] = useState<string>('gpuser')
   const [password, setPassword] = useState<string>('1234')
   const [phoneNum, setPhoneNum] = useState<string>('')
   const [authNum, setAuthNum] = useState<string>('')
@@ -28,8 +28,8 @@ const LoginPage = () => {
 
   const { openModal, closeModal, isOpen } = useModal()
   const { timeLeft, startTimer, resetTimer } = useTimer(180) // 3분(180초) 타이머
-  const loginMutation = useApiHandler('login')
-  const authCheckMutation = useApiHandler('authCheck')
+  const loginMutation = useMutationHandler('login')
+  const authCheckMutation = useMutationHandler('authCheck')
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
@@ -44,26 +44,29 @@ const LoginPage = () => {
     if (validateForm()) {
       loginMutation.mutate({
         method: 'POST',
-        url: '/login/selectMember',
+        url: '/api/login/selectMember',
         data: { id, password },
       })
     }
   }
 
   // 인증번호 확인
-  const handleOnAuthCheck = () => {
+  const handleOnAuthCheck = async () => {
     authCheckMutation.mutate({
       method: 'POST',
-      url: '/WebNewService.svc/Login',
+      url: '/auth',
       data: { phonenum: phoneNum, authnum: authNum },
     })
   }
 
   // 재전송
   const reAuthCheck = () => {
-    console.log('test')
     resetTimer()
-    // handleOnAuthCheck()
+    loginMutation.mutate({
+      method: 'POST',
+      url: '/api/login/selectMember',
+      data: { id, password },
+    })
   }
 
   const items: DescriptionsProps['items'] = [
@@ -116,32 +119,34 @@ const LoginPage = () => {
 
   // 인증 번호 성공 시
   useEffect(() => {
-    if (!authCheckMutation.isSuccess || !authCheckMutation.data) return
-
-    const { message } = authCheckMutation.data
-
-    switch (message) {
-      case 'success':
-        navigate('/')
-        break
-      case 'timeout':
-        alert('인증 시간이 지났습니다. 재전송을 눌러주세요.')
-        break
-      case 'fail':
-        alert('인증번호가 일치하지 않습니다.')
-        break
-      default:
-        console.warn(`Unexpected message: ${message}`)
-        alert('잠시 후 다시 시도해주세요.')
+    if (authCheckMutation.isError) {
+      alert('인증번호가 일치하지 않습니다.')
+      return
     }
-  }, [authCheckMutation.isSuccess, authCheckMutation.data])
+    if (authCheckMutation.isSuccess && authCheckMutation.data) {
+      const { message } = authCheckMutation.data
+      switch (message) {
+        case 'success':
+          navigate('/')
+          break
+        case 'timeout':
+          alert('인증 시간이 지났습니다. 재전송을 눌러주세요.')
+          break
+        case 'fail':
+          alert('인증번호가 일치하지 않습니다.')
+          break
+        default:
+          console.warn(`Unexpected message: ${message}`)
+          alert('잠시 후 다시 시도해주세요.')
+      }
+    }
+  }, [authCheckMutation.isSuccess, authCheckMutation.isError])
 
   // 로그인 성공 실패 여부
   useEffect(() => {
     if (!loginMutation.isSuccess || !loginMutation.data) return
 
     const { message, data } = loginMutation.data
-
     switch (message) {
       case 'success':
         openModal('login')
@@ -164,6 +169,13 @@ const LoginPage = () => {
       alert('인증번호 시간이 만료되었습니다. 재전송버튼을 눌러주세요.')
     }
   }, [timeLeft])
+
+  // 인증번호 취소
+  const cancelAuth = () => {
+    closeModal('login')
+    resetTimer()
+    setAuthNum('')
+  }
 
   return (
     <LoginContainer>
@@ -194,7 +206,7 @@ const LoginPage = () => {
       <CustomModal
         isOpen={isOpen('login')}
         title='사용자 인증'
-        onCancel={() => closeModal('login')}
+        onCancel={cancelAuth}
         content={
           <ModalContents>
             <ModalDescription>
@@ -213,11 +225,7 @@ const LoginPage = () => {
               관리자에게 문의하세요.
             </ModalDescription>
             <ButtonWrapper>
-              <CustomButton
-                type='outline'
-                text='취소'
-                onClick={() => closeModal('login')}
-              />
+              <CustomButton type='outline' text='취소' onClick={cancelAuth} />
               <CustomButton
                 type='primary'
                 text='확인'
