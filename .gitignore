@@ -10,9 +10,10 @@ lerna-debug.log*
 node_modules
 dist-ssr
 *.local
+dist
 .env.development
 .env.production
-dist
+docker-start.sh
 
 # Editor directories and files
 .vscode/*
