@@ -5,7 +5,7 @@
 - 개발 툴 Vite 사용
 - CSS Emotion 사용
 
-### Commit Messge Convention
+### Commit Message Convention
 
 - feat : 새로운 기능 추가
 - fix : 버그 수정

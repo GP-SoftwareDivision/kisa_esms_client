@@ -16,7 +16,7 @@ interface WarningType {
 
 const LoginPage = () => {
   const navigate = useNavigate()
-  const [id, setId] = useState<string>('gpuser')
+  const [id, setId] = useState<string>('gpadmin')
   const [password, setPassword] = useState<string>('1234')
   const [phoneNum, setPhoneNum] = useState<string>('')
   const [authNum, setAuthNum] = useState<string>('')
