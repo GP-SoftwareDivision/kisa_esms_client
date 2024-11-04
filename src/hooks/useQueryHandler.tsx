@@ -1,4 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import { AxiosError } from 'axios'
+import { useNavigate } from 'react-router-dom'
+
 import instance from '../apis/instance.ts'
 
 interface QueryConfig {
@@ -7,16 +11,55 @@ interface QueryConfig {
   body?: object
 }
 
-export function useQueryHandler<TData>({ url, method, body }: QueryConfig) {
-  return useQuery<TData, Error>({
+// 에러 알림
+const notify = (text: string) =>
+  toast.error(text, {
+    position: 'bottom-center',
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    progress: undefined,
+    theme: 'light',
+  })
+
+export function useQueryHandler<TData>({
+  url,
+  method = 'GET',
+  body,
+}: QueryConfig) {
+  const navigate = useNavigate()
+  return useQuery<TData, AxiosError>({
     queryKey: [url, method, body],
     queryFn: async () => {
-      const response = await instance({
-        url,
-        method,
-        data: body ?? body,
-      })
-      return response.data
+      try {
+        const response = await instance({
+          url,
+          method,
+          data: body,
+        })
+        return response.data
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          const status = error.response?.status
+          if (status === 401) {
+            notify(
+              '세션이 만료되었거나 권한이 없습니다. 다시 로그인 후 이용해주세요.'
+            )
+            setTimeout(() => {
+              navigate('/login')
+            }, 5000)
+          }
+          {
+            if (status === 403) notify('페이지에 접근 권한이 없습니다.')
+            setTimeout(() => {
+              navigate('/login')
+            }, 5000)
+          }
+          if (status === 500)
+            notify('일시적인 오류입니다. 잠시 후 다시 시도해주세요.')
+        }
+      }
     },
   })
 }

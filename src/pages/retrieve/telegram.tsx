@@ -143,7 +143,7 @@ const Telegram = () => {
         </Col>
       </SelectContainer>
       <ContentBox>
-        <CustomTable data={data} columns={columns} pagination={true} />
+        <CustomTable data={data} columns={columns} />
       </ContentBox>
     </ContentContainer>
   )

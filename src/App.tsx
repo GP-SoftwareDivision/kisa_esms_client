@@ -5,9 +5,10 @@ import {
   Routes,
   Route,
   Outlet,
-  // Navigate,
+  Navigate,
 } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
+import { ToastContainer } from 'react-toastify'
 
 import instance from './apis/instance.ts'
 import { routes } from './routes/routes'
@@ -16,6 +17,7 @@ import Wrapper from '@/layouts/Wrapper'
 import LoginPage from '@/pages/user/login.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 
+// 루트 경로 진입 시 로그인 여부 확인
 const checkAuthStatus = async () => {
   const response = await instance.get('/auth')
   return response.data
@@ -32,25 +34,26 @@ const App = () => {
       </>
     )
   }
-  useQuery({
-    queryKey: ['authStatus'],
-    queryFn: checkAuthStatus,
-    retry: false,
-    enabled: window.location.pathname === '/',
-  })
-  // const RootRoute = () => {
-  //   if (isLoading) return <Loading />
-  //   if (data?.isLoggedIn) return <Navigate to='/main/dashboard' replace />
-  //   return <Navigate to='/login' replace />
-  // }
+  const RootRoute = () => {
+    const { isLoading, data } = useQuery({
+      queryKey: ['authStatus'],
+      queryFn: checkAuthStatus,
+      retry: false,
+    })
+
+    if (isLoading) return <Loading />
+    if (data?.isLoggedIn) return <Navigate to='/main/dashboard' replace />
+    return <Navigate to='/login' replace />
+  }
 
   return (
     <Router>
       <Suspense fallback={<div></div>}>
+        <ToastContainer />
         <ThemeProvider theme={theme}>
           <Suspense fallback={<Loading />}>
             <Routes>
-              {/*<Route path='/' element={<RootRoute />} />*/}
+              <Route path='/' element={<RootRoute />} />
               <Route path='/login' element={<LoginPage />} />
               <Route element={<Layout />}>
                 {routes.map((route, index) => (

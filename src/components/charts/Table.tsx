@@ -1,4 +1,5 @@
 /** @jsxImportSource @emotion/react */
+import React, { Dispatch } from 'react'
 import { css } from '@emotion/react'
 import { Table } from 'antd'
 import type { TableColumnsType } from 'antd'
@@ -6,13 +7,19 @@ import type { TableColumnsType } from 'antd'
 interface TableProps<T extends Record<string, any>> {
   data: T[]
   columns: TableColumnsType
-  pagination: boolean
+  pagination?: boolean
+  pageNum?: number
+  setPageNum?: Dispatch<React.SetStateAction<number>>
+  total?: number
 }
 
 function CustomTable<T extends Record<string, any>>({
   columns,
   data,
+  pageNum,
+  setPageNum,
   pagination,
+  total,
 }: TableProps<T>) {
   const tableStyles = css`
     .ant-table-thead > tr > th {
@@ -34,18 +41,28 @@ function CustomTable<T extends Record<string, any>>({
       white-space: nowrap;
     }
   `
+  // 페이지네이션 이벤트
+  const handleOnPaging = (page: number) => {
+    if (setPageNum) setPageNum(page)
+  }
 
   return (
     <Table
       columns={columns}
       dataSource={data}
-      pagination={pagination ? { position: ['bottomCenter'] } : false}
+      pagination={
+        pagination
+          ? {
+              current: pageNum,
+              position: ['bottomCenter'],
+              total: total,
+              onChange: (page) => handleOnPaging(page),
+            }
+          : false
+      }
       css={tableStyles}
     />
   )
 }
 
 export default CustomTable
-
-// 15개
-// default date => 1주일

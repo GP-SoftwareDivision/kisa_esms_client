@@ -3,27 +3,22 @@ import { TableColumnsType } from 'antd'
 export const Alertcolumn: TableColumnsType = [
   {
     title: '발송시간',
-    dataIndex: 'send_date',
+    dataIndex: 'senddate',
     align: 'center',
   },
   {
     title: '발송내용',
-    dataIndex: 'send_content',
+    dataIndex: 'contents',
     align: 'center',
   },
   {
     title: '발송 그룹',
-    dataIndex: 'send_group',
-    align: 'center',
-  },
-  {
-    title: '발송 방법',
-    dataIndex: 'send_method',
+    dataIndex: 'groupname',
     align: 'center',
   },
   {
     title: '대상 채널',
-    dataIndex: 'channel_name',
+    dataIndex: 'target',
     align: 'center',
   },
 ]

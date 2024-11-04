@@ -1,39 +1,49 @@
+import { useState } from 'react'
+
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
-import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
 import { Alertcolumn } from '@/data/columns/alert.ts'
+import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
+import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
+
+interface AlertType {
+  seqidx: number
+  senddate: string
+  contents: string
+  kakaoresult: string
+  emailresult: string
+  target: string
+  targetidx: number
+  groupname: string
+}
 
 const Alert = () => {
-  const data = [
-    {
-      send_date: '2024-02-04 09:12:44',
-      send_content: 'Terminal High Altitude Area Defense - The Hidden Wiki',
-      send_group: '키사',
-      send_method: '자동',
-      channel_name: '텔레그램',
+  const [pageNum, setPageNum] = useState<number>(1)
+
+  const alertList = useQueryHandler<{ data: AlertType[]; count: number }>({
+    method: 'POST',
+    url: '/api/main/alarmList',
+    body: {
+      from: pageNum,
+      to: 10,
     },
-    {
-      send_date: '2024-02-04 09:12:44',
-      send_content: 'Terminal High Altitude Area Defense - The Hidden Wiki',
-      send_group: '키사',
-      send_method: '자동',
-      channel_name: '텔레그램',
-    },
-    {
-      send_date: '2024-02-04 09:12:44',
-      send_content: 'Terminal High Altitude Area Defense - The Hidden Wiki',
-      send_group: '키사',
-      send_method: '자동',
-      channel_name: '텔레그램',
-    },
-  ]
+  })
 
   return (
     <>
       <ContentContainer>
         <PageTitle text={'알림 내역'} />
         <ContentBox>
-          <CustomTable data={data} columns={Alertcolumn} pagination={true} />
+          {alertList.isSuccess && (
+            <CustomTable
+              data={alertList?.data.data}
+              columns={Alertcolumn}
+              pagination={true}
+              pageNum={pageNum}
+              setPageNum={setPageNum}
+              total={alertList.data?.count}
+            />
+          )}
         </ContentBox>
       </ContentContainer>
     </>
