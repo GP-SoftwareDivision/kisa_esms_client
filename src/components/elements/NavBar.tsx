@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
 import { mq } from '@/utils/mediaQueries.ts'
 import Button from '@/components/elements/Button.tsx'
+import { useMutationHandler } from '@/hooks/useMutationHandler.tsx'
 
 interface SubMenu {
   title: string
@@ -25,6 +26,8 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(
     pathname[2]
   )
+  const logoutMutation = useMutationHandler('logout')
+
   const handleMenuClick = (menuKey: string, subItemKey?: string) => {
     setActiveMenu(menuKey)
     if (subItemKey) {
@@ -52,6 +55,17 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
     return positions[num] ?? 0
   }
 
+  const handleOnLogOut = () => {
+    logoutMutation.mutate({
+      method: 'DELETE',
+      url: '/auth',
+    })
+  }
+
+  useEffect(() => {
+    if (logoutMutation.isSuccess) navigate('/login')
+  }, [logoutMutation.isSuccess])
+
   return (
     <nav css={navBarStyle}>
       <div css={menuListStyle}>
@@ -75,7 +89,11 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
         </div>
         <UserInfoContainerStyle>
           <UserNameStyle>admin님</UserNameStyle>
-          <Button type={'primary'} text={'로그아웃'} />
+          <Button
+            type={'primary'}
+            text={'로그아웃'}
+            onClick={() => handleOnLogOut()}
+          />
         </UserInfoContainerStyle>
       </div>
       <div css={horizontalSubMenuStyle}>

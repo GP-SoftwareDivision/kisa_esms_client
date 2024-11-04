@@ -127,7 +127,7 @@ const LoginPage = () => {
       const { message } = authCheckMutation.data
       switch (message) {
         case 'success':
-          navigate('/')
+          navigate('/main/dashboard')
           break
         case 'timeout':
           alert('인증 시간이 지났습니다. 재전송을 눌러주세요.')

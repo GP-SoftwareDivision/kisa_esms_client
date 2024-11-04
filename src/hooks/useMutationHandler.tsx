@@ -6,7 +6,7 @@ type ApiMethod = 'POST' | 'GET' | 'PUT' | 'DELETE'
 interface UseApiRequestParams {
   method: ApiMethod
   url: string
-  data: object
+  data?: object
 }
 
 export const useMutationHandler = (requestId: string) => {
@@ -16,7 +16,7 @@ export const useMutationHandler = (requestId: string) => {
       const response = await instance({
         method,
         url,
-        data,
+        data: data ?? data,
       })
       return response.data
     },
