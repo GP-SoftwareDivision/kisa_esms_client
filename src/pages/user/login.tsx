@@ -8,6 +8,7 @@ import CustomModal from '@/components/elements/Modal.tsx'
 import useTimer from '@/hooks/useTimer.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useMutationHandler } from '@/hooks/useMutationHandler.tsx'
+import { notify } from '@/utils/notify.tsx'
 
 interface WarningType {
   id: boolean
@@ -120,7 +121,7 @@ const LoginPage = () => {
   // 인증 번호 성공 시
   useEffect(() => {
     if (authCheckMutation.isError) {
-      alert('인증번호가 일치하지 않습니다.')
+      notify('인증번호가 일치하지 않습니다.')
       return
     }
     if (authCheckMutation.isSuccess && authCheckMutation.data) {
@@ -130,14 +131,14 @@ const LoginPage = () => {
           navigate('/main/dashboard')
           break
         case 'timeout':
-          alert('인증 시간이 지났습니다. 재전송을 눌러주세요.')
+          notify('인증 시간이 지났습니다. 재전송을 눌러주세요.')
           break
         case 'fail':
-          alert('인증번호가 일치하지 않습니다.')
+          notify('인증번호가 일치하지 않습니다.')
           break
         default:
           console.warn(`Unexpected message: ${message}`)
-          alert('잠시 후 다시 시도해주세요.')
+          notify('잠시 후 다시 시도해주세요.')
       }
     }
   }, [authCheckMutation.isSuccess, authCheckMutation.isError])
@@ -153,20 +154,19 @@ const LoginPage = () => {
         startTimer()
         setPhoneNum(data.phonenum)
         break
-      case 'fail':
-        alert('아이디나 비밀번호가 일치하지 않습니다.')
+      case undefined:
+        notify('아이디나 비밀번호가 일치하지 않습니다.')
         break
       default:
         console.warn(`Unexpected message: ${message}`)
-        alert('잠시 후 다시 시도해주세요.')
+        notify('잠시 후 다시 시도해주세요.')
     }
   }, [loginMutation.isSuccess, loginMutation.data])
 
   // 타이머가 변할 때마다 렌더링 트리거
   useEffect(() => {
     if (timeLeft === 0) {
-      // 인증번호 기입 시간 종료 알림
-      alert('인증번호 시간이 만료되었습니다. 재전송버튼을 눌러주세요.')
+      notify('인증번호 시간이 만료되었습니다. 재전송버튼을 눌러주세요.')
     }
   }, [timeLeft])
 

@@ -1,27 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
-import { toast } from 'react-toastify'
 import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 import instance from '../apis/instance.ts'
+import { notify } from '@/utils/notify.tsx'
 
 interface QueryConfig {
   url: string
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   body?: object
 }
-
-// 에러 알림
-const notify = (text: string) =>
-  toast.error(text, {
-    position: 'bottom-center',
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    progress: undefined,
-    theme: 'light',
-  })
 
 export function useQueryHandler<TData>({
   url,
