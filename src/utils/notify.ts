@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 export const notify = (text: string) =>
   toast.error(text, {
     position: 'bottom-center',
-    autoClose: 3000,
+    autoClose: 2000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,

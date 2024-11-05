@@ -24,11 +24,9 @@ const Alert = () => {
     method: 'POST',
     url: '/api/main/alarmList',
     body: {
-      from: pageNum,
-      to: 10,
+      page: pageNum,
     },
   })
-
   return (
     <>
       <ContentContainer>

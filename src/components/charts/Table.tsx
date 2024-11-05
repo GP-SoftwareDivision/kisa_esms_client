@@ -56,6 +56,7 @@ function CustomTable<T extends Record<string, any>>({
               current: pageNum,
               position: ['bottomCenter'],
               total: total,
+              pageSize: 15,
               onChange: (page) => handleOnPaging(page),
             }
           : false

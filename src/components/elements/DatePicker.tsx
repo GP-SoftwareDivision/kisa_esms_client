@@ -1,3 +1,4 @@
+import React, { Dispatch } from 'react'
 import type { GetProps, TimeRangePickerProps } from 'antd'
 import { DatePicker, ConfigProvider } from 'antd'
 import locale from 'antd/lib/locale/ko_KR'
@@ -12,18 +13,18 @@ const { RangePicker } = DatePicker
 
 interface DatePickerProps {
   label: string
+  setDate: Dispatch<React.SetStateAction<{ start: string; end: string }>>
 }
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>
 const CustomDatePicker = (props: DatePickerProps) => {
-  const { label } = props
+  const { label, setDate } = props
 
   const onRangeChange = (
     dates: null | (Dayjs | null)[],
     dateStrings: string[]
   ) => {
     if (dates) {
-      console.log('From: ', dates[0], ', to: ', dates[1])
-      console.log('From: ', dateStrings[0], ', to: ', dateStrings[1])
+      setDate({ start: dateStrings[0], end: dateStrings[1] })
     } else {
       console.log('Clear')
     }
@@ -48,7 +49,7 @@ const CustomDatePicker = (props: DatePickerProps) => {
           presets={rangePresets}
           onChange={onRangeChange}
           disabledDate={disabledDate}
-          defaultValue={[dayjs(), dayjs().subtract(7, 'd')]}
+          defaultValue={[dayjs().subtract(7, 'd'), dayjs()]}
         />
       </SelectBox>
     </ConfigProvider>

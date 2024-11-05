@@ -50,11 +50,6 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
     }
   }, [menus, location])
 
-  const handlePositionSubMenu = (num: number): number => {
-    const positions = [12, 108, 242, 383]
-    return positions[num] ?? 0
-  }
-
   const handleOnLogOut = () => {
     logoutMutation.mutate({
       method: 'DELETE',
@@ -98,14 +93,8 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
       </div>
       <div css={horizontalSubMenuStyle}>
         <div css={SublistStyle}>
-          {menus.map((menu, index) => (
-            <div
-              key={menu.key}
-              css={subMenuListStyle(
-                activeMenu === menu.key,
-                handlePositionSubMenu(index)
-              )}
-            >
+          {menus.map((menu) => (
+            <div key={menu.key} css={subMenuListStyle(activeMenu === menu.key)}>
               {activeMenu === menu.key &&
                 menu.subMenu?.items.map((subItem) => (
                   <div
@@ -141,6 +130,54 @@ const navBarStyle = css`
   align-items: center;
 `
 
+const selectedMainMenuStyle = css`
+  font-weight: bold;
+  color: #4f79a5;
+  border-bottom: 2px solid #4f79a5;
+`
+
+const horizontalSubMenuStyle = css`
+  list-style: none;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  background-color: #f5f5f5;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
+  position: relative;
+  height: 40px;
+  align-items: center;
+`
+
+const subMenuListStyle = (isActive: boolean) => css`
+  display: flex;
+  list-style: none;
+  position: relative;
+  visibility: ${isActive ? 'visible' : 'hidden'};
+  transition: opacity 0.3s ease;
+  padding: 0.5rem 0;
+  gap: 1.5rem;
+  font-size: 14px;
+`
+
+const SublistStyle = css`
+  display: flex;
+  justify-content: center;
+  width: 26rem;
+`
+
+const subMenuItemStyle = css`
+  cursor: pointer;
+`
+
+const selectedSubMenuStyle = css`
+  font-weight: bold;
+  color: #4f79a5;
+`
+
+const UserNameStyle = styled.span`
+  ${({ theme }) => theme.typography.body};
+`
+
 const menuListStyle = () => css`
   width: 100%;
   list-style: none;
@@ -163,12 +200,26 @@ const menuListStyle = () => css`
   ${mq.md} {
     max-width: 720px;
   }
+
+  ${mq.sm} {
+    justify-content: center;
+    font-size: 14px;
+    padding: 0.3rem 0;
+  }
 `
 
 const listStyle = css`
   display: flex;
   justify-content: space-between;
   width: 25rem;
+
+  ${mq.md} {
+    width: 20rem;
+  }
+
+  ${mq.sm} {
+    width: 15rem;
+  }
 `
 
 const menuItemStyle = css`
@@ -176,53 +227,34 @@ const menuItemStyle = css`
   color: black;
   cursor: pointer;
   font-weight: bold;
-`
 
-const selectedMainMenuStyle = css`
-  font-weight: bold;
-  color: #4f79a5;
-  border-bottom: 2px solid #4f79a5;
-`
+  ${mq.sm} {
+    font-size: 0.9rem;
+  }
 
-const horizontalSubMenuStyle = css`
-  list-style: none;
+  ${mq.xs} {
+    font-size: 0.8rem;
+  }
+`
+const UserInfoContainerStyle = styled.div`
   display: flex;
-  width: 100%;
-  justify-content: center;
-  background-color: #f5f5f5;
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
-  position: relative;
-  height: 40px;
   align-items: center;
+  gap: 0.8rem;
+
+  ${mq.md} {
+    gap: 0.5rem;
+    button {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
+    }
+  }
+
+  ${mq.sm} {
+    display: none;
+  }
 `
 
-const subMenuListStyle = (isActive: boolean, index: number) => css`
-  display: flex;
-  list-style: none;
-  position: relative;
-  visibility: ${isActive ? 'visible' : 'hidden'};
-  transition: opacity 0.3s ease;
-  padding: 0.5rem 0;
-  gap: 1.5rem;
-  left: ${index}px;
-  font-size: 14px;
-`
-
-const SublistStyle = css`
-  display: flex;
-  width: 26rem;
-`
-
-const subMenuItemStyle = css`
-  cursor: pointer;
-`
-
-const selectedSubMenuStyle = css`
-  font-weight: bold;
-  color: #4f79a5;
-`
 const HeaderLogo = styled.div`
-  padding: 8px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -231,16 +263,16 @@ const HeaderLogo = styled.div`
     width: 6.5rem;
     height: 2.7rem;
     cursor: pointer;
+
+    ${mq.md} {
+      width: 5rem;
+      height: 2rem;
+    }
+
+    ${mq.sm} {
+      display: none;
+    }
   }
 `
 
-const UserInfoContainerStyle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-`
-
-const UserNameStyle = styled.span`
-  ${({ theme }) => theme.typography.body};
-`
 export default NavBar

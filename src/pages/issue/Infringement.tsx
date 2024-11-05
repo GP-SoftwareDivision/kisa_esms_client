@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import axios from 'axios'
 import { TableColumnsType, Col } from 'antd'
 import type { UploadProps } from 'antd'
 import Dragger from 'antd/es/upload/Dragger'
@@ -18,11 +17,70 @@ import CustomTable from '@/components/charts/Table.tsx'
 import styled from '@emotion/styled'
 import { convertXlsxToCsv, getFileName } from '@/utils/fileHelpers.ts'
 import PageTitle from '@/components/elements/PageTitle.tsx'
+import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
+import instance from '../../apis/instance.ts'
+
+interface AccountListType {
+  seqidx: number
+  filetype: string
+  filename: string
+  uploader: string
+  new_public: number
+  response_public: number
+  duplication_public: number
+  new_education: number
+  response_education: number
+  duplication_education: number
+  new_etc: number
+  response_etc: number
+  duplication_etc: number
+  new_naver: number
+  duplication_naver: number
+  new_nate: number
+  duplication_nate: number
+  new_kakao: number
+  duplication_kakao: number
+  new_count: number
+  total_count: number
+  uploaddate: string
+  firstrecognition: string
+  responsestatus: string
+}
 
 const Infringement = () => {
-  const [file, setFile] = useState<File | null>(null)
-  const [fileName, setFileName] = useState<string | null>(null)
-  const [searchFileName, setSearchFileName] = useState<string>('')
+  // 업로드를 위한 상태
+  const [uploadFile, setUploadFile] = useState<File | null>(null)
+  const [uploadFileName, setUploadFileName] = useState<string | null>(null)
+
+  // 검색을 위한 상태
+  const [pageNum, setPageNum] = useState<number>(1)
+  const [filename, setFilename] = useState<string>('')
+  const [filetype, setFiletype] = useState<string>('')
+  const [uploader, setUploader] = useState<string>('')
+  const [isResponse, setIsResponse] = useState<string>('')
+  const [date, setDate] = useState<{ start: string; end: string }>({
+    start: '',
+    end: '',
+  })
+
+  const accountList = useQueryHandler<{
+    data: AccountListType[]
+    count: number
+  }>({
+    method: 'POST',
+    url: '/api/accoutList',
+    body: {
+      page: pageNum,
+      filename: filename,
+      filetype: filetype,
+      uploader: uploader,
+      responsestatus: isResponse,
+      startdate: date.start,
+      enddate: date.end,
+    },
+  })
+
+  console.log(accountList.data)
 
   const data = [
     {
@@ -123,44 +181,37 @@ const Infringement = () => {
     },
   ]
 
-  const API_URL = import.meta.env.VITE_API_URL
+  // const API_URL = import.meta.env.VITE_API_URL
 
   const handleUpload = async () => {
-    if (!file) {
+    if (!uploadFile) {
       alert('파일을 선택해주세요.')
       return
     }
     const formData = new FormData()
-    const type = file.name.split('.').pop()
-    const csvFile = await convertXlsxToCsv(file)
+    const type = uploadFile.name.split('.').pop()
+    const csvFile = await convertXlsxToCsv(uploadFile)
 
     if (type === 'xlsx')
       formData.append(
         'file',
         new Blob([csvFile], { type: 'text/csv' }),
-        `${fileName}`
+        `${uploadFileName}`
       )
-    else formData.append('file', file, `${fileName}`)
+    else formData.append('file', uploadFile, `${uploadFileName}`)
 
     try {
-      const response = await axios.post(
-        'http://localhost:8080/upload', //172.17.0.2:8080
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          withCredentials: true,
-        }
-      )
+      const response = await instance.post('/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      })
       if (response.status === 200) {
-        const response2 = await axios.post(
-          `${API_URL}/WebESMSUploadService.svc/TestUpload`,
-          {
-            filename: file.name,
-            uploader: 'syjin',
-          }
-        )
+        const response2 = await instance.post(`/api/accountUpload`, {
+          filename: uploadFile.name,
+          uploader: 'syjin',
+        })
         console.log(response2)
       }
     } catch (error) {
@@ -174,13 +225,13 @@ const Infringement = () => {
     accept:
       '.xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain',
     onRemove: () => {
-      setFile(null)
-      setFileName(null)
+      setUploadFile(null)
+      setUploadFileName(null)
     },
     beforeUpload: (file) => {
       const name = getFileName(file.name)
-      setFile(file)
-      setFileName(name)
+      setUploadFile(file)
+      setUploadFileName(name)
       return false
     },
     onDrop: (e) => {
@@ -195,15 +246,15 @@ const Infringement = () => {
         alert(
           '지원하는 형식이 아닙니다. xlsx, csv, txt의 파일 형식만 가능합니다.'
         )
-        setFile(null)
-        setFileName(null)
+        setUploadFile(null)
+        setUploadFileName(null)
       } else {
-        setFile(drag_file)
-        setFileName(name)
+        setUploadFile(drag_file)
+        setUploadFileName(name)
       }
     },
     maxCount: 1,
-    showUploadList: !!fileName,
+    showUploadList: !!uploadFileName,
   }
 
   return (
@@ -211,23 +262,23 @@ const Infringement = () => {
       <PageTitle text={'침해 정보 판별'} />
       <UploadContainer>
         <StyledDragger {...props}>
-          {!fileName && '업로드할 파일 놓기 또는 파일 선택'}
+          {!uploadFileName && '업로드할 파일 놓기 또는 파일 선택'}
         </StyledDragger>
         <Button
           text={'파일 업로드'}
-          type={fileName ? 'primary' : 'disabled'}
-          disabled={!fileName}
+          type={uploadFileName ? 'primary' : 'disabled'}
+          disabled={!uploadFileName}
           onClick={handleUpload}
         />
       </UploadContainer>
       <SelectContainer gutter={[16, 16]}>
         <Col xs={24} sm={12} md={8} lg={6}>
-          <CustomDatePicker label={'조회 기간'} />
+          <CustomDatePicker label={'조회 기간'} setDate={setDate} />
         </Col>
         <Col xs={24} sm={12} md={8} lg={6}>
           <CustomSelect
             label={'파일형식'}
-            onchange={handleOnSelectChange}
+            setState={setFiletype}
             options={[
               { value: '전체', label: '전체' },
               { value: 'xlsx', label: 'xlsx' },
@@ -239,7 +290,7 @@ const Infringement = () => {
         <Col xs={24} sm={12} md={8} lg={6}>
           <CustomSelect
             label={'담당자'}
-            onchange={handleOnSelectChange}
+            setState={setUploader}
             options={[
               { value: '전체', label: '전체' },
               { value: '홍길동', label: '홍길동' },
@@ -250,7 +301,7 @@ const Infringement = () => {
         <Col xs={24} sm={12} md={8} lg={6}>
           <CustomSelect
             label={'대응여부'}
-            onchange={handleOnSelectChange}
+            setState={setIsResponse}
             options={[
               { value: '전체', label: '전체' },
               { value: '대기', label: '대기' },
@@ -263,8 +314,8 @@ const Infringement = () => {
           <CustomInput
             label={'파일명'}
             placeholder={'내용을 입력하세요.'}
-            value={searchFileName}
-            onchange={(e) => setSearchFileName(e.target.value)}
+            value={filename}
+            onchange={(e) => setFilename(e.target.value)}
           />
         </Col>
         <Col xs={24} sm={12} md={8} lg={6}></Col>
@@ -281,7 +332,13 @@ const Infringement = () => {
         </Col>
       </SelectContainer>
       <ContentBox>
-        <CustomTable data={data} columns={columns} pagination={true} />
+        <CustomTable
+          data={data}
+          columns={columns}
+          pagination={true}
+          setPageNum={setPageNum}
+          pageNum={pageNum}
+        />
       </ContentBox>
     </ContentContainer>
   )

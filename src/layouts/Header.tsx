@@ -3,6 +3,7 @@ import styled from '@emotion/styled'
 
 import menu from '@/data/menu.json'
 import NavBar from '@/components/elements/NavBar.tsx'
+import { mq } from '@/utils/mediaQueries.ts'
 
 const Header = () => {
   const navigate = useNavigate()
@@ -33,6 +34,9 @@ const HeaderContainer = styled.header`
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
   background-color: #fff;
   z-index: 1;
+  ${mq.sm} {
+    margin-top: 1.5rem;
+  }
 `
 
 const HeaderContent = styled.div`

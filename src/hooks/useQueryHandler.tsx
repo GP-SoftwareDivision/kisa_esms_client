@@ -3,7 +3,7 @@ import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 import instance from '../apis/instance.ts'
-import { notify } from '@/utils/notify.tsx'
+import { notify } from '@/utils/notify.ts'
 
 interface QueryConfig {
   url: string
@@ -26,27 +26,33 @@ export function useQueryHandler<TData>({
           method,
           data: body,
         })
+        console.log(response.data)
         return response.data
       } catch (error) {
         if (error instanceof AxiosError) {
           const status = error.response?.status
-          if (status === 401) {
-            notify(
-              '세션이 만료되었거나 권한이 없습니다. 다시 로그인 후 이용해주세요.'
-            )
-            setTimeout(() => {
-              navigate('/login')
-            }, 5000)
+          switch (status) {
+            case 401:
+              notify(
+                '세션이 만료되었거나 권한이 없습니다. 다시 로그인 후 이용해주세요.'
+              )
+              setTimeout(() => {
+                navigate('/login')
+              }, 5000)
+              break
+
+            case 403:
+              notify('페이지에 접근 권한이 없습니다.')
+              setTimeout(() => {
+                navigate('/login')
+              }, 5000)
+              break
+
+            default:
+              notify('일시적인 오류입니다. 잠시 후 다시 시도해주세요.')
           }
-          {
-            if (status === 403) notify('페이지에 접근 권한이 없습니다.')
-            setTimeout(() => {
-              navigate('/login')
-            }, 5000)
-          }
-          if (status === 500)
-            notify('일시적인 오류입니다. 잠시 후 다시 시도해주세요.')
         }
+        return {} as TData
       }
     },
   })

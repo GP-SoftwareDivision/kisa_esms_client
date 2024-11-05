@@ -8,7 +8,7 @@ import CustomModal from '@/components/elements/Modal.tsx'
 import useTimer from '@/hooks/useTimer.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useMutationHandler } from '@/hooks/useMutationHandler.tsx'
-import { notify } from '@/utils/notify.tsx'
+import { notify } from '@/utils/notify.ts'
 
 interface WarningType {
   id: boolean

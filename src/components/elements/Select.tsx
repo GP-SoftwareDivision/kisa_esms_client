@@ -1,6 +1,7 @@
 import { Select } from 'antd'
-import { SelectBox, SelectLabel } from '@/assets/styles/global.ts'
 import styled from '@emotion/styled'
+import React, { Dispatch } from 'react'
+import { SelectBox, SelectLabel } from '@/assets/styles/global.ts'
 
 interface InputProps {
   label?: string
@@ -9,10 +10,15 @@ interface InputProps {
     label: string
   }[]
   onchange?: () => void
+  setState?: Dispatch<React.SetStateAction<string>>
 }
 
 const CustomSelect = (props: InputProps) => {
-  const { options, label, onchange } = props
+  const { options, label, setState } = props
+
+  const handleOnChange = (selected: { value: string }) => {
+    if (setState) setState(selected.value)
+  }
 
   return (
     <SelectBox>
@@ -21,7 +27,9 @@ const CustomSelect = (props: InputProps) => {
         labelInValue
         defaultValue={{ value: '전체', label: '전체' }}
         style={{ width: '100%' }}
-        onChange={onchange}
+        onChange={(value) =>
+          handleOnChange(value as { value: string; label: string })
+        }
         options={options}
       />
     </SelectBox>
