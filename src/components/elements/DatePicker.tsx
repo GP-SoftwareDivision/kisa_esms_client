@@ -13,7 +13,7 @@ const { RangePicker } = DatePicker
 
 interface DatePickerProps {
   label: string
-  setDate: Dispatch<React.SetStateAction<{ start: string; end: string }>>
+  setDate?: Dispatch<React.SetStateAction<{ start: string; end: string }>>
 }
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>
 const CustomDatePicker = (props: DatePickerProps) => {
@@ -23,7 +23,7 @@ const CustomDatePicker = (props: DatePickerProps) => {
     dates: null | (Dayjs | null)[],
     dateStrings: string[]
   ) => {
-    if (dates) {
+    if (dates && setDate) {
       setDate({ start: dateStrings[0], end: dateStrings[1] })
     } else {
       console.log('Clear')
