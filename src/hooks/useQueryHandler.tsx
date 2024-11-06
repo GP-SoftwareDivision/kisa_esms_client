@@ -32,6 +32,10 @@ export function useQueryHandler<TData>({
         if (error instanceof AxiosError) {
           const status = error.response?.status
           switch (status) {
+            case 400:
+              notify(`검색 결과가 없습니다.`)
+              break
+
             case 401:
               notify(
                 `세션이 만료되었거나 권한이 없습니다. \n다시 로그인 후 이용해주세요.`

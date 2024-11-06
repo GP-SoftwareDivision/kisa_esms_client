@@ -19,15 +19,10 @@ const CustomSelect = memo((props: SelectProps) => {
   const handleOnChange = (selected: { value: string }) => {
     if (setState) setState(selected.value)
   }
-
-  const addAllOption = [
-    {
-      value: '전체',
-      label: '전체',
-    },
-    ...options,
-  ]
-  console.log(addAllOption)
+  const addAllOption = {
+    value: '전체',
+    label: '전체',
+  }
   return (
     <SelectBox>
       <SelectLabel>{label}</SelectLabel>
@@ -38,7 +33,7 @@ const CustomSelect = memo((props: SelectProps) => {
         onChange={(value) =>
           handleOnChange(value as { value: string; label: string })
         }
-        options={addAllOption}
+        options={options ? [addAllOption, ...options] : [addAllOption]}
       />
     </SelectBox>
   )

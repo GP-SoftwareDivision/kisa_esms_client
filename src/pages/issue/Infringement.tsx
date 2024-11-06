@@ -211,6 +211,8 @@ const Infringement = () => {
     setRequest(tmpReq)
   }
 
+  console.log(accountList.isSuccess)
+
   return (
     <ContentContainer>
       <PageTitle text={'침해 정보 판별'} />
@@ -241,7 +243,7 @@ const Infringement = () => {
             <CustomSelect
               label={'담당자'}
               setState={setUploader}
-              options={accountList.data.uploaderlist.map((v) => ({
+              options={accountList.data.uploaderlist?.map((v) => ({
                 value: v,
                 label: v,
               }))}
