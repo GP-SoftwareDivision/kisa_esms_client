@@ -15,9 +15,15 @@ interface SubMenu {
 interface Props {
   menus: { label: string; key: string; subMenu?: SubMenu }[]
   onSubMenuSelect?: (subItemKey: string | null) => void // 영어로 선택된 서브메뉴의 키를 전달
+  account:
+    | {
+        name: string
+        type: string
+      }
+    | undefined
 }
 
-const NavBar = ({ menus, onSubMenuSelect }: Props) => {
+const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -51,6 +57,7 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
   }, [menus, location])
 
   const handleOnLogOut = () => {
+    console.log('logout')
     logoutMutation.mutate({
       method: 'DELETE',
       url: '/auth',
@@ -82,14 +89,18 @@ const NavBar = ({ menus, onSubMenuSelect }: Props) => {
             </div>
           ))}
         </div>
-        <UserInfoContainerStyle>
-          <UserNameStyle>admin님</UserNameStyle>
-          <Button
-            type={'primary'}
-            text={'로그아웃'}
-            onClick={() => handleOnLogOut()}
-          />
-        </UserInfoContainerStyle>
+        {account ? (
+          <UserInfoContainerStyle>
+            <UserNameStyle>{account?.name}님</UserNameStyle>
+            <Button
+              type={'primary'}
+              text={'로그아웃'}
+              onClick={handleOnLogOut}
+            />
+          </UserInfoContainerStyle>
+        ) : (
+          <UserInfoContainerStyle />
+        )}
       </div>
       <div css={horizontalSubMenuStyle}>
         <div css={SublistStyle}>
@@ -175,7 +186,7 @@ const selectedSubMenuStyle = css`
 `
 
 const UserNameStyle = styled.span`
-  ${({ theme }) => theme.typography.body};
+  ${({ theme }) => theme.typography.body2};
 `
 
 const menuListStyle = () => css`
@@ -236,16 +247,17 @@ const menuItemStyle = css`
     font-size: 0.8rem;
   }
 `
+
 const UserInfoContainerStyle = styled.div`
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  min-width: 140px;
 
   ${mq.md} {
     gap: 0.5rem;
     button {
-      font-size: 0.8rem;
-      padding: 0.3rem 0.6rem;
+      ${({ theme }) => theme.typography.body2} !important;
     }
   }
 

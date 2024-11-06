@@ -4,19 +4,36 @@ import styled from '@emotion/styled'
 import menu from '@/data/menu.json'
 import NavBar from '@/components/elements/NavBar.tsx'
 import { mq } from '@/utils/mediaQueries.ts'
+import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
+
+interface UserInfoType {
+  name: string
+  type: string
+}
 
 const Header = () => {
   const navigate = useNavigate()
+
+  // 유저 정보
+  const accountInfo = useQueryHandler<{ data: UserInfoType }>({
+    method: 'POST',
+    url: '/api/loginInfo',
+  })
 
   const onSubMenuSelect = (subItemKey: string | null) => {
     if (subItemKey) {
       navigate(`/${subItemKey}`)
     }
   }
+
   return (
     <HeaderContainer>
       <HeaderContent>
-        <NavBar menus={menu.list} onSubMenuSelect={onSubMenuSelect} />
+        <NavBar
+          menus={menu.list}
+          onSubMenuSelect={onSubMenuSelect}
+          account={accountInfo.data?.data}
+        />
       </HeaderContent>
     </HeaderContainer>
   )
