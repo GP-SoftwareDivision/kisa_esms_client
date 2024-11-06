@@ -20,20 +20,24 @@ export const dashBoardcolumns: TableColumnsType = [
     title: 'URL',
     dataIndex: 'url',
     align: 'center',
+    responsive: ['lg'],
   },
   {
     title: '제목/채팅방명',
     dataIndex: 'title',
     align: 'center',
+    responsive: ['md'],
   },
   {
     title: '내용',
     dataIndex: 'content',
     align: 'center',
+    responsive: ['lg'],
   },
   {
     title: '작성일시',
     dataIndex: 'writeTime',
     align: 'center',
+    responsive: ['md'],
   },
 ]

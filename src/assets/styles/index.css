@@ -23,7 +23,7 @@
 }
 
 * {
-  font-family: 'PretendardR', sans-serif;
+  font-family: 'PretendardR', sans-serif !important;
 }
 
 body {

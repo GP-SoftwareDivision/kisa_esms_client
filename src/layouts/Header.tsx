@@ -52,7 +52,7 @@ const HeaderContainer = styled.header`
   background-color: #fff;
   z-index: 1;
   ${mq.sm} {
-    margin-top: 1.5rem;
+    padding-top: 1.5rem;
   }
 `
 
