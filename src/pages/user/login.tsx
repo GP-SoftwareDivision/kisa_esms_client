@@ -53,6 +53,11 @@ const LoginPage = () => {
 
   // 인증번호 확인
   const handleOnAuthCheck = async () => {
+    if (!authNum) {
+      notify('인증번호를 입력해주세요.')
+      return
+    }
+
     authCheckMutation.mutate({
       method: 'POST',
       url: '/auth',

@@ -1,4 +1,4 @@
-import React, { Dispatch } from 'react'
+import React, { Dispatch, memo } from 'react'
 import type { GetProps, TimeRangePickerProps } from 'antd'
 import { DatePicker, ConfigProvider } from 'antd'
 import locale from 'antd/lib/locale/ko_KR'
@@ -16,9 +16,9 @@ interface DatePickerProps {
   setDate?: Dispatch<React.SetStateAction<{ start: string; end: string }>>
 }
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>
-const CustomDatePicker = (props: DatePickerProps) => {
-  const { label, setDate } = props
 
+const CustomDatePicker = memo((props: DatePickerProps) => {
+  const { label, setDate } = props
   const onRangeChange = (
     dates: null | (Dayjs | null)[],
     dateStrings: string[]
@@ -54,7 +54,7 @@ const CustomDatePicker = (props: DatePickerProps) => {
       </SelectBox>
     </ConfigProvider>
   )
-}
+})
 
 export default CustomDatePicker
 

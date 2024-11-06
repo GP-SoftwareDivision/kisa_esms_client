@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { TableColumnsType, Col } from 'antd'
-import type { UploadProps } from 'antd'
 import Dragger from 'antd/es/upload/Dragger'
+import type { UploadProps } from 'antd'
 
 import {
   ButtonContainer,
@@ -19,8 +19,9 @@ import { convertXlsxToCsv, getFileName } from '@/utils/fileHelpers.ts'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
 import instance from '../../apis/instance.ts'
+import { InfringementColumns } from '../../data/columns/Infringement.ts'
 
-interface AccountListType {
+interface DataType {
   seqidx: number
   filetype: string
   filename: string
@@ -47,6 +48,13 @@ interface AccountListType {
   responsestatus: string
 }
 
+interface AccountListType {
+  count: number
+  data: DataType[]
+  progress: 'Y' | 'N'
+  uploaderlist: string[]
+}
+
 const Infringement = () => {
   // 업로드를 위한 상태
   const [uploadFile, setUploadFile] = useState<File | null>(null)
@@ -63,107 +71,24 @@ const Infringement = () => {
     end: '',
   })
 
-  const accountList = useQueryHandler<{
-    data: AccountListType[]
-    count: number
-  }>({
-    method: 'POST',
-    url: '/api/accoutList',
-    body: {
-      page: pageNum,
-      filename: filename,
-      filetype: filetype,
-      uploader: uploader,
-      responsestatus: isResponse,
-      startdate: date.start,
-      enddate: date.end,
-    },
+  // 검색 옵션
+  const [request, setRequest] = useState<object>({
+    filename: filename,
+    filetype: filetype,
+    uploader: uploader,
+    responsestatus: isResponse,
+    startdate: date.start,
+    enddate: date.end,
   })
 
-  console.log(accountList.data)
-
-  const data = [
-    {
-      file_type: 'CSV',
-      file_name: 'Terminal High Altitude Area Defense',
-      reg_date: '2024-02-04 09:12:44',
-      uploader: '홍길동',
-      all_new_cnt: '100',
-      all_cnt: '100',
-      is_response: '완료',
-      first_recognize: '기업',
-      download: '',
-    },
-    {
-      file_type: 'CSV',
-      file_name: 'Terminal High Altitude Area Defense',
-      reg_date: '2024-02-04 09:12:44',
-      uploader: '홍길동',
-      all_new_cnt: '100',
-      all_cnt: '100',
-      is_response: '완료',
-      first_recognize: '기업',
-      download: '',
-    },
-    {
-      file_type: 'CSV',
-      file_name: 'Terminal High Altitude Area Defense',
-      reg_date: '2024-02-04 09:12:44',
-      uploader: '홍길동',
-      all_new_cnt: '100',
-      all_cnt: '100',
-      is_response: '완료',
-      first_recognize: '기업',
-      download: '',
-    },
-  ]
+  // 리스트 호출
+  const accountList = useQueryHandler<AccountListType>({
+    method: 'POST',
+    url: '/api/accountList',
+    body: { ...request, page: pageNum },
+  })
 
   const columns: TableColumnsType = [
-    {
-      title: '파일형식',
-      dataIndex: 'file_type',
-      align: 'center',
-    },
-    {
-      title: '파일명',
-      dataIndex: 'file_name',
-      align: 'center',
-    },
-    {
-      title: '업로드 날짜',
-      dataIndex: 'reg_date',
-      align: 'center',
-      responsive: ['lg'],
-    },
-    {
-      title: '담당자',
-      dataIndex: 'uploader',
-      align: 'center',
-      responsive: ['md'],
-    },
-    {
-      title: '신규 총 개수',
-      dataIndex: 'all_new_cnt',
-      align: 'center',
-      responsive: ['md'],
-    },
-    {
-      title: '총 개수',
-      dataIndex: 'all_cnt',
-      align: 'center',
-    },
-    {
-      title: '대응 여부',
-      dataIndex: 'is_response',
-      align: 'center',
-      responsive: ['md'],
-    },
-    {
-      title: '최초 인지(출처)',
-      dataIndex: 'first_recognize',
-      align: 'center',
-      responsive: ['lg'],
-    },
     {
       title: '',
       dataIndex: 'download',
@@ -180,8 +105,6 @@ const Infringement = () => {
       ),
     },
   ]
-
-  // const API_URL = import.meta.env.VITE_API_URL
 
   const handleUpload = async () => {
     if (!uploadFile) {
@@ -208,19 +131,17 @@ const Infringement = () => {
         withCredentials: true,
       })
       if (response.status === 200) {
-        const response2 = await instance.post(`/api/accountUpload`, {
+        await instance.post(`/api/accountUpload`, {
           filename: uploadFile.name,
           uploader: 'syjin',
         })
-        console.log(response2)
       }
     } catch (error) {
       console.error('Error uploading file', error)
     }
   }
 
-  const handleOnSelectChange = () => {}
-
+  // 드래그 조건
   const props: UploadProps = {
     accept:
       '.xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain',
@@ -257,6 +178,39 @@ const Infringement = () => {
     showUploadList: !!uploadFileName,
   }
 
+  // 대응 여부 옵션 메모제이션
+  const memoizedResponseOptions = useMemo(
+    () => [
+      { value: '대기', label: '대기' },
+      { value: '진행중', label: '진행중' },
+      { value: '완료', label: '완료' },
+    ],
+    []
+  )
+
+  // 파일 형식 옵션 메모제이션
+  const memoizedFileTypeOptions = useMemo(
+    () => [
+      { value: 'xlsx', label: 'xlsx' },
+      { value: 'csv', label: 'csv' },
+      { value: 'txt', label: 'txt' },
+    ],
+    []
+  )
+
+  // 검색
+  const handleOnSearch = () => {
+    const tmpReq = {
+      filename: filename,
+      filetype: filetype,
+      uploader: uploader,
+      responsestatus: isResponse,
+      startdate: date.start,
+      enddate: date.end,
+    }
+    setRequest(tmpReq)
+  }
+
   return (
     <ContentContainer>
       <PageTitle text={'침해 정보 판별'} />
@@ -279,35 +233,26 @@ const Infringement = () => {
           <CustomSelect
             label={'파일형식'}
             setState={setFiletype}
-            options={[
-              { value: '전체', label: '전체' },
-              { value: 'xlsx', label: 'xlsx' },
-              { value: 'csv', label: 'csv' },
-              { value: 'txt', label: 'txt' },
-            ]}
+            options={memoizedFileTypeOptions}
           />
         </Col>
         <Col xs={24} sm={12} md={8} lg={6}>
-          <CustomSelect
-            label={'담당자'}
-            setState={setUploader}
-            options={[
-              { value: '전체', label: '전체' },
-              { value: '홍길동', label: '홍길동' },
-              { value: '길동이', label: '길동이' },
-            ]}
-          />
+          {accountList.isSuccess && (
+            <CustomSelect
+              label={'담당자'}
+              setState={setUploader}
+              options={accountList.data.uploaderlist.map((v) => ({
+                value: v,
+                label: v,
+              }))}
+            />
+          )}
         </Col>
         <Col xs={24} sm={12} md={8} lg={6}>
           <CustomSelect
             label={'대응여부'}
             setState={setIsResponse}
-            options={[
-              { value: '전체', label: '전체' },
-              { value: '대기', label: '대기' },
-              { value: '진행중', label: '진행중' },
-              { value: '완료', label: '완료' },
-            ]}
+            options={memoizedResponseOptions}
           />
         </Col>
         <Col xs={24} sm={12} md={8} lg={6}>
@@ -323,22 +268,21 @@ const Infringement = () => {
         <Col xs={24} sm={12} md={8} lg={6}>
           <ButtonContainer>
             <div></div>
-            <Button
-              type={'primary'}
-              onClick={handleOnSelectChange}
-              text={'조회'}
-            />
+            <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
           </ButtonContainer>
         </Col>
       </SelectContainer>
       <ContentBox>
-        <CustomTable
-          data={data}
-          columns={columns}
-          pagination={true}
-          setPageNum={setPageNum}
-          pageNum={pageNum}
-        />
+        {accountList.isSuccess && (
+          <CustomTable
+            data={accountList.data.data}
+            columns={InfringementColumns.concat(columns)}
+            pagination={true}
+            setPageNum={setPageNum}
+            pageNum={pageNum}
+            total={accountList.data.count}
+          />
+        )}
       </ContentBox>
     </ContentContainer>
   )

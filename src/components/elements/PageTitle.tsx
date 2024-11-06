@@ -1,12 +1,12 @@
 import styled from '@emotion/styled'
-import { ReactNode } from 'react'
+import { ReactNode, memo } from 'react'
 
 interface PageTitleType {
   text: string
   children?: ReactNode
 }
 
-const PageTitle = (props: PageTitleType) => {
+const PageTitle = memo((props: PageTitleType) => {
   const { text, children } = props
   return (
     <TitleContainer>
@@ -14,7 +14,7 @@ const PageTitle = (props: PageTitleType) => {
       {children}
     </TitleContainer>
   )
-}
+})
 
 export default PageTitle
 
@@ -28,7 +28,7 @@ const TitleContainer = styled.div`
 `
 
 const StyledTitle = styled.h4`
+  ${({ theme }) => theme.typography.title}
   padding-bottom: 0.5rem;
   margin: 0;
-  ${({ theme }) => theme.typography.title}
 `

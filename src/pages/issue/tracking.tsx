@@ -69,7 +69,6 @@ const Tracking = () => {
             label={'API 타입'}
             onchange={handleOnSelectChange}
             options={[
-              { value: '전체', label: '전체' },
               { value: 'DT', label: 'DT' },
               { value: 'TT', label: 'TT' },
             ]}
@@ -80,7 +79,6 @@ const Tracking = () => {
             label={'사고유형'}
             onchange={handleOnSelectChange}
             options={[
-              { value: '전체', label: '전체' },
               { value: '정보유출', label: '정보유출' },
               { value: '서버해킹', label: '서버해킹' },
               { value: '기타', label: '기타' },
@@ -92,7 +90,6 @@ const Tracking = () => {
             label={'상태'}
             onchange={handleOnSelectChange}
             options={[
-              { value: '전체', label: '전체' },
               { value: '대기', label: '대기' },
               { value: '진행중', label: '진행중' },
               { value: '완료', label: '완료' },

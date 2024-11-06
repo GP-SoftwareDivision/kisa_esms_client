@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import React from 'react'
+import React, { memo } from 'react'
 import { SelectBox, SelectLabel } from '@/assets/styles/global.ts'
 
 interface InputProps {
@@ -9,7 +9,7 @@ interface InputProps {
   onchange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-const CustomInput = (props: InputProps) => {
+const CustomInput = memo((props: InputProps) => {
   const { value, label, placeholder, onchange } = props
 
   return (
@@ -23,7 +23,7 @@ const CustomInput = (props: InputProps) => {
       />
     </SelectBox>
   )
-}
+})
 export default CustomInput
 
 const StyledInput = styled.input`
