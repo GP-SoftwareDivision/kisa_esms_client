@@ -1,9 +1,8 @@
-import { TableColumnsType } from 'antd'
-import CustomTable from '@/components/charts/Table.tsx'
+import styled from '@emotion/styled'
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
+import CustomTable from '@/components/charts/Table.tsx'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
-import styled from '@emotion/styled'
 import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
 
 interface UserListType {
@@ -22,38 +21,33 @@ const User = () => {
     url: '/api/manage/userList',
   })
 
-  const columns: TableColumnsType = [
+  const columns = [
     {
-      title: '그룹명',
-      dataIndex: 'groupname',
-      align: 'center',
+      header: '그룹명',
+      accessorKey: 'groupname',
     },
     {
-      title: '이름',
-      dataIndex: 'name',
-      align: 'center',
+      header: '이름',
+      accessorKey: 'name',
     },
     {
-      title: '번호',
-      dataIndex: 'phonenum',
-      align: 'center',
+      header: '번호',
+      accessorKey: 'phonenum',
     },
     {
-      title: '이메일',
-      dataIndex: 'email',
-      align: 'center',
+      header: '이메일',
+      accessorKey: 'email',
     },
     {
-      title: '',
-      dataIndex: '',
-      align: 'center',
-      width: '10%',
-      render: (_: any, record: any) => (
+      header: '다운로드',
+      accessorKey: '',
+      id: 'actions',
+      cell: ({ row }: any) => (
         <TableButtonWrapper>
           <Button
             type={'download'}
             text={'수정'}
-            onClick={() => console.log(record)}
+            onClick={() => console.log(row.original.seqidx)}
           />
         </TableButtonWrapper>
       ),

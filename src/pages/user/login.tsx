@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Descriptions, DescriptionsProps } from 'antd'
+import { Flex, Box, Grid } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
 
@@ -74,28 +74,6 @@ const LoginPage = () => {
       data: { id, password },
     })
   }
-
-  const items: DescriptionsProps['items'] = [
-    {
-      label: '핸드폰 번호',
-      children: phoneNum,
-    },
-    {
-      label: '인증번호 입력',
-      children: (
-        <VerificationBox>
-          <VerificationInput
-            type='number'
-            value={authNum}
-            onChange={(e) => setAuthNum(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleOnAuthCheck()}
-          />
-          <span>{formatTime(timeLeft)}</span>
-          <VerificationButton onClick={reAuthCheck}>재전송</VerificationButton>
-        </VerificationBox>
-      ),
-    },
-  ]
 
   // 유효성 검사
   const validateForm = (): boolean => {
@@ -217,11 +195,37 @@ const LoginPage = () => {
             <ModalDescription>
               번호가 변경되었을 경우 관리자에게 문의해주세요 (관리자 : 박현진)
             </ModalDescription>
-            <Descriptions
-              bordered
-              column={{ xs: 1, sm: 1, md: 1, lg: 1, xl: 1, xxl: 1 }}
-              items={items}
-            />
+            <Flex direction='column' gap={4} padding={4}>
+              <Grid
+                templateColumns={{ base: '1fr', md: '1fr 2fr' }}
+                alignItems='center'
+              >
+                <Box fontSize={'sm'}>핸드폰 번호</Box>
+                <Box fontSize={'sm'}>{phoneNum}</Box>
+              </Grid>
+              <Grid
+                templateColumns={{ base: '1fr', md: '1fr 2fr' }}
+                alignItems='center'
+              >
+                <Box fontSize={'sm'}>인증 번호 입력</Box>
+                <Box fontSize={'sm'}>
+                  <VerificationBox>
+                    <VerificationInput
+                      type='number'
+                      value={authNum}
+                      onChange={(e) => setAuthNum(e.target.value)}
+                      onKeyDown={(e) =>
+                        e.key === 'Enter' && handleOnAuthCheck()
+                      }
+                    />
+                    <span>{formatTime(timeLeft)}</span>
+                    <VerificationButton onClick={reAuthCheck}>
+                      재전송
+                    </VerificationButton>
+                  </VerificationBox>
+                </Box>
+              </Grid>
+            </Flex>
             <ModalDescription>
               전송 받으신 인증번호를 빈칸에 기입하신 후, [확인] 버튼을 누르시면
               다음으로 진행됩니다.
@@ -284,6 +288,7 @@ const StyledInput = styled.input<{ variant: 'default' | 'warning' }>`
     props.variant === 'default' ? '1px solid #c7c7c7' : '1px solid #ef4444'};
   outline: none;
   padding-left: 10px;
+  ${({ theme }) => theme.typography.body2};
 `
 
 const StyledButton = styled.button`
@@ -294,6 +299,7 @@ const StyledButton = styled.button`
   color: #fff;
   margin-top: 20px;
   cursor: pointer;
+  ${({ theme }) => theme.typography.body2};
 `
 
 const ModalContents = styled.div`
@@ -317,6 +323,7 @@ const VerificationInput = styled.input`
   outline: none;
   max-width: 100px;
   border: 1px solid #c7c7c7;
+  padding-left: 4px;
 `
 
 const VerificationButton = styled.button`
@@ -327,6 +334,7 @@ const VerificationButton = styled.button`
   border-radius: 2px;
   font-size: 0.725rem;
   cursor: pointer;
+  padding: 4px;
 `
 
 const ButtonWrapper = styled.div`

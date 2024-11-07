@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Col } from 'antd'
+import { Box } from '@chakra-ui/react'
+
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import { issueTrackingcolumns } from '@/data/columns/tracking.ts'
@@ -60,11 +61,11 @@ const Tracking = () => {
   return (
     <ContentContainer>
       <PageTitle text={'이슈 대응 이력'} />
-      <SelectContainer gutter={[16, 16]}>
-        <Col xs={24} sm={12} md={8} lg={6}>
+      <SelectContainer columns={[1, 2, 3, 4]}>
+        <Box>
           <CustomDatePicker label={'조회 기간'} />
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        </Box>
+        <Box>
           <CustomSelect
             label={'API 타입'}
             onchange={handleOnSelectChange}
@@ -73,8 +74,8 @@ const Tracking = () => {
               { value: 'TT', label: 'TT' },
             ]}
           />
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        </Box>
+        <Box>
           <CustomSelect
             label={'사고유형'}
             onchange={handleOnSelectChange}
@@ -84,8 +85,8 @@ const Tracking = () => {
               { value: '기타', label: '기타' },
             ]}
           />
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        </Box>
+        <Box>
           <CustomSelect
             label={'상태'}
             onchange={handleOnSelectChange}
@@ -95,40 +96,38 @@ const Tracking = () => {
               { value: '완료', label: '완료' },
             ]}
           />
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        </Box>
+        <Box>
           <CustomInput
             label={'제목'}
             placeholder={'내용을 입력하세요.'}
             value={title}
             onchange={handleOnChange}
           />
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        </Box>
+        <Box>
           <CustomInput
             label={'피해기관'}
             placeholder={'내용을 입력하세요.'}
             value={title}
             onchange={handleOnChange}
           />
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}></Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
-          <ButtonContainer>
-            <Button
-              type={'primary'}
-              onClick={handleOnSelectChange}
-              text={'조회'}
-            />
-            <Button
-              type={'download'}
-              onClick={handleOnSelectChange}
-              text={'엑셀 다운로드'}
-            />
-          </ButtonContainer>
-        </Col>
+        </Box>
+        <Box></Box>
+        <ButtonContainer>
+          <Button
+            type={'primary'}
+            onClick={handleOnSelectChange}
+            text={'조회'}
+          />
+          <Button
+            type={'download'}
+            onClick={handleOnSelectChange}
+            text={'엑셀 다운로드'}
+          />
+        </ButtonContainer>
       </SelectContainer>
-      <ContentBox>
+      <ContentBox mt={4}>
         <CustomTable
           data={data}
           columns={issueTrackingcolumns}

@@ -1,51 +1,34 @@
-import { TableColumnsType } from 'antd'
-
-export const InfringementColumns: TableColumnsType = [
+export const InfringementColumns = [
   {
-    title: '파일형식',
-    dataIndex: 'filetype',
-    align: 'center',
+    header: '파일형식',
+    accessorKey: 'filetype',
   },
   {
-    title: '파일명',
-    dataIndex: 'filename',
-    align: 'center',
-    width: '20%',
+    header: '파일명',
+    accessorKey: 'filename',
   },
   {
-    title: '업로드 날짜',
-    dataIndex: 'uploaddate',
-    align: 'center',
-    responsive: ['lg'],
-    width: '15%',
+    header: '업로드 날짜',
+    accessorKey: 'uploaddate',
   },
   {
-    title: '담당자',
-    dataIndex: 'uploader',
-    align: 'center',
-    responsive: ['md'],
+    header: '담당자',
+    accessorKey: 'uploader',
   },
   {
-    title: '신규 총 개수',
-    dataIndex: 'all_new_cnt',
-    align: 'center',
-    responsive: ['md'],
+    header: '신규 총 개수',
+    accessorKey: 'all_new_cnt',
   },
   {
-    title: '총 개수',
-    dataIndex: 'total_count',
-    align: 'center',
+    header: '총 개수',
+    accessorKey: 'total_count',
   },
   {
-    title: '대응 여부',
-    dataIndex: 'responsestatus',
-    align: 'center',
-    responsive: ['md'],
+    header: '대응 여부',
+    accessorKey: 'responsestatus',
   },
   {
-    title: '최초 인지',
-    dataIndex: 'firstrecognition',
-    align: 'center',
-    responsive: ['lg'],
+    header: '최초 인지',
+    accessorKey: 'firstrecognition',
   },
 ]

@@ -1,24 +1,18 @@
-import { TableColumnsType } from 'antd'
-
-export const Alertcolumn: TableColumnsType = [
+export const Alertcolumn = [
   {
-    title: '발송시간',
-    dataIndex: 'senddate',
-    align: 'center',
+    header: '발송시간',
+    accessorKey: 'senddate',
   },
   {
-    title: '발송내용',
-    dataIndex: 'contents',
-    align: 'center',
+    header: '발송내용',
+    accessorKey: 'contents',
   },
   {
-    title: '발송 그룹',
-    dataIndex: 'groupname',
-    align: 'center',
+    header: '발송 그룹',
+    accessorKey: 'groupname',
   },
   {
-    title: '대상 채널',
-    dataIndex: 'target',
-    align: 'center',
+    header: '대상 채널',
+    accessorKey: 'target',
   },
 ]

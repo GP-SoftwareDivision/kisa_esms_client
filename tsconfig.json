@@ -6,7 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "outDir": "./dist",
     "rootDir": "./src",
     "skipLibCheck": true,

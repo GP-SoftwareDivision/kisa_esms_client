@@ -57,7 +57,6 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
   }, [menus, location])
 
   const handleOnLogOut = () => {
-    console.log('logout')
     logoutMutation.mutate({
       method: 'DELETE',
       url: '/auth',
@@ -89,7 +88,7 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
             </div>
           ))}
         </div>
-        {account ? (
+        {account?.name ? (
           <UserInfoContainerStyle>
             <UserNameStyle>{account?.name}님</UserNameStyle>
             <Button

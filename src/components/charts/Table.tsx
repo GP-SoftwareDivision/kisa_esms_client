@@ -1,66 +1,122 @@
-/** @jsxImportSource @emotion/react */
 import React, { Dispatch } from 'react'
-import { css } from '@emotion/react'
-import { Table } from 'antd'
-import type { TableColumnsType } from 'antd'
+import styled from '@emotion/styled'
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import {
+  PaginationItems,
+  PaginationNextTrigger,
+  PaginationPrevTrigger,
+  PaginationRoot,
+} from '@/components/ui/pagination'
 
-interface TableProps<T extends Record<string, any>> {
-  data: T[]
-  columns: TableColumnsType
+interface TableProps {
+  data: object[]
+  columns: {
+    header: string
+    accessorKey: string
+  }[]
   pagination?: boolean
-  pageNum?: number
   setPageNum?: Dispatch<React.SetStateAction<number>>
   total?: number
 }
 
-function CustomTable<T extends Record<string, any>>({
-  columns,
-  data,
-  pageNum,
-  setPageNum,
-  pagination,
-  total,
-}: TableProps<T>) {
-  const tableStyles = css`
-    .ant-table-thead > tr > th {
-      font-size: 0.875rem;
-      line-height: 1.5;
-      font-weight: bold;
-      padding: 8px 12px;
-    }
+const CustomTable = (props: TableProps) => {
+  const { data, columns, setPageNum, pagination, total } = props
 
-    .ant-table-tbody > tr > td {
-      font-size: 0.825rem;
-      line-height: 1.5;
-      padding: 12px 12px;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-  `
-  // 페이지네이션 이벤트
-  const handleOnPaging = (page: number) => {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  })
+
+  const handleOnPage = (page: number) => {
     if (setPageNum) setPageNum(page)
   }
 
   return (
-    <Table
-      columns={columns}
-      dataSource={data}
-      pagination={
-        pagination
-          ? {
-              current: pageNum,
-              position: ['bottomCenter'],
-              total: total,
-              pageSize: 15,
-              onChange: (page) => handleOnPaging(page),
-            }
-          : false
-      }
-      css={tableStyles}
-    />
+    <TableWrapper>
+      <StyledTable>
+        <thead>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHeader key={header.id}>
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+                </TableHeader>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody>
+          {table.getRowModel().rows.map((row) => (
+            <TableRow key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </tbody>
+      </StyledTable>
+      {pagination && (
+        <PaginationRoot
+          count={total!}
+          pageSize={15}
+          defaultPage={1}
+          onPageChange={(e) => handleOnPage(e.page)}
+          display={'flex'}
+          justifyContent={'center'}
+          marginTop={'2rem'}
+        >
+          <PaginationPrevTrigger />
+          <PaginationItems />
+          <PaginationNextTrigger />
+        </PaginationRoot>
+      )}
+    </TableWrapper>
   )
 }
 
 export default CustomTable
+
+const TableWrapper = styled.div`
+  overflow-x: auto;
+`
+
+const StyledTable = styled.table`
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  ${({ theme }) => theme.typography.body2};
+`
+
+const TableHeader = styled.th`
+  background-color: #fafafa;
+  font-weight: bold !important;
+  text-align: center;
+  padding: 12px;
+`
+
+const TableCell = styled.td`
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 350px;
+`
+
+const TableRow = styled.tr`
+  &:hover {
+    background-color: #fafafa;
+  }
+`

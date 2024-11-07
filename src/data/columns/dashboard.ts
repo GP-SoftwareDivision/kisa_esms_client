@@ -1,43 +1,30 @@
-import { TableColumnsType } from 'antd'
-
-export const dashBoardcolumns: TableColumnsType = [
+export const dashBoardcolumns = [
   {
-    title: '구분',
-    dataIndex: 'type',
-    align: 'center',
+    header: '구분',
+    accessorKey: 'type',
   },
   {
-    title: '카테고리',
-    dataIndex: 'category',
-    align: 'center',
+    header: '카테고리',
+    accessorKey: 'category',
   },
   {
-    title: '키워드',
-    dataIndex: 'keyword',
-    align: 'center',
+    header: '키워드',
+    accessorKey: 'keyword',
   },
   {
-    title: 'URL',
-    dataIndex: 'url',
-    align: 'center',
-    responsive: ['lg'],
+    header: 'URL',
+    accessorKey: 'url',
   },
   {
-    title: '제목/채팅방명',
-    dataIndex: 'title',
-    align: 'center',
-    responsive: ['md'],
+    header: '제목/채팅방명',
+    accessorKey: 'title',
   },
   {
-    title: '내용',
-    dataIndex: 'content',
-    align: 'center',
-    responsive: ['lg'],
+    header: '내용',
+    accessorKey: 'content',
   },
   {
-    title: '작성일시',
-    dataIndex: 'writeTime',
-    align: 'center',
-    responsive: ['md'],
+    header: '작성일시',
+    accessorKey: 'writeTime',
   },
 ]

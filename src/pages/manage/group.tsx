@@ -1,4 +1,3 @@
-import { TableColumnsType } from 'antd'
 import styled from '@emotion/styled'
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
 import CustomTable from '@/components/charts/Table.tsx'
@@ -24,38 +23,29 @@ const Group = () => {
     url: '/api/manage/groupList',
   })
 
-  const columns: TableColumnsType = [
+  const columns = [
     {
-      title: '그룹명',
-      dataIndex: 'groupname',
-      align: 'center',
+      header: '그룹명',
+      accessorKey: 'groupname',
     },
     {
-      title: '설명',
-      dataIndex: 'comment',
-      align: 'center',
+      header: '설명',
+      accessorKey: 'comment',
     },
     {
-      title: '알람방식',
-      dataIndex: 'alram',
-      align: 'center',
+      header: '알람방식',
+      accessorKey: 'alram',
     },
-    // {
-    //   title: '자동발송여부',
-    //   dataIndex: 'autosendflag',
-    //   align: 'center',
-    // },
     {
-      title: '',
-      dataIndex: '',
-      align: 'center',
-      width: '10%',
-      render: (_: any, record: any) => (
+      header: '다운로드',
+      accessorKey: '',
+      id: 'actions',
+      cell: ({ row }: any) => (
         <TableButtonWrapper>
           <Button
             type={'download'}
             text={'수정'}
-            onClick={() => console.log(record)}
+            onClick={() => console.log(row.original.seqidx)}
           />
         </TableButtonWrapper>
       ),

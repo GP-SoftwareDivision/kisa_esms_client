@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { TableColumnsType, Col } from 'antd'
-import Dragger from 'antd/es/upload/Dragger'
+import { Box } from '@chakra-ui/react'
 import type { UploadProps } from 'antd'
+import Dragger from 'antd/es/upload/Dragger'
 
 import {
   ButtonContainer,
@@ -88,18 +88,17 @@ const Infringement = () => {
     body: { ...request, page: pageNum },
   })
 
-  const columns: TableColumnsType = [
+  const columns = [
     {
-      title: '',
-      dataIndex: 'download',
-      align: 'center',
-      responsive: ['lg'],
-      render: (_: any, record: any) => (
+      header: '다운로드',
+      accessorKey: '',
+      id: 'actions',
+      cell: ({ row }: any) => (
         <ButtonWrapper>
           <Button
             type={'download'}
             text={'다운로드'}
-            onClick={() => console.log(record)}
+            onClick={() => console.log(row.original)}
           />
         </ButtonWrapper>
       ),
@@ -210,9 +209,6 @@ const Infringement = () => {
     }
     setRequest(tmpReq)
   }
-
-  console.log(accountList.isSuccess)
-
   return (
     <ContentContainer>
       <PageTitle text={'침해 정보 판별'} />
@@ -222,23 +218,27 @@ const Infringement = () => {
         </StyledDragger>
         <Button
           text={'파일 업로드'}
-          type={uploadFileName ? 'primary' : 'disabled'}
-          disabled={!uploadFileName}
+          type={
+            uploadFileName && accountList.data?.progress === 'N'
+              ? 'primary'
+              : 'disabled'
+          }
+          disabled={!uploadFileName && accountList.data?.progress === 'Y'}
           onClick={handleUpload}
         />
       </UploadContainer>
-      <SelectContainer gutter={[16, 16]}>
-        <Col xs={24} sm={12} md={8} lg={6}>
+      <SelectContainer columns={[1, 2, 3, 4]}>
+        <Box>
           <CustomDatePicker label={'조회 기간'} setDate={setDate} />
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        </Box>
+        <Box>
           <CustomSelect
             label={'파일형식'}
             setState={setFiletype}
             options={memoizedFileTypeOptions}
           />
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        </Box>
+        <Box>
           {accountList.isSuccess && (
             <CustomSelect
               label={'담당자'}
@@ -249,30 +249,30 @@ const Infringement = () => {
               }))}
             />
           )}
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        </Box>
+        <Box>
           <CustomSelect
             label={'대응여부'}
             setState={setIsResponse}
             options={memoizedResponseOptions}
           />
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        </Box>
+        <Box>
           <CustomInput
             label={'파일명'}
             placeholder={'내용을 입력하세요.'}
             value={filename}
             onchange={(e) => setFilename(e.target.value)}
           />
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}></Col>
-        <Col xs={24} sm={12} md={8} lg={6}></Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        </Box>
+        <Box></Box>
+        <Box></Box>
+        <Box>
           <ButtonContainer>
             <div></div>
             <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
           </ButtonContainer>
-        </Col>
+        </Box>
       </SelectContainer>
       <ContentBox>
         {accountList.isSuccess && (
@@ -281,7 +281,6 @@ const Infringement = () => {
             columns={InfringementColumns.concat(columns)}
             pagination={true}
             setPageNum={setPageNum}
-            pageNum={pageNum}
             total={accountList.data.count}
           />
         )}
@@ -293,7 +292,7 @@ export default Infringement
 
 const UploadContainer = styled.div`
   display: flex;
-  margin: 0.5rem 0 1rem 0;
+  margin-top: 0.5rem;
   gap: 1rem;
   position: relative;
 

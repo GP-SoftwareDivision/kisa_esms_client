@@ -27,11 +27,11 @@ const CustomInput = memo((props: InputProps) => {
 export default CustomInput
 
 const StyledInput = styled.input`
-  height: 28px;
-  border-radius: 6px;
+  height: 30px;
+  border-radius: 0.25rem;
   border: 1px solid #d9d9d9;
   outline: none;
   padding-left: 10px;
   width: 100%;
-  ${({ theme }) => theme.typography.body2};
+  ${({ theme }) => theme.typography.body3};
 `

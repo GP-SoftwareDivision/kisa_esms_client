@@ -51,10 +51,6 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-.custom-table .ant-table-cell {
-  text-align: center;
-}
-
 .ant-select-dropdown .ant-select-item {
   font-size: 0.825rem;
   line-height: 1.5;
@@ -76,8 +72,4 @@ input::-webkit-inner-spin-button {
 
 .ant-upload-wrapper .ant-upload-list .ant-upload-list-item {
   margin: 0 !important;
-}
-
-.ant-table-content table {
-  table-layout: fixed !important;
 }

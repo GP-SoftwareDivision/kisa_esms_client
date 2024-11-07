@@ -37,7 +37,6 @@ const Alert = () => {
               data={alertList?.data.data}
               columns={Alertcolumn}
               pagination={true}
-              pageNum={pageNum}
               setPageNum={setPageNum}
               total={alertList.data?.count}
             />

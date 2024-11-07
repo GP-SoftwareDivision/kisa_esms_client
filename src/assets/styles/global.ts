@@ -1,20 +1,21 @@
 import styled from '@emotion/styled'
-import { Row } from 'antd'
+import { Box, SimpleGrid } from '@chakra-ui/react'
 
-export const ContentContainer = styled.div`
+export const ContentContainer = styled(Box)`
   width: 100%;
   display: flex;
   flex-direction: column;
 `
 
-export const ContentBox = styled.div`
+export const ContentBox = styled(Box)`
   border: 1px solid ${({ theme }) => theme.color.gray100};
   border-radius: 4px;
   padding: 1rem;
 `
 
-export const SelectContainer = styled(Row)`
-  margin-bottom: 1rem;
+export const SelectContainer = styled(SimpleGrid)`
+  margin: 1rem 0;
+  gap: 16px;
 `
 
 export const SelectBox = styled.div`
@@ -31,7 +32,7 @@ export const SelectLabel = styled.label`
   ${({ theme }) => theme.typography.body2};
 `
 
-export const ButtonContainer = styled.div`
+export const ButtonContainer = styled(Box)`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;

@@ -38,6 +38,11 @@ export const theme = {
       lineHeight: 1.5,
       fontWeight: 400,
     },
+    body3: {
+      fontSize: '0.75rem',
+      lineHeight: 1.5,
+      fontWeight: 400,
+    },
     title: {
       fontSize: '1rem',
       lineHeight: 1.4,
@@ -135,6 +140,11 @@ declare module '@emotion/react' {
         fontWeight: number
       }
       body2: {
+        fontSize: string
+        lineHeight: number
+        fontWeight: number
+      }
+      body3: {
         fontSize: string
         lineHeight: number
         fontWeight: number
