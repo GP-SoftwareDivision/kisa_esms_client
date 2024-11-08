@@ -11,8 +11,10 @@ import {
   PaginationPrevTrigger,
   PaginationRoot,
 } from '@/components/ui/pagination'
+import { CustomSkeleton } from '@/components/elements/Skeleton.tsx'
 
 interface TableProps {
+  loading: boolean
   data: object[]
   columns: {
     header: string
@@ -24,7 +26,14 @@ interface TableProps {
 }
 
 const CustomTable = (props: TableProps) => {
-  const { data, columns, setPageNum, pagination, total } = props
+  const {
+    loading,
+    data = [],
+    columns = [],
+    setPageNum,
+    pagination,
+    total,
+  } = props
 
   const table = useReactTable({
     data,
@@ -38,47 +47,56 @@ const CustomTable = (props: TableProps) => {
 
   return (
     <TableWrapper>
-      <StyledTable>
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHeader key={header.id}>
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                </TableHeader>
+      {loading ? (
+        <CustomSkeleton />
+      ) : (
+        <>
+          <StyledTable>
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHeader key={header.id}>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </TableHeader>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
               ))}
-            </TableRow>
-          ))}
-        </tbody>
-      </StyledTable>
-      {pagination && (
-        <PaginationRoot
-          count={total!}
-          pageSize={15}
-          defaultPage={1}
-          onPageChange={(e) => handleOnPage(e.page)}
-          display={'flex'}
-          justifyContent={'center'}
-          marginTop={'2rem'}
-        >
-          <PaginationPrevTrigger />
-          <PaginationItems />
-          <PaginationNextTrigger />
-        </PaginationRoot>
+            </tbody>
+          </StyledTable>
+          {pagination && (
+            <PaginationRoot
+              count={total!}
+              pageSize={15}
+              defaultPage={1}
+              onPageChange={(e) => handleOnPage(e.page)}
+              display={'flex'}
+              justifyContent={'center'}
+              marginTop={'2rem'}
+            >
+              <PaginationPrevTrigger />
+              <PaginationItems />
+              <PaginationNextTrigger />
+            </PaginationRoot>
+          )}
+        </>
       )}
     </TableWrapper>
   )
