@@ -1,7 +1,8 @@
 import React, { Dispatch, memo } from 'react'
-import type { GetProps, TimeRangePickerProps } from 'antd'
-import { DatePicker, ConfigProvider } from 'antd'
-import locale from 'antd/lib/locale/ko_KR'
+import ConfigProvider from 'antd/es/config-provider'
+import DatePicker from 'antd/es/date-picker'
+import type { RangePickerProps } from 'antd/es/date-picker'
+import ko_KR from 'antd/es/locale/ko_KR'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import 'dayjs/locale/ko'
@@ -15,7 +16,6 @@ interface DatePickerProps {
   label: string
   setDate?: Dispatch<React.SetStateAction<{ start: string; end: string }>>
 }
-type RangePickerProps = GetProps<typeof DatePicker.RangePicker>
 
 const CustomDatePicker = memo((props: DatePickerProps) => {
   const { label, setDate } = props
@@ -30,7 +30,7 @@ const CustomDatePicker = memo((props: DatePickerProps) => {
     }
   }
 
-  const rangePresets: TimeRangePickerProps['presets'] = [
+  const rangePresets: RangePickerProps['presets'] = [
     { label: '최근 7일', value: [dayjs().add(-7, 'd'), dayjs()] },
     { label: '최근 30일', value: [dayjs().add(-30, 'd'), dayjs()] },
     { label: '최근 90일', value: [dayjs().add(-90, 'd'), dayjs()] },
@@ -42,7 +42,7 @@ const CustomDatePicker = memo((props: DatePickerProps) => {
   }
 
   return (
-    <ConfigProvider locale={locale}>
+    <ConfigProvider locale={ko_KR}>
       <SelectBox>
         <SelectLabel>{label}</SelectLabel>
         <StyledRangePicker
@@ -55,6 +55,8 @@ const CustomDatePicker = memo((props: DatePickerProps) => {
     </ConfigProvider>
   )
 })
+
+CustomDatePicker.displayName = 'CustomDatePicker'
 
 export default CustomDatePicker
 

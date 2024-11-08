@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Box } from '@chakra-ui/react'
-import type { UploadProps } from 'antd'
-import Dragger from 'antd/es/upload/Dragger'
+import styled from '@emotion/styled'
+import Dropzone from 'react-dropzone'
+import { MdUploadFile } from 'react-icons/md'
 
+import instance from '../../apis/instance.ts'
 import {
   ButtonContainer,
   ContentBox,
@@ -14,12 +16,12 @@ import CustomSelect from '@/components/elements/Select.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
-import styled from '@emotion/styled'
-import { convertXlsxToCsv, getFileName } from '@/utils/fileHelpers.ts'
 import PageTitle from '@/components/elements/PageTitle.tsx'
+import { convertXlsxToCsv, getFileName } from '@/utils/fileHelpers.ts'
 import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
-import instance from '../../apis/instance.ts'
-import { InfringementColumns } from '../../data/columns/Infringement.ts'
+import { InfringementColumns } from '@/data/columns/Infringement.ts'
+import { CloseButton } from '@/components/ui/close-button'
+import { notify } from '@/utils/notify.ts'
 
 interface DataType {
   seqidx: number
@@ -140,43 +142,6 @@ const Infringement = () => {
     }
   }
 
-  // 드래그 조건
-  const props: UploadProps = {
-    accept:
-      '.xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain',
-    onRemove: () => {
-      setUploadFile(null)
-      setUploadFileName(null)
-    },
-    beforeUpload: (file) => {
-      const name = getFileName(file.name)
-      setUploadFile(file)
-      setUploadFileName(name)
-      return false
-    },
-    onDrop: (e) => {
-      const drag_file = e.dataTransfer.files[0]
-      const name = getFileName(drag_file.name)
-
-      const fileName = drag_file.name.split('.')
-      const fileExtension = fileName[fileName.length - 1].toLowerCase()
-      const isCorrectType = ['xlsx', 'csv', 'txt'].includes(fileExtension)
-
-      if (!isCorrectType) {
-        alert(
-          '지원하는 형식이 아닙니다. xlsx, csv, txt의 파일 형식만 가능합니다.'
-        )
-        setUploadFile(null)
-        setUploadFileName(null)
-      } else {
-        setUploadFile(drag_file)
-        setUploadFileName(name)
-      }
-    },
-    maxCount: 1,
-    showUploadList: !!uploadFileName,
-  }
-
   // 대응 여부 옵션 메모제이션
   const memoizedResponseOptions = useMemo(
     () => [
@@ -209,13 +174,71 @@ const Infringement = () => {
     }
     setRequest(tmpReq)
   }
+
+  const onDrop = useCallback((acceptedFiles: any) => {
+    console.log('acceptedFiles', acceptedFiles)
+    const drag_file = acceptedFiles[0]
+    const name = getFileName(drag_file.name)
+
+    const fileName = drag_file.name.split('.')
+    const fileExtension = fileName[fileName.length - 1].toLowerCase()
+    const isCorrectType = ['xlsx', 'csv', 'txt'].includes(fileExtension)
+
+    if (!isCorrectType) {
+      notify(
+        '지원하는 형식이 아닙니다. xlsx, csv, txt의 파일 형식만 가능합니다.'
+      )
+      setUploadFile(null)
+      setUploadFileName(null)
+    } else {
+      setUploadFile(drag_file)
+      setUploadFileName(name)
+    }
+  }, [])
+
+  // 업로드 취소
+  const canCleUpload = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    e.stopPropagation()
+    setUploadFile(null)
+    setUploadFileName(null)
+  }
+
   return (
     <ContentContainer>
       <PageTitle text={'침해 정보 판별'} />
       <UploadContainer>
-        <StyledDragger {...props}>
-          {!uploadFileName && '업로드할 파일 놓기 또는 파일 선택'}
-        </StyledDragger>
+        <Dropzone onDrop={(acceptedFiles) => onDrop(acceptedFiles)}>
+          {({ getRootProps, getInputProps }) => (
+            <StyledFileUpload {...getRootProps()}>
+              <input
+                {...getInputProps()}
+                accept={
+                  '.xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain'
+                }
+              />
+              <StyledFileIcon />
+              <p>
+                {uploadFileName
+                  ? uploadFileName
+                  : '업로드할 파일 놓기 또는 파일 선택'}
+              </p>
+              {uploadFile && (
+                <CloseButton
+                  me='-1'
+                  size='xs'
+                  variant='plain'
+                  focusVisibleRing='inside'
+                  focusRingWidth='2px'
+                  pointerEvents='auto'
+                  color='fg.subtle'
+                  height={'auto'}
+                  onClick={(e) => canCleUpload(e)}
+                />
+              )}
+            </StyledFileUpload>
+          )}
+        </Dropzone>
+
         <Button
           text={'파일 업로드'}
           type={
@@ -294,18 +317,27 @@ const UploadContainer = styled.div`
   display: flex;
   margin-top: 0.5rem;
   gap: 1rem;
-  position: relative;
+`
 
-  .ant-upload-wrapper .ant-upload-drag .ant-upload {
-    padding: 4px 8px;
+const StyledFileUpload = styled.div`
+  width: 100%;
+  display: flex;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 0.25rem;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+
+  p {
+    ${({ theme }) => theme.typography.body2};
   }
 `
 
-const StyledDragger = styled(Dragger)`
-  width: 100%;
-  ${({ theme }) => theme.typography.body2};
+const StyledFileIcon = styled(MdUploadFile)`
+  margin-right: 0.3rem;
+  color: ${({ theme }) => theme.color.gray800};
 `
-
 const ButtonWrapper = styled.div`
   display: flex;
   width: 100%;
