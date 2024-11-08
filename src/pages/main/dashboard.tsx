@@ -113,6 +113,7 @@ const MainPage = () => {
         <PageTitle text={'해킹 데이터 현황'} />
         <Box border='1px solid' borderColor='gray.100' borderRadius='4px' p={4}>
           <CustomTable
+            loading={false}
             data={data}
             columns={dashBoardcolumns}
             pagination={false}

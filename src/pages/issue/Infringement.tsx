@@ -300,6 +300,7 @@ const Infringement = () => {
       <ContentBox>
         {accountList.isSuccess && (
           <CustomTable
+            loading={accountList.isLoading}
             data={accountList.data.data}
             columns={InfringementColumns.concat(columns)}
             pagination={true}

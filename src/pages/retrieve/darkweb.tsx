@@ -128,7 +128,7 @@ const DarkWeb = () => {
         </Box>
       </SelectContainer>
       <ContentBox>
-        <CustomTable data={data} columns={columns} pagination={true} />
+        <CustomTable data={data} columns={columns} pagination={false} />
       </ContentBox>
     </ContentContainer>
   )

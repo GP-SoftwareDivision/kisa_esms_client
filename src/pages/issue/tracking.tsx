@@ -129,6 +129,7 @@ const Tracking = () => {
       </SelectContainer>
       <ContentBox mt={4}>
         <CustomTable
+          loading={false}
           data={data}
           columns={issueTrackingcolumns}
           pagination={true}

@@ -27,6 +27,7 @@ const Alert = () => {
       page: pageNum,
     },
   })
+
   return (
     <>
       <ContentContainer>
@@ -34,6 +35,7 @@ const Alert = () => {
         <ContentBox>
           {alertList.isSuccess && (
             <CustomTable
+              loading={alertList.isLoading}
               data={alertList?.data.data}
               columns={Alertcolumn}
               pagination={true}

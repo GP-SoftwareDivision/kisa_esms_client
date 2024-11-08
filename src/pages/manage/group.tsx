@@ -67,6 +67,7 @@ const Group = () => {
       <ContentBox>
         {groupList.isSuccess && (
           <CustomTable
+            loading={groupList.isLoading}
             data={groupList.data.data}
             columns={columns}
             pagination={true}

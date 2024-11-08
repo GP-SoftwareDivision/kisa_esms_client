@@ -69,6 +69,7 @@ const User = () => {
       <ContentBox>
         {userList.isSuccess && (
           <CustomTable
+            loading={userList.isLoading}
             data={userList.data.data}
             columns={columns}
             pagination={true}
