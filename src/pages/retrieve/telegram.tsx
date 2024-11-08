@@ -122,7 +122,7 @@ const Telegram = () => {
         </Box>
       </SelectContainer>
       <ContentBox>
-        <CustomTable data={data} columns={columns} />
+        <CustomTable data={data} columns={columns} loading={false} />
       </ContentBox>
     </ContentContainer>
   )
