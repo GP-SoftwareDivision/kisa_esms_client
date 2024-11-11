@@ -5,20 +5,22 @@ import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
 import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
 
-interface UserListType {
-  seqidx: number
-  email: string
-  usertype: string
-  name: string
-  phonenum: string
-  groupcode: string
+interface groupList {
+  groupcode: number
   groupname: string
+  comment: string
+  alram: string
+  autosendflag: string
+  kakaoflag: string
+  emailflag: string
+  useflag: string
+  updatedate: string
 }
 
-const User = () => {
-  const userList = useQueryHandler<{ data: UserListType[] }>({
+const GroupPage = () => {
+  const groupList = useQueryHandler<{ data: groupList[] }>({
     method: 'POST',
-    url: '/api/manage/userList',
+    url: '/api/manage/groupList',
   })
 
   const columns = [
@@ -27,16 +29,12 @@ const User = () => {
       accessorKey: 'groupname',
     },
     {
-      header: '이름',
-      accessorKey: 'name',
+      header: '설명',
+      accessorKey: 'comment',
     },
     {
-      header: '번호',
-      accessorKey: 'phonenum',
-    },
-    {
-      header: '이메일',
-      accessorKey: 'email',
+      header: '알람방식',
+      accessorKey: 'alram',
     },
     {
       header: '다운로드',
@@ -67,10 +65,10 @@ const User = () => {
         />
       </ButtonWrapper>
       <ContentBox>
-        {userList.isSuccess && (
+        {groupList.isSuccess && (
           <CustomTable
-            loading={userList.isLoading}
-            data={userList.data.data}
+            loading={groupList.isLoading}
+            data={groupList.data.data}
             columns={columns}
             pagination={false}
           />
@@ -79,7 +77,7 @@ const User = () => {
     </ContentContainer>
   )
 }
-export default User
+export default GroupPage
 
 const TableButtonWrapper = styled.div`
   width: 100%;

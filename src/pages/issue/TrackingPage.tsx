@@ -3,7 +3,7 @@ import { Box } from '@chakra-ui/react'
 
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
-import { issueTrackingcolumns } from '@/data/columns/tracking.ts'
+import { issueTrackingColumns } from '@/constants/tableColumns.ts'
 import CustomInput from '@/components/elements/Input.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
 import CustomDatePicker from '@/components/elements/DatePicker.tsx'
@@ -15,7 +15,7 @@ import {
 } from '@/assets/styles/global.ts'
 import Button from '@/components/elements/Button.tsx'
 
-const Tracking = () => {
+const TrackingPage = () => {
   const [title, setTitle] = useState<string>('')
 
   const data = [
@@ -131,11 +131,11 @@ const Tracking = () => {
         <CustomTable
           loading={false}
           data={data}
-          columns={issueTrackingcolumns}
+          columns={issueTrackingColumns}
           pagination={true}
         />
       </ContentBox>
     </ContentContainer>
   )
 }
-export default Tracking
+export default TrackingPage

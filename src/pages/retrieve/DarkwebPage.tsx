@@ -15,7 +15,7 @@ import CustomSelect from '@/components/elements/Select.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import Button from '@/components/elements/Button.tsx'
 
-const DarkWeb = () => {
+const DarkwebPage = () => {
   const [title, setTitle] = useState<string>('')
   const columns = [
     {
@@ -138,4 +138,4 @@ const DarkWeb = () => {
     </ContentContainer>
   )
 }
-export default DarkWeb
+export default DarkwebPage

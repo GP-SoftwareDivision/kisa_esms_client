@@ -19,7 +19,9 @@
       "@/hooks/*": ["./src/hooks/*"],
       "@/utils/*": ["./src/utils/*"],
       "@/data/*": ["./src/data/*"],
-      "@/pages/*": ["./src/pages/*"]
+      "@/pages/*": ["./src/pages/*"],
+      "@/constants/*": ["./src/constants/*"],
+      "@/apis/*": ["./src/apis/*"]
     },
     /* Bundler mode */
     "allowImportingTsExtensions": true,

@@ -7,7 +7,7 @@ import Bar from '@/components/charts/Bar.tsx'
 import Pie from '@/components/charts/Pie.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomList from '@/components/charts/List.tsx'
-import { dashBoardcolumns } from '@/data/columns/dashboard.ts'
+import { dashBoardColumns } from '@/constants/tableColumns.ts'
 
 interface DateSituationType {
   type: string
@@ -115,7 +115,7 @@ const MainPage = () => {
           <CustomTable
             loading={false}
             data={data}
-            columns={dashBoardcolumns}
+            columns={dashBoardColumns}
             pagination={false}
           />
         </Box>

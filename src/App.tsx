@@ -13,20 +13,15 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query'
 import { ToastContainer } from 'react-toastify'
-import instance from './apis/instance.ts'
-import { routes } from './routes/routes'
+
+import instance from '@/apis/instance.ts'
 import { theme } from '@/assets/styles/theme.ts'
 import Wrapper from '@/layouts/Wrapper'
-import LoginPage from '@/pages/user/login.tsx'
+import LoginPage from '@/pages/user/LoginPage.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
+import { routeConfig } from './routes/routeConfig.tsx'
 
 const queryClient = new QueryClient()
-
-// 루트 경로 진입 시 로그인 여부 확인
-const checkAuthStatus = async () => {
-  const response = await instance.get('/auth')
-  return response.data
-}
 
 const App = () => {
   // 로그인 페이지 제외 레이아웃 추가
@@ -39,7 +34,14 @@ const App = () => {
       </>
     )
   }
+
+  // 루트 경로 진입 시 로그인 여부 확인 후 페이지 라우팅 처리
   const RootRoute = () => {
+    const checkAuthStatus = async () => {
+      const response = await instance.get('/auth')
+      return response.data
+    }
+
     const { isLoading, data } = useQuery({
       queryKey: ['authStatus'],
       queryFn: checkAuthStatus,
@@ -61,7 +63,7 @@ const App = () => {
               <Route path='/' element={<RootRoute />} />
               <Route path='/login' element={<LoginPage />} />
               <Route element={<Layout />}>
-                {routes.map((route, index) => (
+                {routeConfig.map((route, index) => (
                   <Route
                     key={index}
                     path={route.path}

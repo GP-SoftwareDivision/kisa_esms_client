@@ -1,32 +1,11 @@
-import { useState } from 'react'
-
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
-import { Alertcolumn } from '@/data/columns/alert.ts'
-import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
+import { AlertColumns } from '@/constants/tableColumns.ts'
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
+import { useAlertList } from '@/hooks/useAlertList.tsx'
 
-interface AlertType {
-  seqidx: number
-  senddate: string
-  contents: string
-  kakaoresult: string
-  emailresult: string
-  target: string
-  targetidx: number
-  groupname: string
-}
-
-const Alert = () => {
-  const [pageNum, setPageNum] = useState<number>(1)
-
-  const alertList = useQueryHandler<{ data: AlertType[]; count: number }>({
-    method: 'POST',
-    url: '/api/main/alarmList',
-    body: {
-      page: pageNum,
-    },
-  })
+const AlertPage = () => {
+  const { alertList, setPageNum } = useAlertList()
 
   return (
     <>
@@ -37,7 +16,7 @@ const Alert = () => {
             <CustomTable
               loading={alertList.isLoading}
               data={alertList?.data.data}
-              columns={Alertcolumn}
+              columns={AlertColumns}
               pagination={true}
               setPageNum={setPageNum}
               total={alertList.data?.count}
@@ -48,4 +27,4 @@ const Alert = () => {
     </>
   )
 }
-export default Alert
+export default AlertPage

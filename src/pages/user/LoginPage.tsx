@@ -1,163 +1,37 @@
-import React, { useCallback, useEffect, useState } from 'react'
 import { Flex, Box, Grid } from '@chakra-ui/react'
-import { useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
 
-import useModal from '@/hooks/useModal.tsx'
 import CustomModal from '@/components/elements/Modal.tsx'
-import useTimer from '@/hooks/useTimer.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
-import { useMutationHandler } from '@/hooks/useMutationHandler.tsx'
-import { notify } from '@/utils/notify.ts'
-
-interface WarningType {
-  id: boolean
-  password: boolean
-}
+import { useAuth } from '@/hooks/useAuth.tsx'
+import { useLogin } from '@/hooks/useLogin.tsx'
 
 const LoginPage = () => {
-  const navigate = useNavigate()
-  const [id, setId] = useState<string>('gpadmin')
-  const [password, setPassword] = useState<string>('1234')
-  const [phoneNum, setPhoneNum] = useState<string>('')
-  const [authNum, setAuthNum] = useState<string>('')
+  const {
+    id,
+    password,
+    warning,
+    phoneNum,
+    isOpen,
+    timeLeft,
+    handleOnChange,
+    handleOnLogin,
+    reAuthCheck,
+    cancelLogin,
+  } = useLogin()
+  const { authNum, setAuthNum, handleOnAuthCheck } = useAuth(phoneNum)
 
-  const [warning, setWarning] = useState<WarningType>({
-    id: false,
-    password: false,
-  })
-
-  const { openModal, closeModal, isOpen } = useModal()
-  const { timeLeft, startTimer, resetTimer } = useTimer(180) // 3분(180초) 타이머
-  const loginMutation = useMutationHandler('login')
-  const authCheckMutation = useMutationHandler('authCheck')
-
+  // 3분 타이머
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`
   }
 
-  // 인증번호 입력 팝업 open
-  const handleOnLogin = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    if (validateForm()) {
-      loginMutation.mutate({
-        method: 'POST',
-        url: '/api/login/selectMember',
-        data: { id, password },
-      })
-    }
-  }
-
-  // 인증번호 확인
-  const handleOnAuthCheck = async () => {
-    if (!authNum) {
-      notify('인증번호를 입력해주세요.')
-      return
-    }
-
-    authCheckMutation.mutate({
-      method: 'POST',
-      url: '/auth',
-      data: { phonenum: phoneNum, authnum: authNum },
-    })
-  }
-
-  // 재전송
-  const reAuthCheck = () => {
-    resetTimer()
-    loginMutation.mutate({
-      method: 'POST',
-      url: '/api/login/selectMember',
-      data: { id, password },
-    })
-  }
-
-  // 유효성 검사
-  const validateForm = (): boolean => {
-    const newWarning = {
-      id: id.trim() === '',
-      password: password.trim() === '',
-    }
-
-    setWarning(newWarning)
-    return !newWarning.id && !newWarning.password
-  }
-
-  const handleOnChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { id, value } = event.target
-      if (id === 'id' || id === 'password') {
-        const setter = id === 'id' ? setId : setPassword
-        setter(value)
-
-        if (value.trim()) {
-          setWarning((prev) => ({ ...prev, [id]: false }))
-        }
-      }
-    },
-    []
-  )
-
-  // 인증 번호 성공 시
-  useEffect(() => {
-    if (authCheckMutation.isError) {
-      notify('인증번호가 일치하지 않습니다.')
-      return
-    }
-    if (authCheckMutation.isSuccess && authCheckMutation.data) {
-      const { message } = authCheckMutation.data
-      switch (message) {
-        case 'success':
-          navigate('/main/dashboard')
-          break
-        case 'timeout':
-          notify('인증 시간이 지났습니다. 재전송을 눌러주세요.')
-          break
-        case 'fail':
-          notify('인증번호가 일치하지 않습니다.')
-          break
-        default:
-          console.warn(`Unexpected message: ${message}`)
-          notify('잠시 후 다시 시도해주세요.')
-      }
-    }
-  }, [authCheckMutation.isSuccess, authCheckMutation.isError])
-
-  // 로그인 성공 실패 여부
-  useEffect(() => {
-    if (!loginMutation.isSuccess || !loginMutation.data) return
-
-    const { message, data } = loginMutation.data
-    switch (message) {
-      case 'success':
-        openModal('login')
-        startTimer()
-        setPhoneNum(data.phonenum)
-        break
-      case undefined:
-        notify('아이디나 비밀번호가 일치하지 않습니다.')
-        break
-      default:
-        console.warn(`Unexpected message: ${message}`)
-        notify('잠시 후 다시 시도해주세요.')
-    }
-  }, [loginMutation.isSuccess, loginMutation.data])
-
-  // 타이머가 변할 때마다 렌더링 트리거
-  useEffect(() => {
-    if (timeLeft === 0) {
-      notify('인증번호 시간이 만료되었습니다. 재전송버튼을 눌러주세요.')
-    }
-  }, [timeLeft])
-
-  // 인증번호 취소
+  // 인증 취소 - 모달 닫힘
   const cancelAuth = () => {
-    closeModal('login')
-    resetTimer()
     setAuthNum('')
+    cancelLogin()
   }
 
   return (
@@ -185,9 +59,8 @@ const LoginPage = () => {
           </StyledButton>
         </StyledForm>
       </LoginContent>
-
       <CustomModal
-        isOpen={isOpen('login')}
+        isOpen={isOpen}
         title='사용자 인증'
         onCancel={cancelAuth}
         content={
