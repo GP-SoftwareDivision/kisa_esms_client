@@ -70,7 +70,7 @@ const Group = () => {
             loading={groupList.isLoading}
             data={groupList.data.data}
             columns={columns}
-            pagination={true}
+            pagination={false}
           />
         )}
       </ContentBox>

@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import styled from '@emotion/styled'
 
 import menu from '@/data/menu.json'
 import NavBar from '@/components/elements/NavBar.tsx'
 import { mq } from '@/utils/mediaQueries.ts'
-import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
+import instance from '../apis/instance.ts'
 
 interface UserInfoType {
   name: string
@@ -14,10 +15,19 @@ interface UserInfoType {
 const Header = () => {
   const navigate = useNavigate()
 
+  const fetchAccountInfo = async () => {
+    try {
+      const response = await instance.post('/api/loginInfo')
+      return response.data
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   // 유저 정보
-  const accountInfo = useQueryHandler<{ data: UserInfoType }>({
-    method: 'POST',
-    url: '/api/loginInfo',
+  const accountInfo = useQuery<{ data: UserInfoType }>({
+    queryKey: ['account'],
+    queryFn: fetchAccountInfo,
   })
 
   const onSubMenuSelect = (subItemKey: string | null) => {

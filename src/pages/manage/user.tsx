@@ -72,7 +72,7 @@ const User = () => {
             loading={userList.isLoading}
             data={userList.data.data}
             columns={columns}
-            pagination={true}
+            pagination={false}
           />
         )}
       </ContentBox>

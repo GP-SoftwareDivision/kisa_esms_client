@@ -7,15 +7,20 @@ import {
   Outlet,
   Navigate,
 } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import {
+  QueryClient,
+  useQuery,
+  QueryClientProvider,
+} from '@tanstack/react-query'
 import { ToastContainer } from 'react-toastify'
-
 import instance from './apis/instance.ts'
 import { routes } from './routes/routes'
 import { theme } from '@/assets/styles/theme.ts'
 import Wrapper from '@/layouts/Wrapper'
 import LoginPage from '@/pages/user/login.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
+
+const queryClient = new QueryClient()
 
 // 루트 경로 진입 시 로그인 여부 확인
 const checkAuthStatus = async () => {
@@ -47,8 +52,8 @@ const App = () => {
   }
 
   return (
-    <Router>
-      <Suspense fallback={<div></div>}>
+    <QueryClientProvider client={queryClient}>
+      <Router>
         <ToastContainer />
         <ThemeProvider theme={theme}>
           <Suspense fallback={<Loading />}>
@@ -67,8 +72,8 @@ const App = () => {
             </Routes>
           </Suspense>
         </ThemeProvider>
-      </Suspense>
-    </Router>
+      </Router>
+    </QueryClientProvider>
   )
 }
 
