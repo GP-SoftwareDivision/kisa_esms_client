@@ -13,8 +13,11 @@ import CustomDatePicker from '@/components/elements/DatePicker.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import Button from '@/components/elements/Button.tsx'
+import { usePagination } from '@/hooks/usePagination.tsx'
+import CustomPagination from '@/components/elements/Pagination.tsx'
 
 const Telegram = () => {
+  const { page, handlePageChange } = usePagination()
   const [title, setTitle] = useState<string>('')
 
   const columns = [
@@ -123,6 +126,11 @@ const Telegram = () => {
       </SelectContainer>
       <ContentBox>
         <CustomTable data={data} columns={columns} loading={false} />
+        <CustomPagination
+          total={1}
+          page={page}
+          handlePageChange={(newPage) => handlePageChange(newPage as number)}
+        />
       </ContentBox>
     </ContentContainer>
   )

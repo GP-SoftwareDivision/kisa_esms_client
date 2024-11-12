@@ -14,8 +14,11 @@ import {
   SelectContainer,
 } from '@/assets/styles/global.ts'
 import Button from '@/components/elements/Button.tsx'
+import CustomPagination from '@/components/elements/Pagination.tsx'
+import { usePagination } from '@/hooks/usePagination.tsx'
 
 const TrackingPage = () => {
+  const { page, handlePageChange } = usePagination()
   const [title, setTitle] = useState<string>('')
 
   const data = [
@@ -129,10 +132,14 @@ const TrackingPage = () => {
       </SelectContainer>
       <ContentBox mt={4}>
         <CustomTable
-          loading={false}
           data={data}
+          loading={false}
           columns={issueTrackingColumns}
-          pagination={true}
+        />
+        <CustomPagination
+          total={1}
+          page={page}
+          handlePageChange={(newPage) => handlePageChange(newPage as number)}
         />
       </ContentBox>
     </ContentContainer>

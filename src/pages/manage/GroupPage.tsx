@@ -4,6 +4,8 @@ import CustomTable from '@/components/charts/Table.tsx'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
 import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
+import CustomPagination from '@/components/elements/Pagination.tsx'
+import { usePagination } from '@/hooks/usePagination.tsx'
 
 interface groupList {
   groupcode: number
@@ -18,6 +20,7 @@ interface groupList {
 }
 
 const GroupPage = () => {
+  const { page, handlePageChange } = usePagination()
   const groupList = useQueryHandler<{ data: groupList[] }>({
     method: 'POST',
     url: '/api/manage/groupList',
@@ -66,12 +69,20 @@ const GroupPage = () => {
       </ButtonWrapper>
       <ContentBox>
         {groupList.isSuccess && (
-          <CustomTable
-            loading={groupList.isLoading}
-            data={groupList.data.data}
-            columns={columns}
-            pagination={false}
-          />
+          <>
+            <CustomTable
+              loading={groupList.isLoading}
+              data={groupList.data.data}
+              columns={columns}
+            />
+            <CustomPagination
+              total={1}
+              page={page}
+              handlePageChange={(newPage) =>
+                handlePageChange(newPage as number)
+              }
+            />
+          </>
         )}
       </ContentBox>
     </ContentContainer>

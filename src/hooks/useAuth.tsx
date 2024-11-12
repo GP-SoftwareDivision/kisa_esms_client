@@ -1,34 +1,40 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { useMutationHandler } from '@/hooks/useMutationHandler'
+import { useMutation } from '@tanstack/react-query'
+
+import instance from '@/apis/instance.ts'
 import { notify } from '@/utils/notify'
 
-export const useAuth = (phoneNum: string) => {
-  const navigate = useNavigate()
-  const authCheckMutation = useMutationHandler('authCheck')
+interface useAuthProps {
+  phoneNum: string
+}
 
+export const useAuth = () => {
+  const navigate = useNavigate()
   const [authNum, setAuthNum] = useState<string>('')
 
-  const handleOnAuthCheck = () => {
-    if (!authNum) {
-      notify('인증번호를 입력해주세요.')
-      return
-    }
-
-    authCheckMutation.mutate({
-      method: 'POST',
-      url: '/auth',
-      data: { phonenum: phoneNum, authnum: authNum },
-    })
-  }
-
-  useEffect(() => {
-    if (authCheckMutation.isError) {
-      notify('인증번호가 일치하지 않습니다.')
-      return
-    }
-    if (authCheckMutation.isSuccess && authCheckMutation.data) {
-      const { message } = authCheckMutation.data
+  // 인번호 체크 API 통신
+  const checkAuth = useMutation({
+    mutationKey: ['checkAuth'],
+    mutationFn: async (data: useAuthProps) => {
+      if (!authNum) {
+        notify('인증번호를 입력해주세요.')
+        return
+      }
+      const response = await instance.post('/auth', {
+        phonenum: data.phoneNum,
+        authnum: authNum,
+      })
+      return response.data
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        notify(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
+      }
+    },
+    onSuccess: (response) => {
+      const { message } = response
       switch (message) {
         case 'success':
           navigate('/main/dashboard')
@@ -43,13 +49,7 @@ export const useAuth = (phoneNum: string) => {
           console.warn(`Unexpected message: ${message}`)
           notify('잠시 후 다시 시도해주세요.')
       }
-    }
-  }, [authCheckMutation.isSuccess, authCheckMutation.isError])
-
-  return {
-    authNum,
-    setAuthNum,
-    handleOnAuthCheck,
-    authCheckMutation,
-  }
+    },
+  })
+  return { checkAuth, authNum, setAuthNum }
 }

@@ -6,8 +6,7 @@ interface PageTitleType {
   children?: ReactNode
 }
 
-const PageTitle = memo((props: PageTitleType) => {
-  const { text, children } = props
+const PageTitle = memo(({ text, children }: PageTitleType) => {
   return (
     <TitleContainer>
       <StyledTitle>{text}</StyledTitle>

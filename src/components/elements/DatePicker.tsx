@@ -17,8 +17,7 @@ interface DatePickerProps {
   setDate?: Dispatch<React.SetStateAction<{ start: string; end: string }>>
 }
 
-const CustomDatePicker = memo((props: DatePickerProps) => {
-  const { label, setDate } = props
+const CustomDatePicker = memo(({ label, setDate }: DatePickerProps) => {
   const onRangeChange = (
     dates: null | (Dayjs | null)[],
     dateStrings: string[]

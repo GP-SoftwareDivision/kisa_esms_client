@@ -17,9 +17,7 @@ interface SelectProps {
   onchange?: () => void
   setState?: Dispatch<React.SetStateAction<string>>
 }
-const CustomSelect = memo((props: SelectProps) => {
-  const { options, label, setState } = props
-
+const CustomSelect = memo(({ options, label, setState }: SelectProps) => {
   const handleOnChange = (selected: string[]) => {
     if (setState) setState(selected[0])
   }

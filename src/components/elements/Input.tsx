@@ -9,21 +9,21 @@ interface InputProps {
   onchange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-const CustomInput = memo((props: InputProps) => {
-  const { value, label, placeholder, onchange } = props
-
-  return (
-    <SelectBox>
-      <SelectLabel>{label}</SelectLabel>
-      <StyledInput
-        id='password'
-        value={value}
-        placeholder={placeholder}
-        onChange={onchange}
-      />
-    </SelectBox>
-  )
-})
+const CustomInput = memo(
+  ({ value, label, placeholder, onchange }: InputProps) => {
+    return (
+      <SelectBox>
+        <SelectLabel>{label}</SelectLabel>
+        <StyledInput
+          id='password'
+          value={value}
+          placeholder={placeholder}
+          onChange={onchange}
+        />
+      </SelectBox>
+    )
+  }
+)
 export default CustomInput
 
 const StyledInput = styled.input`

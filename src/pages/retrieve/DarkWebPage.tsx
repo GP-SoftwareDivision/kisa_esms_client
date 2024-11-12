@@ -14,9 +14,13 @@ import CustomDatePicker from '@/components/elements/DatePicker.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import Button from '@/components/elements/Button.tsx'
+import CustomPagination from '@/components/elements/Pagination.tsx'
+import { usePagination } from '@/hooks/usePagination.tsx'
 
-const DarkwebPage = () => {
+const DarkWebPage = () => {
+  const { page, handlePageChange } = usePagination()
   const [title, setTitle] = useState<string>('')
+
   const columns = [
     {
       header: '카테고리',
@@ -128,14 +132,14 @@ const DarkwebPage = () => {
         </Box>
       </SelectContainer>
       <ContentBox>
-        <CustomTable
-          data={data}
-          columns={columns}
-          pagination={false}
-          loading={false}
+        <CustomTable data={data} columns={columns} loading={false} />
+        <CustomPagination
+          total={1}
+          page={page}
+          handlePageChange={(newPage) => handlePageChange(newPage as number)}
         />
       </ContentBox>
     </ContentContainer>
   )
 }
-export default DarkwebPage
+export default DarkWebPage

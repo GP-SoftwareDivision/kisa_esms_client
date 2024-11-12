@@ -1,25 +1,15 @@
-import { lazy } from 'react'
+import { RouteObject } from 'react-router-dom'
+import * as Components from './components'
 
-const MainPage = lazy(() => import('@/pages/main/DashBoardPage.tsx'))
-const User = lazy(() => import('@/pages/manage/UserPage.tsx'))
-const Tracking = lazy(() => import('@/pages/issue/TrackingPage.tsx'))
-const Infringement = lazy(() => import('@/pages/issue/InfringementPage.tsx'))
-const DarkWeb = lazy(() => import('@/pages/retrieve/DarkwebPage.tsx'))
-const Telegram = lazy(() => import('@/pages/retrieve/TelegramDataPage.tsx'))
-const Alert = lazy(() => import('@/pages/main/AlertPage.tsx'))
-const Keyword = lazy(() => import('@/pages/manage/KeywordPage.tsx'))
-const Ruleset = lazy(() => import('@/pages/manage/RulesetPage.tsx'))
-const Group = lazy(() => import('@/pages/manage/GroupPage.tsx'))
-
-export const routeConfig = [
-  { path: '/main/dashboard', element: <MainPage /> },
-  { path: '/main/alert', element: <Alert /> },
-  { path: '/issue/tracking', element: <Tracking /> },
-  { path: '/issue/infringement', element: <Infringement /> },
-  { path: '/retrieve/darkweb', element: <DarkWeb /> },
-  { path: '/retrieve/telegram', element: <Telegram /> },
-  { path: '/manage/user', element: <User /> },
-  { path: '/manage/keyword', element: <Keyword /> },
-  { path: '/manage/ruleset', element: <Ruleset /> },
-  { path: '/manage/group', element: <Group /> },
+export const routeConfig: RouteObject[] = [
+  { path: '/main/dashboard', element: <Components.MainPage /> },
+  { path: '/main/alert', element: <Components.Alert /> },
+  { path: '/issue/tracking', element: <Components.Tracking /> },
+  { path: '/issue/infringement', element: <Components.Infringement /> },
+  { path: '/retrieve/darkweb', element: <Components.DarkWeb /> },
+  { path: '/retrieve/telegram', element: <Components.Telegram /> },
+  { path: '/manage/user', element: <Components.User /> },
+  { path: '/manage/keyword', element: <Components.Keyword /> },
+  { path: '/manage/ruleset', element: <Components.Ruleset /> },
+  { path: '/manage/group', element: <Components.Group /> },
 ]

@@ -1,3 +1,4 @@
+import { FormEvent } from 'react'
 import { Flex, Box, Grid } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 
@@ -5,56 +6,53 @@ import CustomModal from '@/components/elements/Modal.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useAuth } from '@/hooks/useAuth.tsx'
 import { useLogin } from '@/hooks/useLogin.tsx'
+import { useForm } from '@/hooks/useForm.tsx'
+import { formatTimer } from '@/utils/formatTimer.ts'
 
 const LoginPage = () => {
-  const {
-    id,
-    password,
-    warning,
-    phoneNum,
-    isOpen,
-    timeLeft,
-    handleOnChange,
-    handleOnLogin,
-    reAuthCheck,
-    cancelLogin,
-  } = useLogin()
-  const { authNum, setAuthNum, handleOnAuthCheck } = useAuth(phoneNum)
+  const { login, phoneNum, timeLeft, isOpen, handleOnCancel } = useLogin()
+  const { checkAuth, authNum, setAuthNum } = useAuth()
+  const { fields, warning, handleOnChange, validateForm } = useForm({
+    id: 'gpadmin',
+    password: '1234',
+  })
 
-  // 3분 타이머
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${minutes}:${secs < 10 ? '0' : ''}${secs}`
+  // 로그인
+  const handleLoginAction = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const { id, password } = fields
+
+    if (validateForm()) {
+      login.mutate({ id, password })
+    }
   }
 
-  // 인증 취소 - 모달 닫힘
-  const cancelAuth = () => {
-    setAuthNum('')
-    cancelLogin()
+  // 인증 번호 체크
+  const handleAuthAction = () => {
+    checkAuth.mutate({ phoneNum })
   }
 
   return (
     <LoginContainer>
       <LoginContent>
         <LoginLogo src='/logo_login.png' alt='logo' />
-        <StyledForm onSubmit={(e) => handleOnLogin(e)}>
+        <StyledForm onSubmit={(e) => handleLoginAction(e)}>
           <StyledInput
             id='id'
-            value={id}
+            value={fields.id}
             placeholder='사용자ID'
-            onChange={(e) => handleOnChange(e)}
+            onChange={handleOnChange}
             variant={warning.id ? 'warning' : 'default'}
           />
           <StyledInput
             id='password'
-            value={password}
+            value={fields.password}
             placeholder='비밀번호'
-            onChange={(e) => handleOnChange(e)}
+            onChange={handleOnChange}
             type={'password'}
             variant={warning.password ? 'warning' : 'default'}
           />
-          <StyledButton type='submit' onClick={() => handleOnLogin}>
+          <StyledButton type='submit' onClick={() => handleLoginAction}>
             로그인
           </StyledButton>
         </StyledForm>
@@ -62,7 +60,7 @@ const LoginPage = () => {
       <CustomModal
         isOpen={isOpen}
         title='사용자 인증'
-        onCancel={cancelAuth}
+        onCancel={handleOnCancel}
         content={
           <ModalContents>
             <ModalDescription>
@@ -74,7 +72,7 @@ const LoginPage = () => {
                 alignItems='center'
               >
                 <Box fontSize={'sm'}>핸드폰 번호</Box>
-                <Box fontSize={'sm'}>{phoneNum}</Box>
+                <Box fontSize={'sm'}>{phoneNum ? phoneNum : ''}</Box>
               </Grid>
               <Grid
                 templateColumns={{ base: '1fr', md: '1fr 2fr' }}
@@ -87,12 +85,10 @@ const LoginPage = () => {
                       type='number'
                       value={authNum}
                       onChange={(e) => setAuthNum(e.target.value)}
-                      onKeyDown={(e) =>
-                        e.key === 'Enter' && handleOnAuthCheck()
-                      }
+                      onKeyDown={(e) => e.key === 'Enter' && handleAuthAction}
                     />
-                    <span>{formatTime(timeLeft)}</span>
-                    <VerificationButton onClick={reAuthCheck}>
+                    <span>{formatTimer(timeLeft)}</span>
+                    <VerificationButton onClick={() => console.log('test')}>
                       재전송
                     </VerificationButton>
                   </VerificationBox>
@@ -107,11 +103,15 @@ const LoginPage = () => {
               관리자에게 문의하세요.
             </ModalDescription>
             <ButtonWrapper>
-              <CustomButton type='outline' text='취소' onClick={cancelAuth} />
+              <CustomButton
+                type='outline'
+                text='취소'
+                onClick={handleOnCancel}
+              />
               <CustomButton
                 type='primary'
                 text='확인'
-                onClick={() => handleOnAuthCheck()}
+                onClick={handleAuthAction}
               />
             </ButtonWrapper>
           </ModalContents>

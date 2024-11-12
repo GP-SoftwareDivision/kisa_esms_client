@@ -8,6 +8,8 @@ import Pie from '@/components/charts/Pie.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomList from '@/components/charts/List.tsx'
 import { dashBoardColumns } from '@/constants/tableColumns.ts'
+import { usePagination } from '@/hooks/usePagination.tsx'
+import CustomPagination from '@/components/elements/Pagination.tsx'
 
 interface DateSituationType {
   type: string
@@ -22,6 +24,7 @@ interface DateSituationType {
 const MainPage = () => {
   const today = dayjs()
   const oneWeekAgo = today.subtract(1, 'month').format('YYYY-MM-DD')
+  const { page, handlePageChange } = usePagination()
 
   const data: DateSituationType[] = [
     {
@@ -112,11 +115,11 @@ const MainPage = () => {
       <Box mt={4}>
         <PageTitle text={'해킹 데이터 현황'} />
         <Box border='1px solid' borderColor='gray.100' borderRadius='4px' p={4}>
-          <CustomTable
-            loading={false}
-            data={data}
-            columns={dashBoardColumns}
-            pagination={false}
+          <CustomTable loading={false} data={data} columns={dashBoardColumns} />
+          <CustomPagination
+            total={1}
+            page={page}
+            handlePageChange={(newPage) => handlePageChange(newPage as number)}
           />
         </Box>
       </Box>

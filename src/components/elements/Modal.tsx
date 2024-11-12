@@ -9,9 +9,7 @@ interface ModalType {
   content?: React.ReactNode
 }
 
-const CustomModal = (props: ModalType) => {
-  const { title, content, isOpen, onCancel } = props
-
+const CustomModal = ({ title, content, isOpen, onCancel }: ModalType) => {
   return (
     isOpen && (
       <StyledModal>

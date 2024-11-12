@@ -4,6 +4,8 @@ import CustomTable from '@/components/charts/Table.tsx'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
 import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
+import CustomPagination from '@/components/elements/Pagination.tsx'
+import { usePagination } from '@/hooks/usePagination.tsx'
 
 interface UserListType {
   seqidx: number
@@ -16,6 +18,8 @@ interface UserListType {
 }
 
 const UserPage = () => {
+  const { page, handlePageChange } = usePagination()
+
   const userList = useQueryHandler<{ data: UserListType[] }>({
     method: 'POST',
     url: '/api/manage/userList',
@@ -68,12 +72,20 @@ const UserPage = () => {
       </ButtonWrapper>
       <ContentBox>
         {userList.isSuccess && (
-          <CustomTable
-            loading={userList.isLoading}
-            data={userList.data.data}
-            columns={columns}
-            pagination={false}
-          />
+          <>
+            <CustomTable
+              loading={userList.isLoading}
+              data={userList.data.data}
+              columns={columns}
+            />
+            <CustomPagination
+              total={1}
+              page={page}
+              handlePageChange={(newPage) =>
+                handlePageChange(newPage as number)
+              }
+            />
+          </>
         )}
       </ContentBox>
     </ContentContainer>

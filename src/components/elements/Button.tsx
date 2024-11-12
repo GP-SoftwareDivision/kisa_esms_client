@@ -7,8 +7,7 @@ interface ButtonType {
   onClick?: () => void
 }
 
-const CustomButton = (props: ButtonType) => {
-  const { text, type, disabled, onClick } = props
+const CustomButton = ({ text, type, disabled, onClick }: ButtonType) => {
   return (
     <StyledButton $type={type} onClick={onClick} disabled={disabled}>
       {text}

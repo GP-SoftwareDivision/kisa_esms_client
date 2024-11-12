@@ -1,45 +1,96 @@
-import React from 'react'
+import { useState } from 'react'
 import { Box } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 import Dropzone from 'react-dropzone'
 import { MdUploadFile } from 'react-icons/md'
+
 import {
   ButtonContainer,
   ContentBox,
   ContentContainer,
   SelectContainer,
 } from '@/assets/styles/global'
+import instance from '@/apis/instance'
 import CustomDatePicker from '@/components/elements/DatePicker'
 import CustomSelect from '@/components/elements/Select'
 import CustomInput from '@/components/elements/Input'
 import Button from '@/components/elements/Button'
 import CustomTable from '@/components/charts/Table'
 import PageTitle from '@/components/elements/PageTitle'
-import { InfringementColumns } from '@/constants/tableColumns'
 import { CloseButton } from '@/components/ui/close-button'
-import { useInfringement } from '@/hooks/useInfringement.tsx'
+import CustomPagination from '@/components/elements/Pagination.tsx'
+import { InfringementColumns } from '@/constants/tableColumns'
+import { useQueryHandler } from '@/hooks/useQueryHandler'
+import { usePagination } from '@/hooks/usePagination.tsx'
+import useFileDragDrop from '@/hooks/useFileDragDrop.tsx'
+import useOptions from '@/hooks/useOptions.tsx'
+import { notify } from '@/utils/notify.ts'
 
-const InfringementPage: React.FC = () => {
+interface AccountListType {
+  count: number
+  data: object[]
+  progress: 'Y' | 'N'
+  uploaderlist: string[]
+}
+
+const InfringementPage = () => {
+  const { page, handlePageChange } = usePagination()
   const {
     uploadFile,
     uploadFileName,
-    setPageNum,
-    filename,
-    setFilename,
-    setFiletype,
-    setUploader,
-    setIsResponse,
-    setDate,
-    accountList,
-    handleUpload,
-    memoizedResponseOptions,
-    memoizedFileTypeOptions,
-    handleOnSearch,
-    onDrop,
-    canCleUpload,
-  } = useInfringement()
+    dragFile,
+    formData,
+    startUpload,
+    abortUpload,
+  } = useFileDragDrop()
+  const { responseOptions, fileTypeOptions } = useOptions()
 
-  const columns = [
+  const [filename, setFilename] = useState<string>('')
+  const [filetype, setFiletype] = useState<string>('')
+  const [uploader, setUploader] = useState<string>('')
+  const [isResponse, setIsResponse] = useState<string>('')
+  const [date, setDate] = useState<{ start: string; end: string }>({
+    start: '',
+    end: '',
+  })
+
+  const [request, setRequest] = useState<object>({
+    filename: filename,
+    filetype: filetype,
+    uploader: uploader,
+    responsestatus: isResponse,
+    startdate: date.start,
+    enddate: date.end,
+  })
+
+  const accountList = useQueryHandler<AccountListType>({
+    method: 'POST',
+    url: '/api/accountList',
+    body: { ...request, page: page },
+  })
+
+  // 파일 업로드
+  const accountUpload = async () => {
+    await startUpload()
+    try {
+      const response = await instance.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true,
+      })
+      if (response.status === 200) {
+        await instance.post(`/api/accountUpload`, {
+          filename: uploadFile?.name,
+          uploader: 'syjin',
+        })
+      }
+    } catch (error) {
+      console.error('Error uploading file', error)
+      notify(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
+    }
+  }
+
+  // 다운로드 컬럼 추가
+  const addDownloadColumns = [
     {
       header: '다운로드',
       accessorKey: '',
@@ -60,7 +111,7 @@ const InfringementPage: React.FC = () => {
     <ContentContainer>
       <PageTitle text={'침해 정보 판별'} />
       <UploadContainer>
-        <Dropzone onDrop={onDrop}>
+        <Dropzone onDrop={dragFile}>
           {({ getRootProps, getInputProps }) => (
             <StyledFileUpload {...getRootProps()}>
               <input
@@ -85,7 +136,7 @@ const InfringementPage: React.FC = () => {
                   pointerEvents='auto'
                   color='fg.subtle'
                   height={'auto'}
-                  onClick={canCleUpload}
+                  onClick={abortUpload}
                 />
               )}
             </StyledFileUpload>
@@ -99,7 +150,7 @@ const InfringementPage: React.FC = () => {
               : 'disabled'
           }
           disabled={!uploadFileName && accountList.data?.progress === 'Y'}
-          onClick={handleUpload}
+          onClick={accountUpload}
         />
       </UploadContainer>
       <SelectContainer columns={[1, 2, 3, 4]}>
@@ -110,7 +161,7 @@ const InfringementPage: React.FC = () => {
           <CustomSelect
             label={'파일형식'}
             setState={setFiletype}
-            options={memoizedFileTypeOptions}
+            options={fileTypeOptions}
           />
         </Box>
         <Box>
@@ -129,7 +180,7 @@ const InfringementPage: React.FC = () => {
           <CustomSelect
             label={'대응여부'}
             setState={setIsResponse}
-            options={memoizedResponseOptions}
+            options={responseOptions}
           />
         </Box>
         <Box>
@@ -145,20 +196,39 @@ const InfringementPage: React.FC = () => {
         <Box>
           <ButtonContainer>
             <div></div>
-            <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
+            <Button
+              type={'primary'}
+              onClick={() =>
+                setRequest({
+                  filename: filename,
+                  filetype: filetype,
+                  uploader: uploader,
+                  responsestatus: isResponse,
+                  startdate: date.start,
+                  enddate: date.end,
+                })
+              }
+              text={'조회'}
+            />
           </ButtonContainer>
         </Box>
       </SelectContainer>
       <ContentBox>
         {accountList.isSuccess && (
-          <CustomTable
-            loading={accountList.isLoading}
-            data={accountList.data.data}
-            columns={InfringementColumns.concat(columns)}
-            pagination={true}
-            setPageNum={setPageNum}
-            total={accountList.data.count}
-          />
+          <>
+            <CustomTable
+              loading={accountList.isLoading}
+              data={accountList.data.data}
+              columns={InfringementColumns.concat(addDownloadColumns)}
+            />
+            <CustomPagination
+              total={accountList.data.count}
+              page={page}
+              handlePageChange={(newPage) =>
+                handlePageChange(newPage as number)
+              }
+            />
+          </>
         )}
       </ContentBox>
     </ContentContainer>
@@ -192,6 +262,7 @@ const StyledFileIcon = styled(MdUploadFile)`
   margin-right: 0.3rem;
   color: ${({ theme }) => theme.color.gray800};
 `
+
 const ButtonWrapper = styled.div`
   display: flex;
   width: 100%;
