@@ -18,8 +18,13 @@ const LoginPage = () => {
   })
 
   // 로그인
-  const handleLoginAction = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const handleLoginAction = (
+    event: FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>
+  ) => {
+    if ('preventDefault' in event) {
+      event.preventDefault()
+    }
+
     const { id, password } = fields
 
     if (validateForm()) {
@@ -36,7 +41,7 @@ const LoginPage = () => {
     <LoginContainer>
       <LoginContent>
         <LoginLogo src='/logo_login.png' alt='logo' />
-        <StyledForm onSubmit={(e) => handleLoginAction(e)}>
+        <StyledForm onSubmit={handleLoginAction}>
           <StyledInput
             id='id'
             value={fields.id}
@@ -52,7 +57,7 @@ const LoginPage = () => {
             type={'password'}
             variant={warning.password ? 'warning' : 'default'}
           />
-          <StyledButton type='submit' onClick={() => handleLoginAction}>
+          <StyledButton type='submit' onClick={handleLoginAction}>
             로그인
           </StyledButton>
         </StyledForm>
