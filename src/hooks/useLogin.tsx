@@ -28,6 +28,7 @@ export const useLogin = () => {
   const login = useMutation({
     mutationKey: ['login'],
     mutationFn: async (data: useLoginProps) => {
+      resetTimer()
       const response = await instance.post('/api/login/selectMember', data)
       return response.data
     },

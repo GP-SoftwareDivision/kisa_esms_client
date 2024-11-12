@@ -93,7 +93,7 @@ const LoginPage = () => {
                       onKeyDown={(e) => e.key === 'Enter' && handleAuthAction}
                     />
                     <span>{formatTimer(timeLeft)}</span>
-                    <VerificationButton onClick={() => console.log('test')}>
+                    <VerificationButton onClick={handleLoginAction}>
                       재전송
                     </VerificationButton>
                   </VerificationBox>
