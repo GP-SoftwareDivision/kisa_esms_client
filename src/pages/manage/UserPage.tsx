@@ -6,6 +6,7 @@ import Button from '@/components/elements/Button.tsx'
 import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import { usePagination } from '@/hooks/usePagination.tsx'
+import { UserColumns } from '@/constants/tableColumns.ts'
 
 interface UserListType {
   seqidx: number
@@ -26,22 +27,6 @@ const UserPage = () => {
   })
 
   const columns = [
-    {
-      header: '그룹명',
-      accessorKey: 'groupname',
-    },
-    {
-      header: '이름',
-      accessorKey: 'name',
-    },
-    {
-      header: '번호',
-      accessorKey: 'phonenum',
-    },
-    {
-      header: '이메일',
-      accessorKey: 'email',
-    },
     {
       header: '다운로드',
       accessorKey: '',
@@ -76,7 +61,7 @@ const UserPage = () => {
             <CustomTable
               loading={userList.isLoading}
               data={userList.data.data}
-              columns={columns}
+              columns={UserColumns.concat(columns)}
             />
             <CustomPagination
               total={1}

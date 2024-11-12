@@ -16,49 +16,11 @@ import CustomInput from '@/components/elements/Input.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import { usePagination } from '@/hooks/usePagination.tsx'
+import { DarkWebColumns } from '@/constants/tableColumns.ts'
 
 const DarkWebPage = () => {
   const { page, handlePageChange } = usePagination()
   const [title, setTitle] = useState<string>('')
-
-  const columns = [
-    {
-      header: '카테고리',
-      accessorKey: 'category',
-    },
-    {
-      header: '수집 키워드',
-      accessorKey: 'keyword',
-    },
-    {
-      header: 'URL',
-      accessorKey: 'url',
-    },
-    {
-      header: '제목',
-      accessorKey: 'title',
-    },
-    {
-      header: '작성시간',
-      accessorKey: 'write_time',
-    },
-    {
-      header: '분석여부',
-      accessorKey: 'analysis_flag',
-    },
-    {
-      header: '해킹여부',
-      accessorKey: 'threat_flag',
-    },
-    {
-      header: '대응여부',
-      accessorKey: 'response_flag',
-    },
-    {
-      header: '분석로그',
-      accessorKey: 'threat_log',
-    },
-  ]
 
   const handleOnSelectChange = () => {}
 
@@ -132,7 +94,7 @@ const DarkWebPage = () => {
         </Box>
       </SelectContainer>
       <ContentBox>
-        <CustomTable data={data} columns={columns} loading={false} />
+        <CustomTable data={data} columns={DarkWebColumns} loading={false} />
         <CustomPagination
           total={1}
           page={page}

@@ -6,6 +6,7 @@ import Button from '@/components/elements/Button.tsx'
 import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import { usePagination } from '@/hooks/usePagination.tsx'
+import { GroupColumns } from '@/constants/tableColumns.ts'
 
 interface groupList {
   groupcode: number
@@ -27,18 +28,6 @@ const GroupPage = () => {
   })
 
   const columns = [
-    {
-      header: '그룹명',
-      accessorKey: 'groupname',
-    },
-    {
-      header: '설명',
-      accessorKey: 'comment',
-    },
-    {
-      header: '알람방식',
-      accessorKey: 'alram',
-    },
     {
       header: '다운로드',
       accessorKey: '',
@@ -73,7 +62,7 @@ const GroupPage = () => {
             <CustomTable
               loading={groupList.isLoading}
               data={groupList.data.data}
-              columns={columns}
+              columns={GroupColumns.concat(columns)}
             />
             <CustomPagination
               total={1}

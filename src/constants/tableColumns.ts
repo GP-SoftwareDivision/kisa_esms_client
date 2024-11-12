@@ -1,4 +1,5 @@
 // 알림 내역 테이블 컬럼 정의
+
 export const AlertColumns = [
   {
     header: '발송시간',
@@ -86,7 +87,7 @@ export const InfringementColumns = [
   },
 ]
 
-// 이슈 대응 이력 테이블  컬럼 정의
+// 이슈 대응 이력 테이블 컬럼 정의
 export const issueTrackingColumns = [
   {
     header: 'API 타입',
@@ -119,5 +120,124 @@ export const issueTrackingColumns = [
   {
     header: '대상구분',
     accessorKey: 'target_type',
+  },
+]
+
+// 유저 관리 테이블 컬럼 정의
+export const UserColumns = [
+  {
+    header: '그룹명',
+    accessorKey: 'groupname',
+  },
+  {
+    header: '이름',
+    accessorKey: 'name',
+  },
+  {
+    header: '번호',
+    accessorKey: 'phonenum',
+  },
+  {
+    header: '이메일',
+    accessorKey: 'email',
+  },
+]
+
+// 그룹 관리 테이블 컬럼 정의
+export const GroupColumns = [
+  {
+    header: '그룹명',
+    accessorKey: 'groupname',
+  },
+  {
+    header: '설명',
+    accessorKey: 'comment',
+  },
+  {
+    header: '알람방식',
+    accessorKey: 'alram',
+  },
+]
+
+// 다크웹 테이블 컬럼 정의
+export const DarkWebColumns = [
+  {
+    header: '카테고리',
+    accessorKey: 'category',
+  },
+  {
+    header: '수집 키워드',
+    accessorKey: 'keyword',
+  },
+  {
+    header: 'URL',
+    accessorKey: 'url',
+  },
+  {
+    header: '제목',
+    accessorKey: 'title',
+  },
+  {
+    header: '작성시간',
+    accessorKey: 'write_time',
+  },
+  {
+    header: '분석여부',
+    accessorKey: 'analysis_flag',
+  },
+  {
+    header: '해킹여부',
+    accessorKey: 'threat_flag',
+  },
+  {
+    header: '대응여부',
+    accessorKey: 'response_flag',
+  },
+  {
+    header: '분석로그',
+    accessorKey: 'threat_log',
+  },
+]
+
+export const TelegramColumns = [
+  {
+    header: '수집 키워드',
+    accessorKey: 'keyword',
+  },
+  {
+    header: '채팅방명',
+    accessorKey: 'channel',
+  },
+  {
+    header: '작성시간',
+    accessorKey: 'write_time',
+  },
+  {
+    header: '채팅방 URL',
+    accessorKey: 'url',
+  },
+  {
+    header: '작성자',
+    accessorKey: 'user_name',
+  },
+  {
+    header: '메시지',
+    accessorKey: 'content',
+  },
+  {
+    header: '분석여부',
+    accessorKey: 'analysis_flag',
+  },
+  {
+    header: '해킹여부',
+    accessorKey: 'threat_flag',
+  },
+  {
+    header: '대응여부',
+    accessorKey: 'response_flag',
+  },
+  {
+    header: '분석로그',
+    accessorKey: 'threat_log',
   },
 ]

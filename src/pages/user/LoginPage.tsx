@@ -1,4 +1,4 @@
-import { FormEvent } from 'react'
+import React, { FormEvent } from 'react'
 import { Flex, Box, Grid } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 

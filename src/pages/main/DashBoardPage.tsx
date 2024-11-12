@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import styled from '@emotion/styled'
 import { Box, Grid, GridItem, Flex, VStack } from '@chakra-ui/react'
 
+import data from '@/data/dashboard.json'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Bar from '@/components/charts/Bar.tsx'
 import Pie from '@/components/charts/Pie.tsx'
@@ -11,50 +12,10 @@ import { dashBoardColumns } from '@/constants/tableColumns.ts'
 import { usePagination } from '@/hooks/usePagination.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 
-interface DateSituationType {
-  type: string
-  category: string
-  keyword: string
-  url: string
-  title: string
-  content: string
-  writeTime: string
-}
-
 const MainPage = () => {
   const today = dayjs()
   const oneWeekAgo = today.subtract(1, 'month').format('YYYY-MM-DD')
   const { page, handlePageChange } = usePagination()
-
-  const data: DateSituationType[] = [
-    {
-      type: '다크웹',
-      category: 'tourl',
-      keyword: 'co.kr',
-      url: 'http://3bbad7fauor/',
-      title: 'Terminal High Altitude Al ',
-      content: 'Terminal High Altitude Al ',
-      writeTime: '2021.11.3',
-    },
-    {
-      type: '다크웹',
-      category: 'tourl',
-      keyword: 'co.kr',
-      url: 'http://3bbad7fauor/',
-      title: 'Terminal High Altitude Al ',
-      content: 'Terminal High Altitude Area Defense - The Hidden Wiki ',
-      writeTime: '2021.11.3',
-    },
-    {
-      type: '텔레그램',
-      category: 'tourl',
-      keyword: 'co.kr',
-      url: 'http://3bbad7fauor/',
-      title: 'Terminal High Altitude Al ',
-      content: 'Terminal High Altitude Area Defense - The Hidden Wiki',
-      writeTime: '2021.11.3',
-    },
-  ]
 
   return (
     <>
