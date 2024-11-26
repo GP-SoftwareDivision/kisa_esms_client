@@ -20,17 +20,16 @@ import PageTitle from '@/components/elements/PageTitle'
 import { CloseButton } from '@/components/ui/close-button'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import { InfringementColumns } from '@/constants/tableColumns'
-import { useQueryHandler } from '@/hooks/useQueryHandler'
-import { usePagination } from '@/hooks/usePagination.tsx'
-import useFileDragDrop from '@/hooks/useFileDragDrop.tsx'
-import useOptions from '@/hooks/useOptions.tsx'
+import { useQueries } from '@/hooks/queries/useQueries.tsx'
+import { usePagination } from '@/hooks/common/usePagination.tsx'
+import useFileDragDrop from '@/hooks/common/useFileDragDrop.tsx'
+import useOptions from '@/hooks/common/useOptions.tsx'
 import { notify } from '@/utils/notify.ts'
 
 interface AccountListType {
   count: number
   data: object[]
   progress: 'Y' | 'N'
-  uploaderlist: string[]
 }
 
 const InfringementPage = () => {
@@ -63,10 +62,19 @@ const InfringementPage = () => {
     enddate: date.end,
   })
 
-  const accountList = useQueryHandler<AccountListType>({
+  // 침해 정보 판별 리스트 전체 조회
+  const accountList = useQueries<AccountListType>({
+    queryKey: 'accountList',
     method: 'POST',
     url: '/api/accountList',
     body: { ...request, page: page },
+  })
+
+  // 담당자 리스트 조회
+  const uploaderList = useQueries<{ uploaderlist: string[] }>({
+    queryKey: 'uploaderList',
+    method: 'POST',
+    url: '/api/uploaderList',
   })
 
   // 파일 업로드
@@ -165,16 +173,18 @@ const InfringementPage = () => {
           />
         </Box>
         <Box>
-          {accountList.isSuccess && (
-            <CustomSelect
-              label={'담당자'}
-              setState={setUploader}
-              options={accountList.data.uploaderlist?.map((v) => ({
-                value: v,
-                label: v,
-              }))}
-            />
-          )}
+          <CustomSelect
+            label={'담당자'}
+            setState={setUploader}
+            options={
+              uploaderList.isSuccess
+                ? uploaderList.data?.uploaderlist.map((v) => ({
+                    label: v,
+                    value: v,
+                  }))
+                : []
+            }
+          />
         </Box>
         <Box>
           <CustomSelect
@@ -185,10 +195,11 @@ const InfringementPage = () => {
         </Box>
         <Box>
           <CustomInput
+            id={'filename'}
             label={'파일명'}
             placeholder={'내용을 입력하세요.'}
             value={filename}
-            onchange={(e) => setFilename(e.target.value)}
+            onChange={(e) => setFilename(e.target.value)}
           />
         </Box>
         <Box></Box>

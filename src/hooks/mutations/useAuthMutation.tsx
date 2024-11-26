@@ -4,20 +4,20 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 
 import instance from '@/apis/instance.ts'
-import { notify } from '@/utils/notify'
+import { notify } from '@/utils/notify.ts'
 
-interface useAuthProps {
+interface AuthMutationType {
   phoneNum: string
 }
 
-export const useAuth = () => {
+export const useAuthMutation = () => {
   const navigate = useNavigate()
   const [authNum, setAuthNum] = useState<string>('')
 
   // 인번호 체크 API 통신
   const checkAuth = useMutation({
     mutationKey: ['checkAuth'],
-    mutationFn: async (data: useAuthProps) => {
+    mutationFn: async (data: AuthMutationType) => {
       if (!authNum) {
         notify('인증번호를 입력해주세요.')
         return

@@ -15,10 +15,12 @@ import {
 } from '@/assets/styles/global.ts'
 import Button from '@/components/elements/Button.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
-import { usePagination } from '@/hooks/usePagination.tsx'
+import { usePagination } from '@/hooks/common/usePagination.tsx'
+import useOptions from '@/hooks/common/useOptions.tsx'
 
 const TrackingPage = () => {
   const { page, handlePageChange } = usePagination()
+  const { responseOptions } = useOptions()
   const [title, setTitle] = useState<string>('')
 
   const data = [
@@ -59,7 +61,7 @@ const TrackingPage = () => {
     setTitle(e.target.value)
   }
 
-  const handleOnSelectChange = () => {}
+  const handleOnClick = () => {}
 
   return (
     <ContentContainer>
@@ -71,8 +73,9 @@ const TrackingPage = () => {
         <Box>
           <CustomSelect
             label={'API 타입'}
-            onchange={handleOnSelectChange}
             options={[
+              { value: '전체', label: '전체' },
+
               { value: 'DT', label: 'DT' },
               { value: 'TT', label: 'TT' },
             ]}
@@ -81,8 +84,8 @@ const TrackingPage = () => {
         <Box>
           <CustomSelect
             label={'사고유형'}
-            onchange={handleOnSelectChange}
             options={[
+              { value: '전체', label: '전체' },
               { value: '정보유출', label: '정보유출' },
               { value: '서버해킹', label: '서버해킹' },
               { value: '기타', label: '기타' },
@@ -90,42 +93,32 @@ const TrackingPage = () => {
           />
         </Box>
         <Box>
-          <CustomSelect
-            label={'상태'}
-            onchange={handleOnSelectChange}
-            options={[
-              { value: '대기', label: '대기' },
-              { value: '진행중', label: '진행중' },
-              { value: '완료', label: '완료' },
-            ]}
-          />
+          <CustomSelect label={'상태'} options={responseOptions} />
         </Box>
         <Box>
           <CustomInput
+            id={'title'}
             label={'제목'}
             placeholder={'내용을 입력하세요.'}
             value={title}
-            onchange={handleOnChange}
+            onChange={handleOnChange}
           />
         </Box>
         <Box>
           <CustomInput
+            id={'description'}
             label={'피해기관'}
             placeholder={'내용을 입력하세요.'}
             value={title}
-            onchange={handleOnChange}
+            onChange={handleOnChange}
           />
         </Box>
         <Box></Box>
         <ButtonContainer>
-          <Button
-            type={'primary'}
-            onClick={handleOnSelectChange}
-            text={'조회'}
-          />
+          <Button type={'primary'} onClick={handleOnClick} text={'조회'} />
           <Button
             type={'download'}
-            onClick={handleOnSelectChange}
+            onClick={handleOnClick}
             text={'엑셀 다운로드'}
           />
         </ButtonContainer>

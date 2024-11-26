@@ -26,6 +26,10 @@ export const useForm = (initialFields: Record<string, string> = {}) => {
     }))
   }, [])
 
+  const handleOnCleanForm = () => {
+    setFields(initialFields)
+  }
+
   // 유효성 검사
   const validateForm = (): boolean => {
     const newWarning = Object.fromEntries(
@@ -35,5 +39,5 @@ export const useForm = (initialFields: Record<string, string> = {}) => {
     return !Object.values(newWarning).includes(true)
   }
 
-  return { fields, warning, handleOnChange, validateForm }
+  return { fields, warning, handleOnChange, handleOnCleanForm, validateForm }
 }

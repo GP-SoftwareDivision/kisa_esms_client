@@ -3,16 +3,16 @@ import { AxiosError } from 'axios'
 import { useMutation } from '@tanstack/react-query'
 
 import instance from '@/apis/instance.ts'
-import useModal from '@/hooks/useModal.tsx'
-import useTimer from '@/hooks/useTimer.tsx'
+import useModal from '@/hooks/common/useModal.tsx'
+import useTimer from '@/hooks/common/useTimer.tsx'
 import { notify } from '@/utils/notify.ts'
 
-interface useLoginProps {
+interface LoginMutationType {
   id: string
   password: string
 }
 
-export const useLogin = () => {
+export const useLoginMutation = () => {
   const [phoneNum, setPhoneNum] = useState<string>('')
   const { timeLeft, startTimer, resetTimer } = useTimer(180)
   const { openModal, closeModal, isOpen } = useModal()
@@ -27,7 +27,7 @@ export const useLogin = () => {
   // 로그인 API 통신
   const login = useMutation({
     mutationKey: ['login'],
-    mutationFn: async (data: useLoginProps) => {
+    mutationFn: async (data: LoginMutationType) => {
       resetTimer()
       const response = await instance.post('/api/login/selectMember', data)
       return response.data

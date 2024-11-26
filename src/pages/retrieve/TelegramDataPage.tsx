@@ -13,13 +13,15 @@ import CustomDatePicker from '@/components/elements/DatePicker.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import Button from '@/components/elements/Button.tsx'
-import { usePagination } from '@/hooks/usePagination.tsx'
+import { usePagination } from '@/hooks/common/usePagination.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import { TelegramColumns } from '@/constants/tableColumns.ts'
+import useOptions from '@/hooks/common/useOptions.tsx'
 
 const Telegram = () => {
   const { page, handlePageChange } = usePagination()
   const [title, setTitle] = useState<string>('')
+  const { hackingOptions } = useOptions()
 
   const handleOnSelectChange = () => {}
 
@@ -31,38 +33,33 @@ const Telegram = () => {
           <CustomDatePicker label={'조회 기간'} />
         </Box>
         <Box>
-          <CustomSelect
-            label={'해킹 여부'}
-            onchange={handleOnSelectChange}
-            options={[
-              { value: '해킹', label: '해킹' },
-              { value: '미해킹', label: '미해킹' },
-              { value: '대기', label: '대기' },
-            ]}
-          />
+          <CustomSelect label={'해킹 여부'} options={hackingOptions} />
         </Box>
         <Box>
           <CustomInput
+            id={'writer'}
             label={'작성자'}
             placeholder={'내용을 입력하세요.'}
             value={title}
-            onchange={(e) => setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </Box>
         <Box>
           <CustomInput
+            id={'channel'}
             label={'대화방'}
             placeholder={'내용을 입력하세요.'}
             value={title}
-            onchange={(e) => setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </Box>
         <Box>
           <CustomInput
+            id={'content'}
             label={'내용'}
             placeholder={'내용을 입력하세요.'}
             value={title}
-            onchange={(e) => setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </Box>
         <Box></Box>

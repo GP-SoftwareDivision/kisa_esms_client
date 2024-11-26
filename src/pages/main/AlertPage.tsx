@@ -2,8 +2,8 @@ import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import { AlertColumns } from '@/constants/tableColumns.ts'
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
-import { useQueryHandler } from '@/hooks/useQueryHandler.tsx'
-import { usePagination } from '@/hooks/usePagination.tsx'
+import { useQueries } from '@/hooks/queries/useQueries.tsx'
+import { usePagination } from '@/hooks/common/usePagination.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 
 interface AlertType {
@@ -20,7 +20,8 @@ interface AlertType {
 const AlertPage = () => {
   const { page, handlePageChange } = usePagination()
 
-  const alertList = useQueryHandler<{ data: AlertType[]; count: number }>({
+  const alertList = useQueries<{ data: AlertType[]; count: number }>({
+    queryKey: `alertList_${page}`,
     method: 'POST',
     url: '/api/main/alarmList',
     body: {

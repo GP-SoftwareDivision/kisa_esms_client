@@ -9,7 +9,7 @@ import Pie from '@/components/charts/Pie.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomList from '@/components/charts/List.tsx'
 import { dashBoardColumns } from '@/constants/tableColumns.ts'
-import { usePagination } from '@/hooks/usePagination.tsx'
+import { usePagination } from '@/hooks/common/usePagination.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 
 const MainPage = () => {

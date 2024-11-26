@@ -14,12 +14,12 @@ import {
 } from '@tanstack/react-query'
 import { ToastContainer } from 'react-toastify'
 
+import { routeConfig } from './routes/routeConfig.tsx'
 import instance from '@/apis/instance.ts'
 import { theme } from '@/assets/styles/theme.ts'
 import Wrapper from '@/layouts/Wrapper'
 import LoginPage from '@/pages/user/LoginPage.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
-import { routeConfig } from './routes/routeConfig.tsx'
 
 const queryClient = new QueryClient()
 

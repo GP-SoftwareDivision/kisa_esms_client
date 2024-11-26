@@ -3,8 +3,8 @@ import styled from '@emotion/styled'
 interface ButtonType {
   text: string
   type: 'primary' | 'outline' | 'download' | 'disabled'
+  onClick: () => void
   disabled?: boolean
-  onClick?: () => void
 }
 
 const CustomButton = ({ text, type, disabled, onClick }: ButtonType) => {

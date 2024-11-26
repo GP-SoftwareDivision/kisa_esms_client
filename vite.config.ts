@@ -5,13 +5,13 @@ import * as path from 'path'
 
 export default defineConfig({
   plugins: [
+    tsconfigPaths(),
     react({
       jsxImportSource: '@emotion/react',
       babel: {
         plugins: ['@emotion/babel-plugin'],
       },
     }),
-    tsconfigPaths(),
   ],
   resolve: {
     alias: {

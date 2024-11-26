@@ -2,10 +2,10 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import '@/assets/styles/index.css'
 import 'react-toastify/dist/ReactToastify.css'
-import { Provider } from '@/components/ui/provider'
+import { ChakraProvider, defaultSystem } from '@chakra-ui/react'
 
 createRoot(document.getElementById('root')!).render(
-  <Provider>
+  <ChakraProvider value={defaultSystem}>
     <App />
-  </Provider>
+  </ChakraProvider>
 )

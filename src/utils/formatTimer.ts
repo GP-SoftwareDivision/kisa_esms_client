@@ -1,4 +1,4 @@
-export const formatTimer = (seconds: number) => {
+export const FormatTimer = (seconds: number) => {
   const minutes = Math.floor(seconds / 60)
   const secs = seconds % 60
   return `${minutes}:${secs < 10 ? '0' : ''}${secs}`

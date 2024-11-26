@@ -4,14 +4,15 @@ import styled from '@emotion/styled'
 
 import CustomModal from '@/components/elements/Modal.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
-import { useAuth } from '@/hooks/useAuth.tsx'
-import { useLogin } from '@/hooks/useLogin.tsx'
-import { useForm } from '@/hooks/useForm.tsx'
-import { formatTimer } from '@/utils/formatTimer.ts'
+import { useAuthMutation } from '@/hooks/mutations/useAuthMutation.tsx'
+import { useLoginMutation } from '@/hooks/mutations/useLoginMutation.tsx'
+import { useForm } from '@/hooks/common/useForm.tsx'
+import { FormatTimer } from '@/utils/formatTimer.ts'
 
 const LoginPage = () => {
-  const { login, phoneNum, timeLeft, isOpen, handleOnCancel } = useLogin()
-  const { checkAuth, authNum, setAuthNum } = useAuth()
+  const { login, phoneNum, timeLeft, isOpen, handleOnCancel } =
+    useLoginMutation()
+  const { checkAuth, authNum, setAuthNum } = useAuthMutation()
   const { fields, warning, handleOnChange, validateForm } = useForm({
     id: 'gpadmin',
     password: '1234',
@@ -92,7 +93,7 @@ const LoginPage = () => {
                       onChange={(e) => setAuthNum(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleAuthAction}
                     />
-                    <span>{formatTimer(timeLeft)}</span>
+                    <span>{FormatTimer(timeLeft)}</span>
                     <VerificationButton onClick={handleLoginAction}>
                       재전송
                     </VerificationButton>

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
-import instance from '../apis/instance.ts'
+import instance from '@/apis/instance.ts'
 import { notify } from '@/utils/notify.ts'
 
 type ApiMethod = 'POST' | 'GET' | 'PUT' | 'DELETE'

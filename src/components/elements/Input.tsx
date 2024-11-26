@@ -3,22 +3,23 @@ import React, { memo } from 'react'
 import { SelectBox, SelectLabel } from '@/assets/styles/global.ts'
 
 interface InputProps {
+  id: string
   label?: string
   value: string
   placeholder?: string
-  onchange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 const CustomInput = memo(
-  ({ value, label, placeholder, onchange }: InputProps) => {
+  ({ id, value, label, placeholder, onChange }: InputProps) => {
     return (
       <SelectBox>
         <SelectLabel>{label}</SelectLabel>
         <StyledInput
-          id='password'
-          value={value}
+          id={id}
+          value={value || ''}
           placeholder={placeholder}
-          onChange={onchange}
+          onChange={onChange}
         />
       </SelectBox>
     )

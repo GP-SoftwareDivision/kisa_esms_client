@@ -2,24 +2,26 @@ import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
 
-import instance from '../apis/instance.ts'
+import instance from '@/apis/instance.ts'
 import { notify } from '@/utils/notify.ts'
 
 interface QueryConfig {
+  queryKey: string
   url: string
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   body?: object
   options?: object
 }
 
-export function useQueryHandler<TData>({
+export function useQueries<TData>({
+  queryKey,
   url,
   method = 'GET',
   body,
 }: QueryConfig) {
   const navigate = useNavigate()
   return useQuery<TData, AxiosError>({
-    queryKey: [url, method, body],
+    queryKey: [queryKey],
     queryFn: async () => {
       try {
         const response = await instance({

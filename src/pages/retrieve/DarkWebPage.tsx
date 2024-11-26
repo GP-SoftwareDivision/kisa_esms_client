@@ -15,12 +15,14 @@ import CustomSelect from '@/components/elements/Select.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
-import { usePagination } from '@/hooks/usePagination.tsx'
+import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { DarkWebColumns } from '@/constants/tableColumns.ts'
+import useOptions from '@/hooks/common/useOptions.tsx'
 
 const DarkWebPage = () => {
   const { page, handlePageChange } = usePagination()
   const [title, setTitle] = useState<string>('')
+  const { responseOptions, hackingOptions } = useOptions()
 
   const handleOnSelectChange = () => {}
 
@@ -34,47 +36,32 @@ const DarkWebPage = () => {
         <Box>
           <CustomSelect
             label={'카테고리'}
-            onchange={handleOnSelectChange}
             options={[{ value: '카테고리', label: '카테고리' }]}
           />
         </Box>
         <Box>
           <CustomSelect
             label={'분석여부'}
-            onchange={handleOnSelectChange}
             options={[
-              { value: '분석 대기', label: '분석 대기' },
-              { value: '분석 완료', label: '분석 완료' },
-            ]}
-          />
-        </Box>
-        <Box>
-          <CustomSelect
-            label={'해킹 여부'}
-            onchange={handleOnSelectChange}
-            options={[
-              { value: '해킹', label: '해킹' },
-              { value: '미해킹', label: '미해킹' },
-              { value: '대기', label: '대기' },
-            ]}
-          />
-        </Box>
-        <Box>
-          <CustomSelect
-            label={'대응 여부'}
-            onchange={handleOnSelectChange}
-            options={[
+              { value: '전체', label: '전체' },
               { value: '대기', label: '대기' },
               { value: '완료', label: '완료' },
             ]}
           />
         </Box>
         <Box>
+          <CustomSelect label={'해킹 여부'} options={hackingOptions} />
+        </Box>
+        <Box>
+          <CustomSelect label={'대응 여부'} options={responseOptions} />
+        </Box>
+        <Box>
           <CustomInput
+            id={'title'}
             label={'제목'}
             placeholder={'내용을 입력하세요.'}
             value={title}
-            onchange={(e) => setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </Box>
         <Box></Box>
