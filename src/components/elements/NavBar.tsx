@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
 import { mq } from '@/utils/mediaQueries.ts'
 import Button from '@/components/elements/Button.tsx'
-import { index } from '@/hooks/mutations'
+import { useMutationHandler } from '@/hooks/mutations/index.tsx'
 
 interface SubMenu {
   title: string
@@ -32,7 +32,7 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(
     pathname[2]
   )
-  const logoutMutation = index('logout')
+  const logoutMutation = useMutationHandler('logout')
 
   const handleMenuClick = (menuKey: string, subItemKey?: string) => {
     setActiveMenu(menuKey)
