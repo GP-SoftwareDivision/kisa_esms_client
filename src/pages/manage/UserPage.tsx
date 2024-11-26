@@ -1,19 +1,22 @@
 import styled from '@emotion/styled'
+import { Flex } from '@chakra-ui/react'
+
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
 import CustomTable from '@/components/charts/Table.tsx'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
-import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
-import { usePagination } from '@/hooks/common/usePagination.tsx'
-import { UserColumns } from '@/constants/tableColumns.ts'
 import CustomModal from '@/components/elements/Modal.tsx'
-import { Flex } from '@chakra-ui/react'
 import CustomInput from '@/components/elements/Input.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
+import { UserColumns } from '@/constants/tableColumns.ts'
+import { useQueries } from '@/hooks/queries/useQueries.tsx'
+import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useUserAddMutation } from '@/hooks/mutations/useUserAddMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
+import { formatPhoneNumber } from '@/utils/regexChecks.ts'
+import { useUserUpdateMutation } from '@/hooks/mutations/useUserUpdateMutation.tsx'
 
 interface UserType {
   seqidx: number
@@ -32,25 +35,45 @@ interface UserGroupType {
 
 const UserPage = () => {
   const { page, handlePageChange } = usePagination()
-  const { fields, handleOnChange } = useForm()
-  const { insertUser, handleOnAddUser, handleOnAddUserCancel, insertUserOpen } =
-    useUserAddMutation()
+  const { fields, handleOnChange, handleOnCleanForm } = useForm()
+  const {
+    insertUser,
+    handleOnAddUser,
+    handleOnAddUserCancel,
+    insertUserOpen,
+    setUserType,
+    setGroupCode,
+  } = useUserAddMutation()
 
+  const {
+    updateUser,
+    updateData,
+    setUpdateData,
+    handleOnUpdateUser,
+    handleOnUpdateUserCancel,
+    updateUserOpen,
+    handleUpdateOption,
+    handleOnUpdateText,
+  } = useUserUpdateMutation()
+
+  // 유저 관리 전체 리스트
   const userList = useQueries<{ data: UserType[] }>({
     queryKey: 'userList',
     method: 'POST',
     url: '/api/manage/userList',
   })
 
-  const userGroupList = useQueries<{ grouplist: UserGroupType[] }>({
+  // 추가 시 그룹 리스트
+  const userGroupList = useQueries<{ data: UserGroupType[] }>({
     queryKey: 'userGroupList',
     method: 'POST',
     url: '/api/manage/userGroupList',
+    enabled: userList.isSuccess && !!userList.data.data?.length,
   })
 
   const columns = [
     {
-      header: '다운로드',
+      header: '수정',
       accessorKey: '',
       id: 'actions',
       cell: ({ row }: any) => (
@@ -58,12 +81,33 @@ const UserPage = () => {
           <Button
             type={'download'}
             text={'수정'}
-            onClick={() => console.log(row.original.seqidx)}
+            onClick={() => {
+              handleOnUpdateUser()
+              setUpdateData(row.original)
+            }}
           />
         </TableButtonWrapper>
       ),
     },
   ]
+
+  // 유저 추가 액션
+  const handleInsertUserAction = () => {
+    const { name, email, id, password, phonenum } = fields
+    insertUser.mutate({
+      name,
+      email,
+      id,
+      password,
+      phonenum: formatPhoneNumber(phonenum),
+    })
+  }
+
+  // 유저 추가 취소 액션
+  const handleOnCancelAction = () => {
+    handleOnAddUserCancel()
+    handleOnCleanForm()
+  }
 
   return (
     <ContentContainer>
@@ -89,10 +133,12 @@ const UserPage = () => {
           </>
         )}
       </ContentBox>
+
+      {/*유저 추가 모달*/}
       <CustomModal
         isOpen={insertUserOpen}
         title='유저 추가'
-        onCancel={handleOnAddUserCancel}
+        onCancel={handleOnCancelAction}
         content={
           <ModalContents>
             <Flex direction='column' gap={4} padding={4}>
@@ -103,41 +149,140 @@ const UserPage = () => {
                 placeholder={'이름을 입력하세요.'}
                 onChange={handleOnChange}
               />
-              <CustomSelect
-                label={'그룹'}
-                options={
-                  userGroupList.isSuccess ? userGroupList.data?.grouplist : []
-                }
-                multiple
-                // setState={(value) =>
-                //   handleUpdateFlag('useflag', value as string)
-                // }
+              <CustomInput
+                id='id'
+                value={fields.id}
+                label='ID'
+                placeholder={'ID를 입력하세요.'}
+                onChange={handleOnChange}
               />
               <CustomInput
                 id='email'
                 value={fields.email}
+                type={'email'}
                 label='이메일'
                 placeholder={'이메일을 입력하세요.'}
                 onChange={handleOnChange}
               />
               <CustomInput
-                id='phoneNumber'
-                value={fields.phoneNumber}
-                label='전화번호'
-                placeholder={'전화번호를 입력하세요.'}
+                id='password'
+                value={fields.password}
+                type={'password'}
+                label='비밀번호'
+                placeholder={'비밀번호를 입력하세요.'}
                 onChange={handleOnChange}
+              />
+              <CustomInput
+                id='phonenum'
+                type={'number'}
+                value={fields.phonenum}
+                label='전화번호'
+                placeholder={'숫자만 입력하세요'}
+                onChange={handleOnChange}
+              />
+              <CustomSelect
+                label={'권한'}
+                options={[
+                  { label: '사용자', value: 'user' },
+                  { label: '관리자', value: 'administrator' },
+                ]}
+                setState={setUserType}
+              />
+              <CustomSelect
+                label={'그룹'}
+                options={
+                  userGroupList.isSuccess ? userGroupList.data?.data : []
+                }
+                multiple
+                setState={setGroupCode}
               />
             </Flex>
             <ButtonWrapper>
               <CustomButton
                 type='outline'
                 text='취소'
-                onClick={handleOnAddUserCancel}
+                onClick={handleOnCancelAction}
               />
               <CustomButton
                 type='primary'
                 text='추가'
-                onClick={insertUser.mutate}
+                onClick={handleInsertUserAction}
+              />
+            </ButtonWrapper>
+          </ModalContents>
+        }
+      />
+
+      {/*유저 수정 모달*/}
+      <CustomModal
+        isOpen={updateUserOpen}
+        title='유저 수정'
+        onCancel={handleOnUpdateUserCancel}
+        content={
+          <ModalContents>
+            <Flex direction='column' gap={4} padding={4}>
+              <CustomInput
+                id='update_name'
+                value={updateData?.name || ''}
+                label='이름'
+                placeholder={'이름을 입력하세요.'}
+                onChange={handleOnUpdateText}
+              />
+              <CustomInput
+                id='update_id'
+                value={updateData?.id || ''}
+                label='ID'
+                placeholder={'ID를 입력하세요.'}
+                onChange={handleOnUpdateText}
+              />
+              <CustomInput
+                id='update_email'
+                value={updateData?.email || ''}
+                type={'email'}
+                label='이메일'
+                placeholder={'이메일을 입력하세요.'}
+                onChange={handleOnUpdateText}
+              />
+              <CustomInput
+                id='update_phonenum'
+                value={updateData?.phonenum || ''}
+                label='전화번호'
+                placeholder={'숫자만 입력하세요'}
+                onChange={handleOnUpdateText}
+              />
+              <CustomSelect
+                label={'권한'}
+                value={updateData.usertype}
+                options={[
+                  { label: '사용자', value: 'user' },
+                  { label: '관리자', value: 'administrator' },
+                ]}
+                setState={(value) =>
+                  handleUpdateOption('usertype', value as string)
+                }
+              />
+              <CustomSelect
+                label={'그룹'}
+                value={updateData.groupcode}
+                options={
+                  userGroupList.isSuccess ? userGroupList.data?.data : []
+                }
+                multiple
+                setState={(value) =>
+                  handleUpdateOption('groupcode', value as string)
+                }
+              />
+            </Flex>
+            <ButtonWrapper>
+              <CustomButton
+                type='outline'
+                text='취소'
+                onClick={handleOnUpdateUserCancel}
+              />
+              <CustomButton
+                type='primary'
+                text='수정'
+                onClick={updateUser.mutate}
               />
             </ButtonWrapper>
           </ModalContents>

@@ -66,7 +66,7 @@ const TableWrapper = styled.div`
 `
 
 const StyledTable = styled.table`
-  table-layout: fixed;
+  table-layout: auto;
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;

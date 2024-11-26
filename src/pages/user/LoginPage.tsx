@@ -174,7 +174,7 @@ const StyledButton = styled.button`
   height: 40px;
   border-radius: 2px;
   border: none;
-  background: #004c9f;
+  background: #061f5c;
   color: #fff;
   margin-top: 20px;
   cursor: pointer;
@@ -206,7 +206,7 @@ const VerificationInput = styled.input`
 `
 
 const VerificationButton = styled.button`
-  background-color: #004d9f;
+  background-color: #061f5c;
   color: #fff;
   border: none;
   margin-left: 15px;

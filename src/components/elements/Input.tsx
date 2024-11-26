@@ -4,14 +4,15 @@ import { SelectBox, SelectLabel } from '@/assets/styles/global.ts'
 
 interface InputProps {
   id: string
-  label?: string
   value: string
-  placeholder?: string
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  label: string
+  placeholder: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  type?: string
 }
 
 const CustomInput = memo(
-  ({ id, value, label, placeholder, onChange }: InputProps) => {
+  ({ id, value, label, placeholder, onChange, type }: InputProps) => {
     return (
       <SelectBox>
         <SelectLabel>{label}</SelectLabel>
@@ -20,6 +21,7 @@ const CustomInput = memo(
           value={value || ''}
           placeholder={placeholder}
           onChange={onChange}
+          type={type ? type : 'text'}
         />
       </SelectBox>
     )

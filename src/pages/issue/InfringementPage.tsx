@@ -24,7 +24,7 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import useFileDragDrop from '@/hooks/common/useFileDragDrop.tsx'
 import useOptions from '@/hooks/common/useOptions.tsx'
-import { notify } from '@/utils/notify.ts'
+import { notifyError } from '@/utils/notify.ts'
 
 interface AccountListType {
   count: number
@@ -64,7 +64,7 @@ const InfringementPage = () => {
 
   // 침해 정보 판별 리스트 전체 조회
   const accountList = useQueries<AccountListType>({
-    queryKey: 'accountList',
+    queryKey: `accountList_${page}`,
     method: 'POST',
     url: '/api/accountList',
     body: { ...request, page: page },
@@ -93,7 +93,7 @@ const InfringementPage = () => {
       }
     } catch (error) {
       console.error('Error uploading file', error)
-      notify(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
+      notifyError(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
     }
   }
 

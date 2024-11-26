@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { convertXlsxToCsv, getFileName } from '@/utils/fileHelpers.ts'
-import { notify } from '@/utils/notify.ts'
+import { notifyError } from '@/utils/notify.ts'
 
 const useFileDragDrop = () => {
   const [uploadFile, setUploadFile] = useState<File | null>(null)
@@ -14,7 +14,7 @@ const useFileDragDrop = () => {
     const fileExtension = fileName[fileName.length - 1].toLowerCase()
     const isCorrectType = ['xlsx', 'csv', 'txt'].includes(fileExtension)
     if (!isCorrectType) {
-      notify(
+      notifyError(
         '지원하는 형식이 아닙니다. xlsx, csv, txt의 파일 형식만 가능합니다.'
       )
       setUploadFile(null)

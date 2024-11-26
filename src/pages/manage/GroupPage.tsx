@@ -54,7 +54,7 @@ const GroupPage = () => {
     handleOnUpdateGroupCancel,
     updateData,
     setUpdateData,
-    handleUpdateFlag,
+    handleUpdateOption,
     handleOnUpdateText,
   } = useGroupUpdateMutation()
 
@@ -206,12 +206,14 @@ const GroupPage = () => {
                 value={updateData?.groupname || ''}
                 label='그룹 이름'
                 onChange={handleOnUpdateText}
+                placeholder={'그룹 이름을 입력하세요.'}
               />
               <CustomInput
                 id='update_comment'
                 value={updateData?.comment || ''}
                 label='설명'
                 onChange={handleOnUpdateText}
+                placeholder={'설명을 입력하세요.'}
               />
               <CustomSelect
                 label={'사용'}
@@ -221,7 +223,7 @@ const GroupPage = () => {
                   { value: 'N', label: '미사용' },
                 ]}
                 setState={(value) =>
-                  handleUpdateFlag('useflag', value as string)
+                  handleUpdateOption('useflag', value as string)
                 }
               />
               <CustomSelect
@@ -232,7 +234,7 @@ const GroupPage = () => {
                   { value: 'N', label: '미발송' },
                 ]}
                 setState={(value) =>
-                  handleUpdateFlag('autosendflag', value as string)
+                  handleUpdateOption('autosendflag', value as string)
                 }
               />
               <CustomSelect
@@ -243,7 +245,7 @@ const GroupPage = () => {
                   { value: 'N', label: '미발송' },
                 ]}
                 setState={(value) =>
-                  handleUpdateFlag('kakaoflag', value as string)
+                  handleUpdateOption('kakaoflag', value as string)
                 }
               />
               <CustomSelect
@@ -254,7 +256,7 @@ const GroupPage = () => {
                   { value: 'N', label: '미발송' },
                 ]}
                 setState={(value) =>
-                  handleUpdateFlag('emailflag', value as string)
+                  handleUpdateOption('emailflag', value as string)
                 }
               />
             </Flex>

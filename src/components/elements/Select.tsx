@@ -19,10 +19,17 @@ interface SelectProps {
   setState?: Dispatch<React.SetStateAction<string>>
   multiple?: boolean
 }
+
 const CustomSelect = memo(
   ({ options, value, label, setState, multiple }: SelectProps) => {
     const handleOnChange = (selected: string[]) => {
-      if (setState) setState(selected[0])
+      if (setState) setState(selected.join())
+    }
+
+    const isMultipleVal = (val: string): string[] => {
+      if (val.split(',').length > 1) {
+        return val.split(',').map((v) => v)
+      } else return [val]
     }
 
     return (
@@ -35,7 +42,7 @@ const CustomSelect = memo(
         defaultValue={!multiple ? ['전체'] : undefined}
         flexDirection={'row'}
         alignItems={'center'}
-        value={value ? [value] : undefined}
+        value={value ? isMultipleVal(value) : undefined}
         onValueChange={({ value }) => handleOnChange(value)}
       >
         <StyledLabel>{label}</StyledLabel>
