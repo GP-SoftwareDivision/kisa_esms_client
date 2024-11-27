@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import React, { memo } from 'react'
-import { SelectBox, SelectLabel } from '@/assets/styles/global.ts'
+import { Input } from '@chakra-ui/react'
+import { Field } from '@/components/ui/field'
 
 interface InputProps {
   id: string
@@ -8,33 +9,38 @@ interface InputProps {
   label: string
   placeholder: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  type?: string
+  required?: boolean
 }
 
 const CustomInput = memo(
-  ({ id, value, label, placeholder, onChange, type }: InputProps) => {
+  ({ id, value, label, placeholder, onChange, required }: InputProps) => {
     return (
-      <SelectBox>
-        <SelectLabel>{label}</SelectLabel>
-        <StyledInput
+      <StyledField label={label} required={required}>
+        <Input
           id={id}
           value={value || ''}
           placeholder={placeholder}
           onChange={onChange}
-          type={type ? type : 'text'}
         />
-      </SelectBox>
+      </StyledField>
     )
   }
 )
 export default CustomInput
 
-const StyledInput = styled.input`
-  height: 30px;
-  border-radius: 0.25rem;
-  border: 1px solid #d9d9d9;
-  outline: none;
-  padding-left: 10px;
+const StyledField = styled(Field)`
   width: 100%;
-  ${({ theme }) => theme.typography.body3};
+  flex-direction: row;
+  align-items: center;
+
+  label {
+    min-width: 60px;
+    ${({ theme }) => theme.typography.body2};
+  }
+
+  input {
+    height: 30px;
+    outline: none;
+    ${({ theme }) => theme.typography.body3};
+  }
 `

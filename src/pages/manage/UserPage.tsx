@@ -1,5 +1,6 @@
 import styled from '@emotion/styled'
-import { Flex } from '@chakra-ui/react'
+import { Flex, Input } from '@chakra-ui/react'
+import { withMask } from 'use-mask-input'
 
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
 import CustomTable from '@/components/charts/Table.tsx'
@@ -10,13 +11,15 @@ import CustomModal from '@/components/elements/Modal.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
+import { Field } from '@/components/ui/field.tsx'
+import { PasswordInput } from '@/components/ui/password-input.tsx'
 import { UserColumns } from '@/constants/tableColumns.ts'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useUserAddMutation } from '@/hooks/mutations/useUserAddMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
-import { formatPhoneNumber } from '@/utils/regexChecks.ts'
 import { useUserUpdateMutation } from '@/hooks/mutations/useUserUpdateMutation.tsx'
+import { formatPhoneNumber } from '@/utils/regexChecks.ts'
 
 interface UserType {
   seqidx: number
@@ -47,6 +50,7 @@ const UserPage = () => {
 
   const {
     updateUser,
+    deleteUser,
     updateData,
     setUpdateData,
     handleOnUpdateUser,
@@ -79,7 +83,7 @@ const UserPage = () => {
       cell: ({ row }: any) => (
         <TableButtonWrapper>
           <Button
-            type={'download'}
+            type={'secondary'}
             text={'수정'}
             onClick={() => {
               handleOnUpdateUser()
@@ -89,17 +93,32 @@ const UserPage = () => {
         </TableButtonWrapper>
       ),
     },
+    {
+      header: '삭제',
+      accessorKey: '',
+      id: 'deletes',
+      cell: ({ row }: any) => (
+        <TableButtonWrapper>
+          <Button
+            type={'danger'}
+            text={'삭제'}
+            onClick={() => deleteUser.mutate({ seqidx: row.original.seqidx })}
+          />
+        </TableButtonWrapper>
+      ),
+    },
   ]
 
   // 유저 추가 액션
   const handleInsertUserAction = () => {
-    const { name, email, id, password, phonenum } = fields
+    const { name, email, id, password, passwordConfirm, phonenum } = fields
     insertUser.mutate({
       name,
       email,
       id,
       password,
-      phonenum: formatPhoneNumber(phonenum),
+      passwordConfirm,
+      phonenum: phonenum && formatPhoneNumber(phonenum),
     })
   }
 
@@ -113,7 +132,7 @@ const UserPage = () => {
     <ContentContainer>
       <PageTitle text={'유저 관리'} />
       <ButtonWrapper>
-        <Button type={'download'} onClick={handleOnAddUser} text={'추가'} />
+        <Button type={'secondary'} onClick={handleOnAddUser} text={'추가'} />
       </ButtonWrapper>
       <ContentBox>
         {userList.isSuccess && (
@@ -148,6 +167,7 @@ const UserPage = () => {
                 label='이름'
                 placeholder={'이름을 입력하세요.'}
                 onChange={handleOnChange}
+                required
               />
               <CustomInput
                 id='id'
@@ -155,31 +175,43 @@ const UserPage = () => {
                 label='ID'
                 placeholder={'ID를 입력하세요.'}
                 onChange={handleOnChange}
+                required
               />
               <CustomInput
                 id='email'
                 value={fields.email}
-                type={'email'}
                 label='이메일'
                 placeholder={'이메일을 입력하세요.'}
                 onChange={handleOnChange}
+                required
               />
-              <CustomInput
-                id='password'
-                value={fields.password}
-                type={'password'}
-                label='비밀번호'
-                placeholder={'비밀번호를 입력하세요.'}
-                onChange={handleOnChange}
-              />
-              <CustomInput
-                id='phonenum'
-                type={'number'}
-                value={fields.phonenum}
-                label='전화번호'
-                placeholder={'숫자만 입력하세요'}
-                onChange={handleOnChange}
-              />
+              <StyledField label={'비밀번호'} required>
+                <PasswordInput
+                  id='password'
+                  value={fields.password || ''}
+                  placeholder={
+                    '영문,숫자,특수문자를 포함한 8자 이상을 입력하세요.'
+                  }
+                  onChange={handleOnChange}
+                />
+              </StyledField>
+              <StyledField label={' '}>
+                <PasswordInput
+                  id='passwordConfirm'
+                  value={fields.passwordConfirm || ''}
+                  placeholder={'비밀번호를 한 번 더 입력하세요.'}
+                  onChange={handleOnChange}
+                />
+              </StyledField>
+              <StyledField label={'전화번호'} required>
+                <Input
+                  id='phonenum'
+                  value={fields.phonenum || ''}
+                  placeholder={'숫자만 입력하세요'}
+                  onChange={handleOnChange}
+                  ref={withMask('999-9999-9999')}
+                />
+              </StyledField>
               <CustomSelect
                 label={'권한'}
                 options={[
@@ -187,6 +219,7 @@ const UserPage = () => {
                   { label: '관리자', value: 'administrator' },
                 ]}
                 setState={setUserType}
+                required
               />
               <CustomSelect
                 label={'그룹'}
@@ -195,6 +228,7 @@ const UserPage = () => {
                 }
                 multiple
                 setState={setGroupCode}
+                required
               />
             </Flex>
             <ButtonWrapper>
@@ -227,6 +261,7 @@ const UserPage = () => {
                 label='이름'
                 placeholder={'이름을 입력하세요.'}
                 onChange={handleOnUpdateText}
+                required
               />
               <CustomInput
                 id='update_id'
@@ -234,22 +269,25 @@ const UserPage = () => {
                 label='ID'
                 placeholder={'ID를 입력하세요.'}
                 onChange={handleOnUpdateText}
+                required
               />
               <CustomInput
                 id='update_email'
                 value={updateData?.email || ''}
-                type={'email'}
                 label='이메일'
                 placeholder={'이메일을 입력하세요.'}
                 onChange={handleOnUpdateText}
+                required
               />
-              <CustomInput
-                id='update_phonenum'
-                value={updateData?.phonenum || ''}
-                label='전화번호'
-                placeholder={'숫자만 입력하세요'}
-                onChange={handleOnUpdateText}
-              />
+              <StyledField label={'전화번호'} required>
+                <Input
+                  id='update_phonenum'
+                  value={updateData?.phonenum || ''}
+                  placeholder={'숫자만 입력하세요'}
+                  onChange={handleOnUpdateText}
+                  ref={withMask('999-9999-9999')}
+                />
+              </StyledField>
               <CustomSelect
                 label={'권한'}
                 value={updateData.usertype}
@@ -260,6 +298,7 @@ const UserPage = () => {
                 setState={(value) =>
                   handleUpdateOption('usertype', value as string)
                 }
+                required
               />
               <CustomSelect
                 label={'그룹'}
@@ -271,6 +310,7 @@ const UserPage = () => {
                 setState={(value) =>
                   handleUpdateOption('groupcode', value as string)
                 }
+                required
               />
             </Flex>
             <ButtonWrapper>
@@ -311,4 +351,25 @@ const ModalContents = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+`
+
+const StyledField = styled(Field)`
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+
+  label {
+    min-width: 60px;
+    ${({ theme }) => theme.typography.body2};
+  }
+
+  input {
+    height: 30px;
+    outline: none;
+    ${({ theme }) => theme.typography.body3};
+  }
+
+  svg {
+    color: #a1a1aa;
+  }
 `

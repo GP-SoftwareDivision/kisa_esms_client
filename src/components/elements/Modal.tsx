@@ -59,6 +59,8 @@ const StyledHeader = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
 
   svg {
     cursor: pointer;
@@ -68,4 +70,6 @@ const StyledHeader = styled.div`
 const StyledContent = styled.div`
   background-color: #fff;
   border: 2px solid #061f5c;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
 `

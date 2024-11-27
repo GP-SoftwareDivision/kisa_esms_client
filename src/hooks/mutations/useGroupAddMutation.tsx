@@ -84,19 +84,19 @@ export const useGroupAddMutation = () => {
   })
 
   // 그룹 추가 => 모달 열림
-  const handleOnAddGroup = () => {
+  const openInsertGroup = () => {
     openModal('insert_group')
   }
 
   // 그룹 추가 취소 => 모달 닫힘
-  const handleOnAddGroupCancel = () => {
+  const closeInsertGroup = () => {
     closeModal('insert_group')
   }
 
   return {
     insertGroup,
-    handleOnAddGroup,
-    handleOnAddGroupCancel,
+    openInsertGroup,
+    closeInsertGroup,
     insertGroupOpen: isOpen('insert_group'),
     setAutoSendFlag,
     setUseFlag,

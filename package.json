@@ -44,6 +44,7 @@
     "react-router-dom": "^6.26.2",
     "react-toastify": "^10.0.6",
     "ts-node-dev": "^2.0.0",
+    "use-mask-input": "^3.4.2",
     "vite-plugin-style-import": "^2.0.0",
     "xlsx": "^0.18.5"
   },

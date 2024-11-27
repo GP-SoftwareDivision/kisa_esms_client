@@ -72,7 +72,7 @@ const Telegram = () => {
               text={'조회'}
             />
             <Button
-              type={'download'}
+              type={'secondary'}
               onClick={handleOnSelectChange}
               text={'엑셀 다운로드'}
             />

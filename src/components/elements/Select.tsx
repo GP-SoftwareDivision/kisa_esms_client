@@ -18,10 +18,11 @@ interface SelectProps {
   value?: string
   setState?: Dispatch<React.SetStateAction<string>>
   multiple?: boolean
+  required?: boolean
 }
 
 const CustomSelect = memo(
-  ({ options, value, label, setState, multiple }: SelectProps) => {
+  ({ options, value, label, setState, multiple, required }: SelectProps) => {
     const handleOnChange = (selected: string[]) => {
       if (setState) setState(selected.join())
     }
@@ -38,6 +39,7 @@ const CustomSelect = memo(
           items: options,
         })}
         size='xs'
+        required
         multiple={multiple}
         defaultValue={!multiple ? ['전체'] : undefined}
         flexDirection={'row'}
@@ -45,7 +47,10 @@ const CustomSelect = memo(
         value={value ? isMultipleVal(value) : undefined}
         onValueChange={({ value }) => handleOnChange(value)}
       >
-        <StyledLabel>{label}</StyledLabel>
+        <StyledLabel>
+          {label}
+          <span>{required ? '*' : null}</span>
+        </StyledLabel>
         <SelectTrigger width={'100%'}>
           <SelectValueText placeholder={'옵션을 선택해 주세요.'} />
         </SelectTrigger>
@@ -68,4 +73,10 @@ export default CustomSelect
 const StyledLabel = styled(SelectLabel)`
   min-width: 60px;
   ${({ theme }) => theme.typography.body2};
+  text-align: left;
+
+  span {
+    color: #ef4444;
+    padding: 0 4px;
+  }
 `

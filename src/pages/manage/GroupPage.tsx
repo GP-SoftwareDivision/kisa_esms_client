@@ -38,8 +38,8 @@ const GroupPage = () => {
   const {
     insertGroup,
     insertGroupOpen,
-    handleOnAddGroup,
-    handleOnAddGroupCancel,
+    openInsertGroup,
+    closeInsertGroup,
     setAutoSendFlag,
     setUseFlag,
     setEmailFlag,
@@ -50,8 +50,8 @@ const GroupPage = () => {
   const {
     updateGroup,
     updateGroupOpen,
-    handleOnUpdateGroup,
-    handleOnUpdateGroupCancel,
+    openUpdateGroup,
+    closeUpdateGroup,
     updateData,
     setUpdateData,
     handleUpdateOption,
@@ -73,7 +73,7 @@ const GroupPage = () => {
 
   // 그룹 추가 취소 액션
   const handleOnCancelAction = () => {
-    handleOnAddGroupCancel()
+    closeInsertGroup()
     handleOnCleanForm()
   }
 
@@ -85,10 +85,10 @@ const GroupPage = () => {
       cell: ({ row }: any) => (
         <TableButtonWrapper>
           <Button
-            type={'download'}
+            type={'secondary'}
             text={'수정'}
             onClick={() => {
-              handleOnUpdateGroup()
+              openUpdateGroup()
               setUpdateData(row.original)
             }}
           />
@@ -101,7 +101,7 @@ const GroupPage = () => {
     <ContentContainer>
       <PageTitle text={'그룹 관리'} />
       <ButtonWrapper>
-        <Button type={'download'} onClick={handleOnAddGroup} text={'추가'} />
+        <Button type={'secondary'} onClick={openInsertGroup} text={'추가'} />
       </ButtonWrapper>
       <ContentBox>
         {groupList.isSuccess && (
@@ -136,6 +136,7 @@ const GroupPage = () => {
                 label='그룹 이름'
                 placeholder={'그룹 이름을 입력하세요.'}
                 onChange={handleOnChange}
+                required
               />
               <CustomInput
                 id='comment'
@@ -151,6 +152,7 @@ const GroupPage = () => {
                   { value: 'N', label: '미사용' },
                 ]}
                 setState={setUseFlag}
+                required
               />
               <CustomSelect
                 label={'자동'}
@@ -159,6 +161,7 @@ const GroupPage = () => {
                   { value: 'N', label: '미발송' },
                 ]}
                 setState={setAutoSendFlag}
+                required
               />
               <CustomSelect
                 label={'카카오톡'}
@@ -167,6 +170,7 @@ const GroupPage = () => {
                   { value: 'N', label: '미발송' },
                 ]}
                 setState={setKakaoFlag}
+                required
               />
               <CustomSelect
                 label={'이메일'}
@@ -175,6 +179,7 @@ const GroupPage = () => {
                   { value: 'N', label: '미발송' },
                 ]}
                 setState={setEmailFlag}
+                required
               />
             </Flex>
             <ButtonWrapper>
@@ -197,7 +202,7 @@ const GroupPage = () => {
       <CustomModal
         isOpen={updateGroupOpen}
         title='그룹 수정'
-        onCancel={handleOnUpdateGroupCancel}
+        onCancel={closeUpdateGroup}
         content={
           <ModalContents>
             <Flex direction='column' gap={4} padding={4}>
@@ -207,6 +212,7 @@ const GroupPage = () => {
                 label='그룹 이름'
                 onChange={handleOnUpdateText}
                 placeholder={'그룹 이름을 입력하세요.'}
+                required
               />
               <CustomInput
                 id='update_comment'
@@ -225,6 +231,7 @@ const GroupPage = () => {
                 setState={(value) =>
                   handleUpdateOption('useflag', value as string)
                 }
+                required
               />
               <CustomSelect
                 label={'자동'}
@@ -236,6 +243,7 @@ const GroupPage = () => {
                 setState={(value) =>
                   handleUpdateOption('autosendflag', value as string)
                 }
+                required
               />
               <CustomSelect
                 label={'카카오톡'}
@@ -247,6 +255,7 @@ const GroupPage = () => {
                 setState={(value) =>
                   handleUpdateOption('kakaoflag', value as string)
                 }
+                required
               />
               <CustomSelect
                 label={'이메일'}
@@ -258,13 +267,14 @@ const GroupPage = () => {
                 setState={(value) =>
                   handleUpdateOption('emailflag', value as string)
                 }
+                required
               />
             </Flex>
             <ButtonWrapper>
               <CustomButton
                 type='outline'
                 text='취소'
-                onClick={handleOnUpdateGroupCancel}
+                onClick={closeUpdateGroup}
               />
               <CustomButton
                 type='primary'

@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import styled from '@emotion/styled'
 import {
   flexRender,
@@ -12,6 +13,8 @@ interface TableProps {
   columns: {
     header: string
     accessorKey: string
+    id?: string
+    cell?: () => ReactNode
   }[]
 }
 

@@ -77,12 +77,12 @@ export const useGroupUpdateMutation = () => {
   })
 
   // 그룹 수정 => 모달 열림
-  const handleOnUpdateGroup = () => {
+  const openUpdateGroup = () => {
     openModal('update_group')
   }
 
   // 그룹 수정 취소 => 모달 닫힘
-  const handleOnUpdateGroupCancel = () => {
+  const closeUpdateGroup = () => {
     closeModal('update_group')
   }
 
@@ -105,8 +105,8 @@ export const useGroupUpdateMutation = () => {
 
   return {
     updateGroup,
-    handleOnUpdateGroup,
-    handleOnUpdateGroupCancel,
+    openUpdateGroup,
+    closeUpdateGroup,
     updateGroupOpen: isOpen('update_group'),
     updateData,
     setUpdateData,

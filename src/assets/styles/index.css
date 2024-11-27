@@ -52,6 +52,10 @@ input::-webkit-inner-spin-button {
 }
 
 /*datepicker 커스텀*/
+.ant-picker {
+  border-radius: 0.25rem !important;
+}
+
 .ant-picker-outlined:hover {
   border-color: #d9d9d9;
 }

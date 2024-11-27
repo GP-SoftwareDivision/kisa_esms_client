@@ -106,7 +106,7 @@ const InfringementPage = () => {
       cell: ({ row }: any) => (
         <ButtonWrapper>
           <Button
-            type={'download'}
+            type={'secondary'}
             text={'다운로드'}
             onClick={() => console.log(row.original)}
           />
@@ -155,7 +155,7 @@ const InfringementPage = () => {
           type={
             uploadFileName && accountList.data?.progress === 'N'
               ? 'primary'
-              : 'disabled'
+              : 'ghost'
           }
           disabled={!uploadFileName && accountList.data?.progress === 'Y'}
           onClick={accountUpload}

@@ -14,6 +14,7 @@ interface UserMutationType {
   email: string
   id: string
   password: string
+  passwordConfirm: string
   phonenum: string
 }
 
@@ -34,7 +35,7 @@ export const useUserAddMutation = () => {
     mutationKey: ['insertUser'],
     mutationFn: async (data: UserMutationType) => {
       const request: RequestType = { ...data, usertype, groupcode }
-
+      console.log(request)
       const isRequestValid = hasEmptyValue(request)
       if (isRequestValid) {
         notifyError('모든 항목을 전부 입력해주세요.')
@@ -50,6 +51,10 @@ export const useUserAddMutation = () => {
         )
         throw new Error()
       }
+      if (data.password !== data.passwordConfirm) {
+        notifyError('비밀번호와 비밀번호 확인이 일치하지 않습니다.')
+        throw new Error()
+      }
       const response = await instance.post('/api/manage/userInsert', request)
       return response.data
     },
@@ -57,6 +62,9 @@ export const useUserAddMutation = () => {
       if (error instanceof AxiosError) {
         const status = error.response?.status
         switch (status) {
+          case 400:
+            notifyError(`중복된 계정입니다. 다시 입력해주세요.`)
+            break
           case 401:
             notifyError(
               `세션이 만료되었거나 권한이 없습니다. \n다시 로그인 후 이용해주세요.`

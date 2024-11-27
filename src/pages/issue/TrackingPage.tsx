@@ -117,7 +117,7 @@ const TrackingPage = () => {
         <ButtonContainer>
           <Button type={'primary'} onClick={handleOnClick} text={'조회'} />
           <Button
-            type={'download'}
+            type={'secondary'}
             onClick={handleOnClick}
             text={'엑셀 다운로드'}
           />
