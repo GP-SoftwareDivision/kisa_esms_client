@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { Box } from '@chakra-ui/react'
+import { useNavigate } from 'react-router-dom'
+import { Checkbox } from '@/components/ui/checkbox'
 
-import CustomTable from '@/components/charts/Table.tsx'
-import data from '@/data/dark.json'
 import {
   ButtonContainer,
-  ContentBox,
   ContentContainer,
   SelectContainer,
 } from '@/assets/styles/global.ts'
@@ -16,13 +15,15 @@ import CustomInput from '@/components/elements/Input.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
-import { DarkWebColumns } from '@/constants/tableColumns.ts'
 import useOptions from '@/hooks/common/useOptions.tsx'
+import DarkwebCard from '@/components/templates/DarkwebCard.tsx'
+import styled from '@emotion/styled'
 
 const DarkWebPage = () => {
+  const navigate = useNavigate()
   const { page, handlePageChange } = usePagination()
-  const [title, setTitle] = useState<string>('')
   const { responseOptions, hackingOptions } = useOptions()
+  const [title, setTitle] = useState<string>('')
 
   const handleOnSelectChange = () => {}
 
@@ -64,7 +65,11 @@ const DarkWebPage = () => {
             onChange={(e) => setTitle(e.target.value)}
           />
         </Box>
-        <Box></Box>
+        <Box>
+          <StyledCheckBox size={'sm'} colorPalette={'gray'}>
+            결과 내 재검색
+          </StyledCheckBox>
+        </Box>
         <Box>
           <ButtonContainer>
             <Button
@@ -80,15 +85,23 @@ const DarkWebPage = () => {
           </ButtonContainer>
         </Box>
       </SelectContainer>
-      <ContentBox>
-        <CustomTable data={data} columns={DarkWebColumns} loading={false} />
-        <CustomPagination
-          total={1}
-          page={page}
-          handlePageChange={(newPage) => handlePageChange(newPage as number)}
-        />
-      </ContentBox>
+      <DarkwebCard onClick={() => navigate('detail')} />
+      <CustomPagination
+        total={1}
+        page={page}
+        handlePageChange={(newPage) => handlePageChange(newPage as number)}
+      />
     </ContentContainer>
   )
 }
 export default DarkWebPage
+
+const StyledCheckBox = styled(Checkbox)`
+  position: absolute;
+  right: 260px;
+  bottom: 6px;
+
+  span {
+    ${({ theme }) => theme.typography.body2};
+  }
+`

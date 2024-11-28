@@ -2,7 +2,7 @@ import styled from '@emotion/styled'
 
 interface ButtonType {
   text: string
-  type: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
+  type: 'primary' | 'secondary' | 'tertiary' | 'outline' | 'ghost' | 'danger'
   onClick: () => void
   disabled?: boolean
 }
@@ -20,6 +20,8 @@ const getButtonColor = (type: string) => {
   switch (type) {
     case 'secondary':
       return '#36a210'
+    case 'tertiary':
+      return '#4285F4'
     case 'outline':
       return '#ffffff'
     case 'ghost':
@@ -32,7 +34,7 @@ const getButtonColor = (type: string) => {
 }
 
 const StyledButton = styled.button<{
-  $type: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
+  $type: 'primary' | 'secondary' | 'tertiary' | 'outline' | 'ghost' | 'danger'
 }>`
   background: ${(props) => getButtonColor(props.$type)};
   border: ${(props) =>

@@ -6,6 +6,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { CustomSkeleton } from '@/components/elements/Skeleton.tsx'
+import { useNavigate } from 'react-router-dom'
 
 interface TableProps {
   data: object[]
@@ -16,14 +17,25 @@ interface TableProps {
     id?: string
     cell?: () => ReactNode
   }[]
+  detailURL?: string
 }
 
-const CustomTable = ({ loading, data = [], columns = [] }: TableProps) => {
+const CustomTable = ({
+  loading,
+  data = [],
+  columns = [],
+  detailURL,
+}: TableProps) => {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   })
+  const navigate = useNavigate()
+  const handleOnRowClick = (row: any) => {
+    console.log(row)
+    navigate(detailURL ?? '')
+  }
 
   return (
     <TableWrapper>
@@ -47,7 +59,10 @@ const CustomTable = ({ loading, data = [], columns = [] }: TableProps) => {
           </thead>
           <tbody>
             {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow
+                key={row.id}
+                onClick={detailURL ? () => handleOnRowClick(row) : undefined}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

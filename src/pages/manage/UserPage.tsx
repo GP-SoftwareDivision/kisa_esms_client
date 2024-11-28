@@ -130,10 +130,12 @@ const UserPage = () => {
 
   return (
     <ContentContainer>
-      <PageTitle text={'유저 관리'} />
-      <ButtonWrapper>
-        <Button type={'secondary'} onClick={handleOnAddUser} text={'추가'} />
-      </ButtonWrapper>
+      <PageTitle
+        text={'유저 관리'}
+        children={
+          <Button type={'secondary'} onClick={handleOnAddUser} text={'추가'} />
+        }
+      />
       <ContentBox>
         {userList.isSuccess && (
           <>

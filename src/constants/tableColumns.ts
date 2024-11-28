@@ -186,8 +186,16 @@ export const DarkWebColumns = [
     accessorKey: 'title',
   },
   {
+    header: '작성자',
+    accessorKey: 'title',
+  },
+  {
     header: '작성시간',
     accessorKey: 'write_time',
+  },
+  {
+    header: '내용',
+    accessorKey: 'contents',
   },
   {
     header: '분석여부',

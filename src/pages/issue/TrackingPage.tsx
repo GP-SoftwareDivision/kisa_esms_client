@@ -17,44 +17,12 @@ import Button from '@/components/elements/Button.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import useOptions from '@/hooks/common/useOptions.tsx'
+import data from '@/data/tracking.json'
 
 const TrackingPage = () => {
-  const { page, handlePageChange } = usePagination()
   const { responseOptions } = useOptions()
   const [title, setTitle] = useState<string>('')
-
-  const data = [
-    {
-      api_type: 'DT',
-      title: 'Terminal High Altitude Area Defense',
-      write_time: '2024-02-04 09:12:44',
-      hacked_organization: '기관',
-      incident_type: '사고유형',
-      response_status: '잔행중',
-      leaked_data: '개인정보',
-      target_type: '기업',
-    },
-    {
-      api_type: 'DT',
-      title: 'Terminal High Altitude Area Defense',
-      write_time: '2024-02-04 09:12:44',
-      hacked_organization: '기관',
-      incident_type: '사고유형',
-      response_status: '진행중',
-      leaked_data: '개인정보',
-      target_type: '기업',
-    },
-    {
-      api_type: 'DT',
-      title: 'Terminal High Altitude Area Defense',
-      write_time: '2024-02-04 09:12:44',
-      hacked_organization: '기관명',
-      incident_type: '사고유형',
-      response_status: '진행중',
-      leaked_data: '개인정보',
-      target_type: '기업',
-    },
-  ]
+  const { page, handlePageChange } = usePagination()
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
@@ -65,7 +33,24 @@ const TrackingPage = () => {
 
   return (
     <ContentContainer>
-      <PageTitle text={'이슈 대응 이력'} />
+      <PageTitle
+        text={'이슈 대응 이력'}
+        children={
+          <ButtonContainer>
+            <Button
+              type={'tertiary'}
+              // onClick={() => navigate('/issue/tracking/detail/post')}
+              onClick={() => console.log('')}
+              text={'추가'}
+            />
+            <Button
+              type={'secondary'}
+              onClick={handleOnClick}
+              text={'엑셀 다운로드'}
+            />
+          </ButtonContainer>
+        }
+      />
       <SelectContainer columns={[1, 2, 3, 4]}>
         <Box>
           <CustomDatePicker label={'조회 기간'} />
@@ -75,7 +60,6 @@ const TrackingPage = () => {
             label={'API 타입'}
             options={[
               { value: '전체', label: '전체' },
-
               { value: 'DT', label: 'DT' },
               { value: 'TT', label: 'TT' },
             ]}
@@ -116,11 +100,6 @@ const TrackingPage = () => {
         <Box></Box>
         <ButtonContainer>
           <Button type={'primary'} onClick={handleOnClick} text={'조회'} />
-          <Button
-            type={'secondary'}
-            onClick={handleOnClick}
-            text={'엑셀 다운로드'}
-          />
         </ButtonContainer>
       </SelectContainer>
       <ContentBox mt={4}>

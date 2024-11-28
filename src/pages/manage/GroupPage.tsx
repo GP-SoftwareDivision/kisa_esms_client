@@ -99,10 +99,12 @@ const GroupPage = () => {
 
   return (
     <ContentContainer>
-      <PageTitle text={'그룹 관리'} />
-      <ButtonWrapper>
-        <Button type={'secondary'} onClick={openInsertGroup} text={'추가'} />
-      </ButtonWrapper>
+      <PageTitle
+        text={'그룹 관리'}
+        children={
+          <Button type={'secondary'} onClick={openInsertGroup} text={'추가'} />
+        }
+      />
       <ContentBox>
         {groupList.isSuccess && (
           <>

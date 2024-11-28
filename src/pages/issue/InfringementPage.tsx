@@ -206,7 +206,6 @@ const InfringementPage = () => {
         <Box></Box>
         <Box>
           <ButtonContainer>
-            <div></div>
             <Button
               type={'primary'}
               onClick={() =>

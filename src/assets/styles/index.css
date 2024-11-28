@@ -54,6 +54,7 @@ input::-webkit-inner-spin-button {
 /*datepicker 커스텀*/
 .ant-picker {
   border-radius: 0.25rem !important;
+  width: -webkit-fill-available;
 }
 
 .ant-picker-outlined:hover {

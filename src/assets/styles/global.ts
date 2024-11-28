@@ -16,6 +16,7 @@ export const ContentBox = styled(Box)`
 export const SelectContainer = styled(SimpleGrid)`
   margin: 1rem 0;
   gap: 16px;
+  position: relative;
 `
 
 export const SelectBox = styled.div`
@@ -33,7 +34,12 @@ export const SelectLabel = styled.label`
 `
 
 export const ButtonContainer = styled(Box)`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+
+  button {
+    min-width: 120px;
+    height: 30px;
+  }
 `
