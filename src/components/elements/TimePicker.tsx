@@ -40,7 +40,4 @@ const StyledDatePicker = styled(DatePicker)`
   .ant-picker-input > input {
     ${({ theme }) => theme.typography.body3};
   }
-  .ant-picker-suffix {
-    ${({ theme }) => theme.typography.body3};
-  }
 `

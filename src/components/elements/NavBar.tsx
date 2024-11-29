@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
 import { mq } from '@/utils/mediaQueries.ts'
 import Button from '@/components/elements/Button.tsx'
-import { useMutationHandler } from '@/hooks/mutations/index.tsx'
+import { useLoginMutation } from '@/hooks/mutations/useLoginMutation.tsx'
 
 interface SubMenu {
   title: string
@@ -26,13 +26,13 @@ interface Props {
 const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
   const location = useLocation()
   const navigate = useNavigate()
+  const { logout } = useLoginMutation()
 
   const pathname = location.pathname.split('/')
   const [activeMenu, setActiveMenu] = useState<string | null>(pathname[1])
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(
     pathname[2]
   )
-  const logoutMutation = useMutationHandler('logout')
 
   const handleMenuClick = (menuKey: string, subItemKey?: string) => {
     setActiveMenu(menuKey)
@@ -55,17 +55,6 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
       }
     }
   }, [menus, location])
-
-  const handleOnLogOut = () => {
-    logoutMutation.mutate({
-      method: 'DELETE',
-      url: '/auth',
-    })
-  }
-
-  useEffect(() => {
-    if (logoutMutation.isSuccess) navigate('/login')
-  }, [logoutMutation.isSuccess])
 
   return (
     <nav css={navBarStyle}>
@@ -94,7 +83,7 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
             <Button
               type={'primary'}
               text={'로그아웃'}
-              onClick={handleOnLogOut}
+              onClick={logout.mutate}
             />
           </UserInfoContainerStyle>
         ) : (

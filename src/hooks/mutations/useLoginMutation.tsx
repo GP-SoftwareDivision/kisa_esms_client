@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { AxiosError } from 'axios'
 import { useMutation } from '@tanstack/react-query'
@@ -13,6 +14,7 @@ interface LoginMutationType {
 }
 
 export const useLoginMutation = () => {
+  const navigate = useNavigate()
   const [phoneNum, setPhoneNum] = useState<string>('')
   const { timeLeft, startTimer, resetTimer } = useTimer(180)
   const { openModal, closeModal, isOpen } = useModal()
@@ -54,5 +56,28 @@ export const useLoginMutation = () => {
       }
     },
   })
-  return { login, phoneNum, timeLeft, isOpen: isOpen('login'), handleOnCancel }
+  const logout = useMutation({
+    mutationKey: ['logout'],
+    mutationFn: async () => {
+      resetTimer()
+      const response = await instance.delete('/auth')
+      return response.data
+    },
+    onError: (error) => {
+      if (error instanceof AxiosError) {
+        notifyError(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
+      }
+    },
+    onSuccess: () => {
+      navigate('/login')
+    },
+  })
+  return {
+    login,
+    phoneNum,
+    timeLeft,
+    isOpen: isOpen('login'),
+    handleOnCancel,
+    logout,
+  }
 }
