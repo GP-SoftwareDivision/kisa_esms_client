@@ -6,8 +6,8 @@ export const routeConfig: RouteObject[] = [
   { path: '/main/alert', element: <Components.Alert /> },
   { path: '/issue/tracking', element: <Components.Tracking /> },
   {
-    path: '/issue/tracking/detail/post',
-    element: <Components.TrackingPostPage />,
+    path: '/issue/tracking/detail',
+    element: <Components.TrackingDetailPage />,
   },
   { path: '/issue/infringement', element: <Components.Infringement /> },
   { path: '/retrieve/darkweb', element: <Components.DarkWeb /> },

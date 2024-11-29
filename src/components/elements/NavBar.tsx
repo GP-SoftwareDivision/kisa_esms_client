@@ -201,14 +201,17 @@ const menuListStyle = () => css`
 
   ${mq.xxl} {
     max-width: 1400px;
+    padding: 0.5rem 1rem;
   }
 
   ${mq.lg} {
     max-width: 960px;
+    padding: 0.5rem 1rem;
   }
 
   ${mq.md} {
     max-width: 720px;
+    padding: 0.5rem 1rem;
   }
 
   ${mq.sm} {

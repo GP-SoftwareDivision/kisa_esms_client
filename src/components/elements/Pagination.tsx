@@ -25,7 +25,7 @@ const CustomPagination = ({
       onPageChange={(e) => handlePageChange(e.page)}
       display={'flex'}
       justifyContent={'center'}
-      marginTop={'2rem'}
+      margin={'1rem'}
     >
       <PaginationPrevTrigger />
       <PaginationItems />

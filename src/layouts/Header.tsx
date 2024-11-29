@@ -61,8 +61,9 @@ const HeaderContainer = styled.header`
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
   background-color: #fff;
   z-index: 1;
+
   ${mq.sm} {
-    padding-top: 1.5rem;
+    padding-top: 0.5rem;
   }
 `
 

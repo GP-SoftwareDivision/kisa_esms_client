@@ -1,4 +1,4 @@
-import { Card } from '@chakra-ui/react'
+import { Box, Card, SimpleGrid } from '@chakra-ui/react'
 import { Caption } from '@/components/elements/Caption.tsx'
 import styled from '@emotion/styled'
 
@@ -31,9 +31,9 @@ const TelegramCard = (props: ttListType) => {
 
   return (
     <Card.Root size='sm' onClick={() => console.log(seqidx)}>
-      <Card.Body color='fg.muted'>
+      <Card.Body color='fg.muted' key={seqidx}>
         <NavLayout>
-          <StyledNavContainer>
+          <StyledNavContainer column={[1, 2, 3, 4]}>
             <StyledCaptionBox>
               <StyledLabel>수집 키워드</StyledLabel>
               <Caption text={keyword} type={'blue'} />
@@ -84,24 +84,23 @@ const TelegramCard = (props: ttListType) => {
 }
 export default TelegramCard
 
-const NavLayout = styled.div`
+const NavLayout = styled(SimpleGrid)`
   display: flex;
   justify-content: space-between;
 `
-const StyledNavContainer = styled.div`
+const StyledNavContainer = styled(SimpleGrid)`
   display: flex;
   gap: 1rem;
 `
+
 const StyledLabel = styled.span`
   font-weight: bold;
 `
-
-const StyledCaptionBox = styled.div`
+const StyledCaptionBox = styled(Box)`
   display: flex;
   gap: 0.5rem;
   ${({ theme }) => theme.typography.body2};
 `
-
 const BodyLayout = styled.div`
   display: flex;
   flex-direction: column;

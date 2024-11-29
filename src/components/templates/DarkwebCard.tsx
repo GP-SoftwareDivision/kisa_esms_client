@@ -7,7 +7,7 @@ interface DarkwebCardProps {
 const DarkwebCard = (props: DarkwebCardProps) => {
   const { onClick } = props
   return (
-    <Card.Root size='sm' onClick={onClick}>
+    <Card.Root size='sm' onClick={onClick} cursor='pointer'>
       <Card.Body color='fg.muted'>
         <NavLayout>
           <StyledNavContainer>

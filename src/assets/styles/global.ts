@@ -16,7 +16,6 @@ export const ContentBox = styled(Box)`
 export const SelectContainer = styled(SimpleGrid)`
   margin: 1rem 0;
   gap: 16px;
-  position: relative;
 `
 
 export const SelectBox = styled.div`

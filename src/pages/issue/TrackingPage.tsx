@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Box } from '@chakra-ui/react'
+import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
@@ -21,6 +22,7 @@ import data from '@/data/tracking.json'
 
 const TrackingPage = () => {
   const { responseOptions } = useOptions()
+  const navigate = useNavigate()
   const [title, setTitle] = useState<string>('')
   const { page, handlePageChange } = usePagination()
 
@@ -39,8 +41,7 @@ const TrackingPage = () => {
           <ButtonContainer>
             <Button
               type={'tertiary'}
-              // onClick={() => navigate('/issue/tracking/detail/post')}
-              onClick={() => console.log('')}
+              onClick={() => navigate('detail')}
               text={'추가'}
             />
             <Button

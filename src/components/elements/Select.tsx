@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select'
 import styled from '@emotion/styled'
 interface SelectProps {
-  label: string
+  label?: string
   options: {
     value: string
     label: string
@@ -47,10 +47,12 @@ const CustomSelect = memo(
         value={value ? isMultipleVal(value) : undefined}
         onValueChange={({ value }) => handleOnChange(value)}
       >
-        <StyledLabel>
-          {label}
-          <span>{required ? '*' : null}</span>
-        </StyledLabel>
+        {label && (
+          <StyledLabel>
+            {label}
+            <span>{required ? '*' : null}</span>
+          </StyledLabel>
+        )}
         <SelectTrigger width={'100%'}>
           <SelectValueText placeholder={'옵션을 선택해 주세요.'} />
         </SelectTrigger>

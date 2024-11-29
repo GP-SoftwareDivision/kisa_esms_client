@@ -1,34 +1,46 @@
-import { DatePicker, DatePickerProps } from 'antd'
+import { DatePicker } from 'antd'
+import styled from '@emotion/styled'
 import ko_KR from 'antd/es/locale/ko_KR'
 import ConfigProvider from 'antd/es/config-provider'
 import 'dayjs/locale/ko'
 
-import { SelectBox, SelectLabel } from '@/assets/styles/global.ts'
+import { SelectBox } from '@/assets/styles/global.ts'
 import React, { Dispatch } from 'react'
 
 interface TimePickerProps {
-  label: string
-  setDate?: Dispatch<React.SetStateAction<DatePickerProps['value']>>
+  setDate?: Dispatch<React.SetStateAction<string>>
 }
 
 const CustomTimePicker = (props: TimePickerProps) => {
-  const { label, setDate } = props
+  const { setDate } = props
 
-  const onOk = (value: DatePickerProps['value']) => {
-    if (setDate) setDate(value)
+  const onOk = (value: string | unknown) => {
+    if (value && setDate) {
+      setDate(value as string)
+    }
+  }
+
+  const onChange = (date: string | unknown) => {
+    if (date && setDate) {
+      setDate(date as string)
+    }
   }
 
   return (
     <ConfigProvider locale={ko_KR}>
       <SelectBox>
-        <SelectLabel>{label}</SelectLabel>
-        <DatePicker
-          showTime
-          onChange={(value) => setDate && setDate(value)}
-          onOk={onOk}
-        />
+        <StyledDatePicker showTime onChange={onChange} onOk={onOk} />
       </SelectBox>
     </ConfigProvider>
   )
 }
 export default CustomTimePicker
+
+const StyledDatePicker = styled(DatePicker)`
+  .ant-picker-input > input {
+    ${({ theme }) => theme.typography.body3};
+  }
+  .ant-picker-suffix {
+    ${({ theme }) => theme.typography.body3};
+  }
+`

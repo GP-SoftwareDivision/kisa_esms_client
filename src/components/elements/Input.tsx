@@ -42,5 +42,6 @@ const StyledField = styled(Field)`
     height: 30px;
     outline: none;
     ${({ theme }) => theme.typography.body3};
+    background-color: #fff;
   }
 `
