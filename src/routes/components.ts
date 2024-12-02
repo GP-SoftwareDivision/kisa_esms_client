@@ -23,3 +23,8 @@ export const Alert = lazy(() => import('@/pages/main/AlertPage.tsx'))
 export const Keyword = lazy(() => import('@/pages/manage/KeywordPage.tsx'))
 export const Ruleset = lazy(() => import('@/pages/manage/RulesetPage.tsx'))
 export const Group = lazy(() => import('@/pages/manage/GroupPage.tsx'))
+export const Server = lazy(() => import('@/pages/manage/ServerPage.tsx'))
+export const Domain = lazy(() => import('@/pages/manage/DomainPage.tsx'))
+export const SearchHistory = lazy(
+  () => import('@/pages/manage/SearchHistoryPage.tsx')
+)

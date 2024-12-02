@@ -1,5 +1,4 @@
 // 알림 내역 테이블 컬럼 정의
-
 export const AlertColumns = [
   {
     header: '발송시간',
@@ -164,6 +163,42 @@ export const GroupColumns = [
   {
     header: '알람방식',
     accessorKey: 'alram',
+  },
+]
+
+// 서버 관리 테이블 컬럼 정의
+export const ServerColumns = [
+  {
+    header: '서버명',
+    accessorKey: 'servername',
+  },
+  {
+    header: '수집대상',
+    accessorKey: 'apitype',
+  },
+  {
+    header: '수집개수',
+    accessorKey: 'count',
+  },
+  {
+    header: '마지막 수집일시',
+    accessorKey: 'lastcrawl',
+  },
+]
+
+// 도메인 관리 테이블 컬럼 정의
+export const DomainColumns = [
+  {
+    header: '도메인명',
+    accessorKey: 'domain',
+  },
+  {
+    header: '최초 수집일',
+    accessorKey: 'firstcrawl',
+  },
+  {
+    header: '최근 수집일',
+    accessorKey: 'lastcrawl',
   },
 ]
 

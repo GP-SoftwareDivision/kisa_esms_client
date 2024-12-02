@@ -161,7 +161,7 @@ const subMenuListStyle = (isActive: boolean) => css`
 const SublistStyle = css`
   display: flex;
   justify-content: center;
-  width: 26rem;
+  //width: 26rem;
 `
 
 const subMenuItemStyle = css`

@@ -33,7 +33,10 @@
         { "label": "유저 관리", "key": "user" },
         { "label": "그룹 관리", "key": "group" },
         { "label": "수집 키워드 관리", "key": "keyword" },
-        { "label": "룰셋 관리", "key": "ruleset" }
+        { "label": "룰셋 관리", "key": "ruleset" },
+        { "label": "서버 관리", "key": "server" },
+        { "label": "검색 기록 관리", "key": "searchhistory" },
+        { "label": "도메인 관리", "key": "domain"}
       ]
     }
   }

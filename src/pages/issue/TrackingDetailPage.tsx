@@ -10,6 +10,7 @@ import CustomTextarea from '@/components/elements/Textarea.tsx'
 
 const TrackingDetailPage = () => {
   const handleOnChange = () => {}
+
   return (
     <ContentContainer>
       <PageTitle text={'국내 정보 유출 이력 대응'} />

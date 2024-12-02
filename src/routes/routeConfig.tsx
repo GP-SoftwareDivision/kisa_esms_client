@@ -17,4 +17,7 @@ export const routeConfig: RouteObject[] = [
   { path: '/manage/keyword', element: <Components.Keyword /> },
   { path: '/manage/ruleset', element: <Components.Ruleset /> },
   { path: '/manage/group', element: <Components.Group /> },
+  { path: '/manage/server', element: <Components.Server /> },
+  { path: '/manage/domain', element: <Components.Domain /> },
+  { path: '/manage/searchhistory', element: <Components.SearchHistory /> },
 ]
