@@ -28,7 +28,7 @@ export function useQueries<TData>({
         const response = await instance({
           url,
           method,
-          data: body,
+          data: body ? body : undefined,
         })
         return response.data
       } catch (error) {

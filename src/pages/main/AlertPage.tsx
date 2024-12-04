@@ -21,7 +21,7 @@ const AlertPage = () => {
   const { page, handlePageChange } = usePagination()
 
   const alertList = useQueries<{ data: AlertType[]; count: number }>({
-    queryKey: `alertList_${page}`,
+    queryKey: `alertList`,
     method: 'POST',
     url: '/api/main/alarmList',
     body: {

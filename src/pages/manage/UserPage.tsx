@@ -29,6 +29,7 @@ interface UserType {
   phonenum: string
   groupcode: string
   groupname: string
+  activeflag: string
 }
 
 interface UserGroupType {
@@ -119,6 +120,7 @@ const UserPage = () => {
       password,
       passwordConfirm,
       phonenum: phonenum && formatPhoneNumber(phonenum),
+      activeflag: 'Y',
     })
   }
 
@@ -266,14 +268,6 @@ const UserPage = () => {
                 required
               />
               <CustomInput
-                id='update_id'
-                value={updateData?.id || ''}
-                label='ID'
-                placeholder={'ID를 입력하세요.'}
-                onChange={handleOnUpdateText}
-                required
-              />
-              <CustomInput
                 id='update_email'
                 value={updateData?.email || ''}
                 label='이메일'
@@ -311,6 +305,18 @@ const UserPage = () => {
                 multiple
                 setState={(value) =>
                   handleUpdateOption('groupcode', value as string)
+                }
+                required
+              />
+              <CustomSelect
+                label={'사용'}
+                value={updateData.activeflag}
+                options={[
+                  { label: '사용', value: 'Y' },
+                  { label: '미사용', value: 'N' },
+                ]}
+                setState={(value) =>
+                  handleUpdateOption('activeflag', value as string)
                 }
                 required
               />

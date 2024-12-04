@@ -16,6 +16,7 @@ interface UserMutationType {
   password: string
   passwordConfirm: string
   phonenum: string
+  activeflag: string
 }
 
 interface RequestType extends UserMutationType {
@@ -35,7 +36,6 @@ export const useUserAddMutation = () => {
     mutationKey: ['insertUser'],
     mutationFn: async (data: UserMutationType) => {
       const request: RequestType = { ...data, usertype, groupcode }
-      console.log(request)
       const isRequestValid = hasEmptyValue(request)
       if (isRequestValid) {
         notifyError('모든 항목을 전부 입력해주세요.')

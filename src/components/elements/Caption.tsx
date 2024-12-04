@@ -18,6 +18,6 @@ const getCaptionColor = (color: string) => {
   }
 }
 const StyledCaption = styled.span<{ type: string }>`
-  ${({ theme }) => theme.typography.body2};
+  ${({ theme }) => theme.typography.body3};
   color: ${(props) => getCaptionColor(props.type)};
 `

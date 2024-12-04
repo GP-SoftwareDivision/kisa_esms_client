@@ -12,11 +12,11 @@ import { isValidEmail } from '@/utils/regexChecks.ts'
 interface UserRowType {
   name: string
   email: string
-  id: string
   password: string
   phonenum: string
   usertype: string
   groupcode: string
+  activeflag: string
 }
 
 export const useUserUpdateMutation = () => {
@@ -25,11 +25,11 @@ export const useUserUpdateMutation = () => {
   const [updateData, setUpdateData] = useState<UserRowType>({
     name: '',
     email: '',
-    id: '',
     password: '',
     phonenum: '',
     usertype: '',
     groupcode: '',
+    activeflag: '',
   })
   const { openModal, closeModal, isOpen } = useModal()
 

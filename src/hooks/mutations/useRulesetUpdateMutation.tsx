@@ -8,33 +8,39 @@ import { ChangeEvent, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // 테이블 개별 리스트 타입
-interface KeywordRowType {
-  apitype: string
+interface RulesetRowType {
   seqidx: number
+  type: string
+  rule: string
   useflag: string
-  keyword: string
+  hackingflag: string
 }
 
-export const useKeywordUpdateMutation = () => {
+export const useRulesetUpdateMutation = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { openModal, closeModal, isOpen } = useModal()
 
-  const [updateData, setUpdateData] = useState<KeywordRowType>({
-    apitype: '',
+  const [updateData, setUpdateData] = useState<RulesetRowType>({
     seqidx: 0,
+    type: '',
+    rule: '',
     useflag: '',
-    keyword: '',
+    hackingflag: '',
   })
 
   // 키워드 수정 API
-  const updateKeyword = useMutation({
-    mutationKey: ['updateKeyword'],
+  const updateRuleset = useMutation({
+    mutationKey: ['updateRuleset'],
     mutationFn: async () => {
-      const response = await instance.post(
-        '/api/manage/keywordUpdate',
-        updateData
-      )
+      const request = {
+        seqidx: updateData.seqidx,
+        apitype: updateData.type,
+        rule: updateData.rule,
+        useflag: updateData.useflag,
+        hackingflag: updateData.hackingflag,
+      }
+      const response = await instance.post('/api/manage/ruleUpdate', request)
       return response.data
     },
     onError: (error) => {
@@ -61,19 +67,19 @@ export const useKeywordUpdateMutation = () => {
     },
     onSuccess: async () => {
       notifySuccess('수정되었습니다.')
-      closeModal('update_keyword')
-      await queryClient?.invalidateQueries({ queryKey: ['keywordList'] })
+      closeModal('update_ruleset')
+      await queryClient?.invalidateQueries({ queryKey: ['ruleList'] })
     },
   })
 
   // 키워드 삭제 API
-  const deleteKeyword = useMutation({
-    mutationKey: ['deleteKeyword'],
+  const deleteRuleset = useMutation({
+    mutationKey: ['deleteRuleset'],
     mutationFn: async (request: { items: number[] }) => {
       const isConfirm = confirm('삭제하시겠습니까?')
       if (!isConfirm) throw new Error()
 
-      const response = await instance.post('/api/manage/keywordDelete', {
+      const response = await instance.post('/api/manage/ruleDelete', {
         seqidx: request.items.join(','),
       })
       return response.data
@@ -105,22 +111,22 @@ export const useKeywordUpdateMutation = () => {
       notifySuccess('삭제되었습니다.')
 
       closeModal('update_user')
-      queryClient?.invalidateQueries({ queryKey: ['keywordList'] })
+      queryClient?.invalidateQueries({ queryKey: ['ruleList'] })
     },
   })
 
   // 키워드 수정 => 모달 열림
-  const openUpdateKeyword = () => {
-    openModal('update_keyword')
+  const openUpdateRuleset = () => {
+    openModal('update_ruleset')
   }
 
   // 키워드 수정 취소 => 모달 닫힘
-  const closeUpdateKeyword = () => {
-    closeModal('update_keyword')
+  const closeUpdateRuleset = () => {
+    closeModal('update_ruleset')
   }
 
   // selectBox 업데이트
-  const handleUpdateOption = (field: keyof KeywordRowType, value: string) => {
+  const handleUpdateOption = (field: keyof RulesetRowType, value: string) => {
     setUpdateData((prev) => (prev ? { ...prev, [field]: value } : prev))
   }
 
@@ -128,17 +134,17 @@ export const useKeywordUpdateMutation = () => {
   const handleOnUpdateText = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target
-      setUpdateData((prev) => ({ ...prev, keyword: value }))
+      setUpdateData((prev) => ({ ...prev, rule: value }))
     },
     []
   )
 
   return {
-    updateKeyword,
-    deleteKeyword,
-    openUpdateKeyword,
-    closeUpdateKeyword,
-    updateKeywordOpen: isOpen('update_keyword'),
+    updateRuleset,
+    deleteRuleset,
+    openUpdateRuleset,
+    closeUpdateRuleset,
+    updateRulesetOpen: isOpen('update_ruleset'),
     updateData,
     setUpdateData,
     handleUpdateOption,

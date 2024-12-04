@@ -1,7 +1,6 @@
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
-import { ServerColumns } from '@/constants/tableColumns.ts'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 
 interface ServerType {
@@ -18,6 +17,34 @@ const ServerPage = () => {
     url: '/api/manage/serverList',
   })
 
+  // 서버 관리 테이블 컬럼 정의
+  const ServerColumns = [
+    {
+      header: '서버명',
+      accessorKey: 'servername',
+    },
+    {
+      header: '수집타입',
+      accessorKey: 'apitype',
+      cell: ({ row }: any) =>
+        row.original?.apitype === 'DT' ? (
+          <span>다크웹</span>
+        ) : (
+          <span>텔레그램</span>
+        ),
+    },
+    {
+      header: '수집개수',
+      accessorKey: 'count',
+      cell: ({ row }: any) => {
+        return <span>{row.original?.count}개</span>
+      },
+    },
+    {
+      header: '마지막 수집일시',
+      accessorKey: 'lastcrawl',
+    },
+  ]
   return (
     <ContentContainer>
       <PageTitle text={'서버 관리'} />

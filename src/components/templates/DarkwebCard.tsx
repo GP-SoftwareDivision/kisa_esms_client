@@ -1,6 +1,9 @@
 import { Card } from '@chakra-ui/react'
-import { Caption } from '@/components/elements/Caption.tsx'
 import styled from '@emotion/styled'
+import { PiFileHtmlDuotone } from 'react-icons/pi'
+
+import { Caption } from '@/components/elements/Caption.tsx'
+
 interface DarkwebCardProps {
   onClick?: () => void
 }
@@ -59,10 +62,11 @@ const DarkwebCard = (props: DarkwebCardProps) => {
               <Caption text={'https://t.me/COHP7'} type={'black'} />
             </StyledCaptionBox>
             <StyledCaptionBox>
-              <StyledLabel>분석로그</StyledLabel>
+              <StyledLabel>판단키워드</StyledLabel>
               <Caption text={'email'} type={'blue'} />
             </StyledCaptionBox>
           </StyledNavContainer>
+          <HtmlIcon />
         </NavLayout>
       </Card.Body>
     </Card.Root>
@@ -79,12 +83,14 @@ const StyledNavContainer = styled.div`
   gap: 1rem;
 `
 const StyledLabel = styled.span`
-  font-weight: bold;
+  font-weight: bold !important;
+  ${({ theme }) => theme.typography.body};
 `
 
 const StyledCaptionBox = styled.div`
   display: flex;
   gap: 0.5rem;
+  align-items: baseline;
   ${({ theme }) => theme.typography.body2};
 `
 
@@ -99,4 +105,9 @@ const StyledBodyBox = styled.div`
   display: flex;
   flex-direction: column;
   ${({ theme }) => theme.typography.body2};
+`
+const HtmlIcon = styled(PiFileHtmlDuotone)`
+  ${({ theme }) => theme.typography.h4};
+  cursor: pointer;
+  margin: 0;
 `

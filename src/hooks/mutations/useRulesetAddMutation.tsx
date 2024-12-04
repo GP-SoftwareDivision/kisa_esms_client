@@ -7,27 +7,28 @@ import useModal from '@/hooks/common/useModal.tsx'
 import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import { hasEmptyValue } from '@/utils/hasEmptyValue.ts'
 
-interface KeywordMutationType {
-  keyword: string
+interface RulesetMutationType {
+  rule: string
   apitype: string
+  hackingflag: string
 }
 
-export const useKeywordAddMutation = () => {
+export const useRulesetAddMutation = () => {
   const navigate = useNavigate()
 
   const queryClient = useQueryClient()
   const { openModal, closeModal, isOpen } = useModal()
 
   // 키워드 추가 API
-  const insertKeyword = useMutation({
-    mutationKey: ['insertKeyword'],
-    mutationFn: async (data: KeywordMutationType) => {
+  const insertRuleset = useMutation({
+    mutationKey: ['insertRuleset'],
+    mutationFn: async (data: RulesetMutationType) => {
       const isRequestValid = hasEmptyValue(data)
       if (isRequestValid) {
         notifyError('모든 항목을 전부 입력해주세요.')
         throw new Error()
       }
-      const response = await instance.post('/api/manage/keywordInsert', data)
+      const response = await instance.post('/api/manage/ruleInsert', data)
       return response.data
     },
     onError: (error) => {
@@ -55,25 +56,25 @@ export const useKeywordAddMutation = () => {
     onSuccess: () => {
       notifySuccess('추가되었습니다.')
 
-      closeModal('insert_keyword')
-      queryClient?.invalidateQueries({ queryKey: ['keywordList'] })
+      closeModal('insert_ruleset')
+      queryClient?.invalidateQueries({ queryKey: ['ruleList'] })
     },
   })
 
   // 키워드 추가 => 모달 열림
-  const openInsertKeyword = () => {
-    openModal('insert_keyword')
+  const openInsertRuleset = () => {
+    openModal('insert_ruleset')
   }
 
   // 키워드 추가 취소 => 모달 닫힘
-  const closeInsertKeyword = () => {
-    closeModal('insert_keyword')
+  const closeInsertRuleset = () => {
+    closeModal('insert_ruleset')
   }
 
   return {
-    insertKeyword,
-    openInsertKeyword,
-    closeInsertKeyword,
-    insertKeywordOpen: isOpen('insert_keyword'),
+    insertRuleset,
+    openInsertRuleset,
+    closeInsertRuleset,
+    insertRulesetOpen: isOpen('insert_ruleset'),
   }
 }

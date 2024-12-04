@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import styled from '@emotion/styled'
+import { Flex } from '@chakra-ui/react'
+
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
@@ -9,7 +12,6 @@ import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { useKeywordAddMutation } from '@/hooks/mutations/useKeywordAddMutation.tsx'
 import CustomModal from '@/components/elements/Modal.tsx'
-import { Flex } from '@chakra-ui/react'
 import CustomInput from '@/components/elements/Input.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
@@ -24,19 +26,27 @@ interface KeywordType {
 }
 
 const KeywordPage = () => {
+  // api 타입
+  const [apitype, setApitype] = useState<string>('')
+
+  // 삭제 목록
+  const [deleteItems, setDeleteItems] = useState<number[]>([])
+
   const { page, handlePageChange } = usePagination()
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
+  // 키워드 추가 hooks
   const {
     insertKeyword,
     openInsertKeyword,
     closeInsertKeyword,
     insertKeywordOpen,
-    setApiType,
   } = useKeywordAddMutation()
 
+  // 키워드 수정 hooks
   const {
     updateKeyword,
+    deleteKeyword,
     openUpdateKeyword,
     closeUpdateKeyword,
     updateKeywordOpen,
@@ -44,7 +54,6 @@ const KeywordPage = () => {
     setUpdateData,
     handleUpdateOption,
     handleOnUpdateText,
-    setDeleteItems,
   } = useKeywordUpdateMutation()
 
   // 그룹 리스트 조회 hooks
@@ -60,7 +69,7 @@ const KeywordPage = () => {
   // 키워드 추가 액션
   const handleInsertKeywordAction = () => {
     const { keyword } = fields
-    insertKeyword.mutate({ keyword })
+    insertKeyword.mutate({ keyword, apitype })
     handleOnCleanForm()
   }
 
@@ -78,10 +87,11 @@ const KeywordPage = () => {
       cell: ({ row }: any) => {
         return (
           <Checkbox
+            checked={deleteItems.includes(row.original.seqidx)}
             size={'xs'}
             onCheckedChange={(checked) => {
               const itemId = row.original.seqidx
-              if (checked) {
+              if (checked.checked) {
                 // 체크된 경우: 배열에 추가 (중복 방지)
                 setDeleteItems((prev) =>
                   prev.includes(itemId) ? prev : [...prev, itemId]
@@ -97,6 +107,12 @@ const KeywordPage = () => {
     {
       header: '수집타입',
       accessorKey: 'apitype',
+      cell: ({ row }: any) =>
+        row.original?.apitype === 'DT' ? (
+          <span>다크웹</span>
+        ) : (
+          <span>텔레그램</span>
+        ),
     },
     {
       header: '사용여부',
@@ -117,17 +133,15 @@ const KeywordPage = () => {
       accessorKey: '수정',
       id: 'update',
       cell: ({ row }: any) => (
-        <div>
-          <Button
-            type={'secondary'}
-            text={'수정'}
-            onClick={() => {
-              const { keyword, seqidx, apitype, useflag } = row.original
-              openUpdateKeyword()
-              setUpdateData({ keyword, seqidx, apitype, useflag })
-            }}
-          />
-        </div>
+        <Button
+          type={'secondary'}
+          text={'수정'}
+          onClick={() => {
+            const { keyword, seqidx, apitype, useflag } = row.original
+            openUpdateKeyword()
+            setUpdateData({ keyword, seqidx, apitype, useflag })
+          }}
+        />
       ),
     },
   ]
@@ -143,8 +157,12 @@ const KeywordPage = () => {
               text={'추가'}
             />
             <Button
-              type={'primary'}
-              onClick={() => console.log('test')}
+              type={deleteItems.length === 0 ? 'ghost' : 'primary'}
+              onClick={() => {
+                deleteKeyword.mutate({ items: deleteItems })
+                setDeleteItems([])
+              }}
+              disabled={deleteItems.length === 0}
               text={'삭제'}
             />
           </TitleButtonWrapper>
@@ -191,7 +209,7 @@ const KeywordPage = () => {
                   { value: 'DT', label: '다크웹' },
                   { value: 'TT', label: '텔레그램' },
                 ]}
-                setState={setApiType}
+                setState={setApitype}
                 required
               />
             </Flex>

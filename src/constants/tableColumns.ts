@@ -148,6 +148,10 @@ export const UserColumns = [
     header: '그룹명',
     accessorKey: 'groupname',
   },
+  {
+    header: '생성일시',
+    accessorKey: 'regdate',
+  },
 ]
 
 // 그룹 관리 테이블 컬럼 정의
@@ -166,30 +170,10 @@ export const GroupColumns = [
   },
 ]
 
-// 서버 관리 테이블 컬럼 정의
-export const ServerColumns = [
-  {
-    header: '서버명',
-    accessorKey: 'servername',
-  },
-  {
-    header: '수집대상',
-    accessorKey: 'apitype',
-  },
-  {
-    header: '수집개수',
-    accessorKey: 'count',
-  },
-  {
-    header: '마지막 수집일시',
-    accessorKey: 'lastcrawl',
-  },
-]
-
 // 도메인 관리 테이블 컬럼 정의
 export const DomainColumns = [
   {
-    header: '도메인명',
+    header: 'URL',
     accessorKey: 'domain',
   },
   {
@@ -199,6 +183,18 @@ export const DomainColumns = [
   {
     header: '최근 수집일',
     accessorKey: 'lastcrawl',
+  },
+  {
+    header: '사이트/텔레그램명',
+    accessorKey: 'sitename',
+  },
+  {
+    header: '해커그룹(특정시)',
+    accessorKey: 'hacked_organization',
+  },
+  {
+    header: '비고',
+    accessorKey: 'comment',
   },
 ]
 

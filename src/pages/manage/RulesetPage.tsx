@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import styled from '@emotion/styled'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
@@ -7,6 +8,14 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import { Checkbox } from '@/components/ui/checkbox.tsx'
+import { useForm } from '@/hooks/common/useForm.tsx'
+import { useRulesetAddMutation } from '@/hooks/mutations/useRulesetAddMutation.tsx'
+import { useRulesetUpdateMutation } from '@/hooks/mutations/useRulesetUpdateMutation.tsx'
+import CustomModal from '@/components/elements/Modal.tsx'
+import { Flex } from '@chakra-ui/react'
+import CustomInput from '@/components/elements/Input.tsx'
+import CustomSelect from '@/components/elements/Select.tsx'
+import CustomButton from '@/components/elements/Button.tsx'
 
 interface RulesetType {
   seqidx: number
@@ -18,10 +27,38 @@ interface RulesetType {
 }
 
 const RulesetPage = () => {
+  // 삭제 목록
+  const [deleteItems, setDeleteItems] = useState<number[]>([])
+
   const { page, handlePageChange } = usePagination()
+  const { fields, handleOnChange, handleOnCleanForm } = useForm()
+
+  const [hackingflag, setHackingflag] = useState<string>('')
+  const [apitype, setApitype] = useState<string>('')
+
+  // 키워드 추가 hooks
+  const {
+    insertRuleset,
+    openInsertRuleset,
+    closeInsertRuleset,
+    insertRulesetOpen,
+  } = useRulesetAddMutation()
+
+  // 키워드 수정 hooks
+  const {
+    updateRuleset,
+    deleteRuleset,
+    openUpdateRuleset,
+    closeUpdateRuleset,
+    updateRulesetOpen,
+    updateData,
+    setUpdateData,
+    handleUpdateOption,
+    handleOnUpdateText,
+  } = useRulesetUpdateMutation()
 
   const ruleList = useQueries<{ data: RulesetType[]; count: number }>({
-    queryKey: `ruleList_${page}`,
+    queryKey: `ruleList`,
     method: 'POST',
     url: '/api/manage/ruleList',
     body: {
@@ -35,13 +72,35 @@ const RulesetPage = () => {
       header: '',
       accessorKey: '',
       id: 'delete',
-      cell: () => {
-        return <Checkbox size={'xs'} />
+      cell: ({ row }: any) => {
+        return (
+          <Checkbox
+            checked={deleteItems.includes(row.original.seqidx)}
+            size={'xs'}
+            onCheckedChange={(checked) => {
+              const itemId = row.original.seqidx
+              if (checked.checked) {
+                // 체크된 경우: 배열에 추가 (중복 방지)
+                setDeleteItems((prev) =>
+                  prev.includes(itemId) ? prev : [...prev, itemId]
+                )
+              } else {
+                setDeleteItems((prev) => prev.filter((id) => id !== itemId))
+              }
+            }}
+          />
+        )
       },
     },
     {
       header: '수집타입',
       accessorKey: 'type',
+      cell: ({ row }: any) =>
+        row.original?.type === 'DT' ? (
+          <span>다크웹</span>
+        ) : (
+          <span>텔레그램</span>
+        ),
     },
     {
       header: '키워드',
@@ -71,19 +130,31 @@ const RulesetPage = () => {
       header: '',
       accessorKey: '수정',
       id: 'update',
-      cell: () => (
-        <div>
-          <Button
-            type={'secondary'}
-            text={'수정'}
-            onClick={() => console.log('test')}
-          />
-        </div>
+      cell: ({ row }: any) => (
+        <Button
+          type={'secondary'}
+          text={'수정'}
+          onClick={() => {
+            const { rule, seqidx, type, useflag, hackingflag } = row.original
+            openUpdateRuleset()
+            setUpdateData({ rule, seqidx, type, useflag, hackingflag })
+          }}
+        />
       ),
     },
   ]
 
-  const deleteSearchHistory = () => {}
+  // 룰셋 추가 액션
+  const handleInsertKeywordAction = () => {
+    const { rule } = fields
+    insertRuleset.mutate({ rule, apitype, hackingflag })
+  }
+
+  // 룰셋 추가 취소 액션
+  const handleOnCancelAction = () => {
+    closeInsertRuleset()
+    handleOnCleanForm()
+  }
 
   return (
     <ContentContainer>
@@ -93,12 +164,16 @@ const RulesetPage = () => {
           <TitleButtonWrapper>
             <Button
               type={'secondary'}
-              onClick={deleteSearchHistory}
+              onClick={openInsertRuleset}
               text={'추가'}
             />
             <Button
-              type={'primary'}
-              onClick={deleteSearchHistory}
+              type={deleteItems.length === 0 ? 'ghost' : 'primary'}
+              onClick={() => {
+                deleteRuleset.mutate({ items: deleteItems })
+                setDeleteItems([])
+              }}
+              disabled={deleteItems.length === 0}
               text={'삭제'}
             />
           </TitleButtonWrapper>
@@ -122,6 +197,126 @@ const RulesetPage = () => {
           </>
         )}
       </ContentBox>
+
+      {/*룰셋 추가 모달*/}
+      <CustomModal
+        isOpen={insertRulesetOpen}
+        title='수집 키워드 추가'
+        onCancel={handleOnCancelAction}
+        content={
+          <ModalContents>
+            <Flex direction='column' gap={4} padding={4}>
+              <CustomInput
+                id='rule'
+                value={fields.rule}
+                label='룰 키워드'
+                placeholder={'키워드를 입력하세요.'}
+                onChange={handleOnChange}
+                required
+              />
+              <CustomSelect
+                label={'타입'}
+                options={[
+                  { value: 'DT', label: '다크웹' },
+                  { value: 'TT', label: '텔레그램' },
+                ]}
+                setState={setApitype}
+                required
+              />
+              <CustomSelect
+                label={'해킹여부'}
+                options={[
+                  { value: 'Y', label: '해킹' },
+                  { value: 'N', label: '미해킹' },
+                ]}
+                setState={setHackingflag}
+                required
+              />
+            </Flex>
+            <ButtonWrapper>
+              <CustomButton
+                type='outline'
+                text='취소'
+                onClick={handleOnCancelAction}
+              />
+              <CustomButton
+                type='primary'
+                text='추가'
+                onClick={handleInsertKeywordAction}
+              />
+            </ButtonWrapper>
+          </ModalContents>
+        }
+      />
+
+      {/*룰셋 수정 모달*/}
+      <CustomModal
+        isOpen={updateRulesetOpen}
+        title='그룹 수정'
+        onCancel={closeUpdateRuleset}
+        content={
+          <ModalContents>
+            <Flex direction='column' gap={4} padding={4}>
+              <CustomInput
+                id='update_rule'
+                value={updateData.rule || ''}
+                label='키워드'
+                placeholder={'키워드를 입력하세요.'}
+                onChange={handleOnUpdateText}
+                required
+              />
+              <CustomSelect
+                label={'타입'}
+                value={updateData.type}
+                options={[
+                  { value: 'DT', label: '다크웹' },
+                  { value: 'TT', label: '텔레그램' },
+                ]}
+                setState={(value) =>
+                  handleUpdateOption('type', value as string)
+                }
+                required
+              />
+              <CustomSelect
+                label={'사용여부'}
+                value={updateData.useflag}
+                options={[
+                  { value: 'Y', label: '사용' },
+                  { value: 'N', label: '미사용' },
+                ]}
+                setState={(value) =>
+                  handleUpdateOption('useflag', value as string)
+                }
+                required
+              />
+              <CustomSelect
+                label={'해킹여부'}
+                value={updateData.hackingflag}
+                options={[
+                  { value: 'Y', label: '해킹' },
+                  { value: 'N', label: '미해킹' },
+                ]}
+                setState={(value) =>
+                  handleUpdateOption('hackingflag', value as string)
+                }
+                required
+              />
+            </Flex>
+            <ButtonWrapper>
+              <CustomButton
+                type='outline'
+                text='취소'
+                onClick={handleOnCancelAction}
+              />
+              <CustomButton
+                type='primary'
+                text='수정'
+                onClick={updateRuleset.mutate}
+              />
+            </ButtonWrapper>
+          </ModalContents>
+        }
+      />
     </ContentContainer>
   )
 }
@@ -130,4 +325,18 @@ export default RulesetPage
 const TitleButtonWrapper = styled.div`
   display: flex;
   gap: 0.5rem;
+`
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+  gap: 10px;
+`
+
+const ModalContents = styled.div`
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `

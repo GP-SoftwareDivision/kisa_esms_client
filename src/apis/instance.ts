@@ -8,6 +8,7 @@ const instance = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
+  maxContentLength: Infinity,
 })
 
 export default instance

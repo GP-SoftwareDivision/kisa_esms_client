@@ -19,6 +19,22 @@ import useOptions from '@/hooks/common/useOptions.tsx'
 import DarkwebCard from '@/components/templates/DarkwebCard.tsx'
 import styled from '@emotion/styled'
 import CustomAccordion from '@/components/elements/Accordion.tsx'
+import { useQueries } from '@/hooks/queries/useQueries.tsx'
+
+interface dtListType {
+  seqidx: number
+  target: string
+  keyword: string
+  writetime: string
+  url: string
+  writer: null
+  title: string
+  contents: string
+  threatflag: string
+  threatlog: null
+  issueresponseflag: null
+  htmlpath: string
+}
 
 const DarkWebPage = () => {
   const navigate = useNavigate()
@@ -26,11 +42,40 @@ const DarkWebPage = () => {
   const { responseOptions, hackingOptions } = useOptions()
   const [title, setTitle] = useState<string>('')
 
+  const params = {
+    startdate: '2024-12-01',
+    enddate: '2024-12-01',
+    page: page.toString(),
+    threatflag: '',
+    category: '',
+    keyword: '',
+    contents: '',
+  }
+  const queryString = new URLSearchParams(params).toString()
+
+  // 유저 관리 전체 리스트
+  const dtList = useQueries<{ data: dtListType[] }>({
+    queryKey: 'dtList',
+    method: 'GET',
+    url: `/api/monitoring/dtList?${queryString}`,
+  })
+
+  console.log(dtList)
+
   const handleOnSelectChange = () => {}
 
   return (
     <ContentContainer>
-      <PageTitle text={'다크웹 데이터'} />
+      <PageTitle
+        text={'다크웹 데이터'}
+        children={
+          <Button
+            type={'secondary'}
+            onClick={handleOnSelectChange}
+            text={'엑셀 다운로드'}
+          />
+        }
+      />
       <Stack position={'relative'}>
         <StyledLoad>
           <CustomSelect
@@ -86,10 +131,11 @@ const DarkWebPage = () => {
                 onClick={handleOnSelectChange}
                 text={'조회'}
               />
+
               <Button
                 type={'secondary'}
                 onClick={handleOnSelectChange}
-                text={'엑셀 다운로드'}
+                text={'조회 조건 저장'}
               />
             </ButtonContainer>
           </Box>
@@ -119,13 +165,13 @@ const DarkWebPage = () => {
                 />
               </Box>
               <Box></Box>
-              <Box display={'flex'} justifyContent={'flex-end'}>
+              <ButtonContainer>
                 <Button
                   type={'primary'}
                   onClick={handleOnSelectChange}
                   text={'재검색'}
                 />
-              </Box>
+              </ButtonContainer>
             </AccordionContainer>
           }
         />

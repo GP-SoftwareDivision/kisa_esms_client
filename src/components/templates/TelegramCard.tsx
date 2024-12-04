@@ -1,6 +1,8 @@
-import { Box, Card, SimpleGrid } from '@chakra-ui/react'
-import { Caption } from '@/components/elements/Caption.tsx'
 import styled from '@emotion/styled'
+import { Box, Card, SimpleGrid } from '@chakra-ui/react'
+import { PiFileHtmlDuotone } from 'react-icons/pi'
+
+import { Caption } from '@/components/elements/Caption.tsx'
 
 interface ttListType {
   channelurl: string
@@ -31,7 +33,7 @@ const TelegramCard = (props: ttListType) => {
 
   return (
     <Card.Root size='sm' onClick={() => console.log(seqidx)}>
-      <Card.Body color='fg.muted' key={seqidx}>
+      <Card.Body color='fg.muted' gap={'1rem'} key={seqidx}>
         <NavLayout>
           <StyledNavContainer column={[1, 2, 3, 4]}>
             <StyledCaptionBox>
@@ -47,10 +49,12 @@ const TelegramCard = (props: ttListType) => {
               <Caption text={username} type={'blue'} />
             </StyledCaptionBox>
           </StyledNavContainer>
-          <StyledCaptionBox>
-            <StyledLabel>작성시간</StyledLabel>
-            <Caption text={writetime} type={'blue'} />
-          </StyledCaptionBox>
+          <StyledNavContainer column={[1, 2, 3, 4]}>
+            <StyledCaptionBox>
+              <StyledLabel>작성시간</StyledLabel>
+              <Caption text={writetime} type={'blue'} />
+            </StyledCaptionBox>
+          </StyledNavContainer>
         </NavLayout>
         <BodyLayout>
           <StyledBodyBox>
@@ -66,17 +70,24 @@ const TelegramCard = (props: ttListType) => {
           <StyledNavContainer>
             <StyledCaptionBox>
               <StyledLabel>해킹여부</StyledLabel>
-              <Caption text={threatflag} type={'red'} />
+              <Caption
+                text={threatflag === 'Y' ? '해킹' : '미해킹'}
+                type={'red'}
+              />
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>대응여부</StyledLabel>
-              <Caption text={issueresponseflag} type={'black'} />
+              <Caption
+                text={issueresponseflag === 'Y' ? '대응' : '미대응'}
+                type={'black'}
+              />
             </StyledCaptionBox>
             <StyledCaptionBox>
-              <StyledLabel>분석로그</StyledLabel>
+              <StyledLabel>판단키워드</StyledLabel>
               <Caption text={threatlog} type={'blue'} />
             </StyledCaptionBox>
           </StyledNavContainer>
+          <HtmlIcon />
         </NavLayout>
       </Card.Body>
     </Card.Root>
@@ -87,17 +98,22 @@ export default TelegramCard
 const NavLayout = styled(SimpleGrid)`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `
+
 const StyledNavContainer = styled(SimpleGrid)`
   display: flex;
   gap: 1rem;
 `
 
 const StyledLabel = styled.span`
-  font-weight: bold;
+  font-weight: bold !important;
+  ${({ theme }) => theme.typography.body};
 `
+
 const StyledCaptionBox = styled(Box)`
   display: flex;
+  align-items: baseline;
   gap: 0.5rem;
   ${({ theme }) => theme.typography.body2};
 `
@@ -112,4 +128,10 @@ const StyledBodyBox = styled.div`
   display: flex;
   flex-direction: column;
   ${({ theme }) => theme.typography.body2};
+`
+
+const HtmlIcon = styled(PiFileHtmlDuotone)`
+  ${({ theme }) => theme.typography.h4};
+  cursor: pointer;
+  margin: 0;
 `
