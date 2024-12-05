@@ -2,6 +2,8 @@
   "compilerOptions": {
     "target": "ES2022",
     "resolveJsonModule": true,
+    "sourceMap": true,
+    "incremental": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
