@@ -9,7 +9,7 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN yarn build
+RUN yarn build --max-old-space-size=2048
 
 FROM nginx:stable-alpine
 
