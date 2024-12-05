@@ -33,58 +33,57 @@ const TelegramCard = (props: ttListType) => {
 
   return (
     <Card.Root size='sm' onClick={() => console.log(seqidx)}>
-      <Card.Body color='fg.muted' gap={'1rem'} key={seqidx}>
+      <Card.Body color='fg.muted' gap={'0.5rem'} key={seqidx}>
         <NavLayout>
           <StyledNavContainer column={[1, 2, 3, 4]}>
             <StyledCaptionBox>
-              <StyledLabel>수집 키워드</StyledLabel>
-              <Caption text={keyword} type={'blue'} />
-            </StyledCaptionBox>
-            <StyledCaptionBox>
-              <StyledLabel>채팅방 URL</StyledLabel>
-              <Caption text={channelurl} type={'black'} />
+              <StyledLabel>작성시간</StyledLabel>
+              <Caption text={writetime} type={'blue'} />
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>작성자</StyledLabel>
               <Caption text={username} type={'blue'} />
             </StyledCaptionBox>
           </StyledNavContainer>
-          <StyledNavContainer column={[1, 2, 3, 4]}>
-            <StyledCaptionBox>
-              <StyledLabel>작성시간</StyledLabel>
-              <Caption text={writetime} type={'blue'} />
-            </StyledCaptionBox>
-          </StyledNavContainer>
+          <StyledNavContainer column={[1, 2, 3, 4]}></StyledNavContainer>
         </NavLayout>
         <BodyLayout>
           <StyledBodyBox>
-            <StyledLabel>대화방</StyledLabel>
-            <Caption text={channel} type={'black'} />
+            <StyledLabel>대화방(URL)</StyledLabel>
+            <Caption text={`${channel}  (${channelurl})`} type={'black'} />
           </StyledBodyBox>
           <StyledBodyBox>
-            <StyledLabel>메시지</StyledLabel>
+            <StyledLabel>내용</StyledLabel>
             <Caption text={contents} type={'black'} />
           </StyledBodyBox>
         </BodyLayout>
         <NavLayout>
           <StyledNavContainer>
             <StyledCaptionBox>
-              <StyledLabel>해킹여부</StyledLabel>
+              <StyledLabel>수집 키워드</StyledLabel>
+              <Caption text={keyword} type={'blue'} />
+            </StyledCaptionBox>
+            <StyledCaptionBox>
+              <StyledLabel>판단 키워드</StyledLabel>
+              <Caption text={threatlog} type={'blue'} />
+            </StyledCaptionBox>
+          </StyledNavContainer>
+        </NavLayout>
+        <NavLayout>
+          <StyledNavContainer>
+            <StyledCaptionBox>
+              <StyledLabel>해킹 여부</StyledLabel>
               <Caption
                 text={threatflag === 'Y' ? '해킹' : '미해킹'}
                 type={'red'}
               />
             </StyledCaptionBox>
             <StyledCaptionBox>
-              <StyledLabel>대응여부</StyledLabel>
+              <StyledLabel>대응 여부</StyledLabel>
               <Caption
                 text={issueresponseflag === 'Y' ? '대응' : '미대응'}
                 type={'black'}
               />
-            </StyledCaptionBox>
-            <StyledCaptionBox>
-              <StyledLabel>판단키워드</StyledLabel>
-              <Caption text={threatlog} type={'blue'} />
             </StyledCaptionBox>
           </StyledNavContainer>
           <HtmlIcon />
@@ -108,14 +107,13 @@ const StyledNavContainer = styled(SimpleGrid)`
 
 const StyledLabel = styled.span`
   font-weight: bold !important;
-  ${({ theme }) => theme.typography.body};
+  ${({ theme }) => theme.typography.body2};
 `
 
 const StyledCaptionBox = styled(Box)`
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  ${({ theme }) => theme.typography.body2};
 `
 const BodyLayout = styled.div`
   display: flex;
@@ -127,7 +125,6 @@ const BodyLayout = styled.div`
 const StyledBodyBox = styled.div`
   display: flex;
   flex-direction: column;
-  ${({ theme }) => theme.typography.body2};
 `
 
 const HtmlIcon = styled(PiFileHtmlDuotone)`

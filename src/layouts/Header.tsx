@@ -15,24 +15,36 @@ interface UserInfoType {
 const Header = () => {
   const navigate = useNavigate()
 
-  const fetchAccountInfo = async () => {
-    try {
-      const response = await instance.post('/api/loginInfo')
-      return response.data
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   // 유저 정보
   const accountInfo = useQuery<{ data: UserInfoType }>({
     queryKey: ['account'],
-    queryFn: fetchAccountInfo,
+    queryFn: async () => {
+      try {
+        const response = await instance.post('/api/loginInfo')
+        return response.data
+      } catch (error) {
+        console.error(error)
+      }
+    },
   })
 
   const onSubMenuSelect = (subItemKey: string | null) => {
+    const darkwebParams = new URLSearchParams({
+      startdate: '2024-11-01',
+      enddate: '2024-11-01',
+      page: '1',
+      threatflag: '',
+      category: '',
+      keyword: '',
+      contents: '',
+    }).toString()
+
     if (subItemKey) {
-      navigate(`/${subItemKey}`)
+      const pathName = subItemKey.split('/')[1]
+      console.log(pathName)
+      if (pathName === 'darkweb') navigate(`/${subItemKey}?${darkwebParams}`)
+      else if (pathName === 'telegram') navigate(`/${subItemKey}`)
+      else navigate(`/${subItemKey}`)
     }
   }
 

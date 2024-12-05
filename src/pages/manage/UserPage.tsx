@@ -61,7 +61,7 @@ const UserPage = () => {
     handleOnUpdateText,
   } = useUserUpdateMutation()
 
-  // 유저 관리 전체 리스트
+  // 사용자 관리 전체 리스트
   const userList = useQueries<{ data: UserType[] }>({
     queryKey: 'userList',
     method: 'POST',
@@ -110,7 +110,7 @@ const UserPage = () => {
     },
   ]
 
-  // 유저 추가 액션
+  // 사용자 추가 액션
   const handleInsertUserAction = () => {
     const { name, email, id, password, passwordConfirm, phonenum } = fields
     insertUser.mutate({
@@ -124,7 +124,7 @@ const UserPage = () => {
     })
   }
 
-  // 유저 추가 취소 액션
+  // 사용자 추가 취소 액션
   const handleOnCancelAction = () => {
     handleOnAddUserCancel()
     handleOnCleanForm()
@@ -133,7 +133,7 @@ const UserPage = () => {
   return (
     <ContentContainer>
       <PageTitle
-        text={'유저 관리'}
+        text={'사용자 관리'}
         children={
           <Button type={'secondary'} onClick={handleOnAddUser} text={'추가'} />
         }
@@ -157,10 +157,10 @@ const UserPage = () => {
         )}
       </ContentBox>
 
-      {/*유저 추가 모달*/}
+      {/*사용 추가 모달*/}
       <CustomModal
         isOpen={insertUserOpen}
-        title='유저 추가'
+        title='사용자 추가'
         onCancel={handleOnCancelAction}
         content={
           <ModalContents>
@@ -251,10 +251,10 @@ const UserPage = () => {
         }
       />
 
-      {/*유저 수정 모달*/}
+      {/*사용자 수정 모달*/}
       <CustomModal
         isOpen={updateUserOpen}
-        title='유저 수정'
+        title='사용자 수정'
         onCancel={handleOnUpdateUserCancel}
         content={
           <ModalContents>
@@ -275,6 +275,24 @@ const UserPage = () => {
                 onChange={handleOnUpdateText}
                 required
               />
+              <StyledField label={'비밀번호'} required>
+                <PasswordInput
+                  id='updatePassword'
+                  value={fields.updatePassword || ''}
+                  placeholder={
+                    '영문,숫자,특수문자를 포함한 8자 이상을 입력하세요.'
+                  }
+                  onChange={handleOnChange}
+                />
+              </StyledField>
+              <StyledField label={' '}>
+                <PasswordInput
+                  id='updatePasswordConfirm'
+                  value={fields.updatePasswordConfirm || ''}
+                  placeholder={'비밀번호를 한 번 더 입력하세요.'}
+                  onChange={handleOnChange}
+                />
+              </StyledField>
               <StyledField label={'전화번호'} required>
                 <Input
                   id='update_phonenum'

@@ -4,9 +4,8 @@ const useOptions = () => {
   const responseOptions = useMemo(
     () => [
       { value: '전체', label: '전체' },
+      { value: '대응', label: '대응' },
       { value: '대기', label: '대기' },
-      { value: '진행중', label: '진행중' },
-      { value: '완료', label: '완료' },
     ],
     []
   )

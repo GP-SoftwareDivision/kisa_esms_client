@@ -149,31 +149,15 @@ export const UserColumns = [
     accessorKey: 'groupname',
   },
   {
-    header: '생성일시',
+    header: '등록일',
     accessorKey: 'regdate',
-  },
-]
-
-// 그룹 관리 테이블 컬럼 정의
-export const GroupColumns = [
-  {
-    header: '그룹명',
-    accessorKey: 'groupname',
-  },
-  {
-    header: '설명',
-    accessorKey: 'comment',
-  },
-  {
-    header: '알람방식',
-    accessorKey: 'alram',
   },
 ]
 
 // 도메인 관리 테이블 컬럼 정의
 export const DomainColumns = [
   {
-    header: 'URL',
+    header: '사이트(도메인)',
     accessorKey: 'domain',
   },
   {
@@ -185,7 +169,11 @@ export const DomainColumns = [
     accessorKey: 'lastcrawl',
   },
   {
-    header: '사이트/텔레그램명',
+    header: '구분',
+    accessorKey: 'type',
+  },
+  {
+    header: '채널명',
     accessorKey: 'sitename',
   },
   {

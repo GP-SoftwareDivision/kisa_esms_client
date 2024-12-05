@@ -39,7 +39,7 @@ export const theme = {
       fontWeight: 400,
     },
     body3: {
-      fontSize: '0.75rem',
+      fontSize: '0.735rem',
       lineHeight: 1.5,
       fontWeight: 400,
     },

@@ -43,8 +43,8 @@ const DarkWebPage = () => {
   const [title, setTitle] = useState<string>('')
 
   const params = {
-    startdate: '2024-12-01',
-    enddate: '2024-12-01',
+    startdate: '2024-11-01',
+    enddate: '2024-11-01',
     page: page.toString(),
     threatflag: '',
     category: '',
@@ -54,7 +54,7 @@ const DarkWebPage = () => {
   const queryString = new URLSearchParams(params).toString()
 
   // 유저 관리 전체 리스트
-  const dtList = useQueries<{ data: dtListType[] }>({
+  const dtList = useQueries<{ data: dtListType[]; count: number }>({
     queryKey: 'dtList',
     method: 'GET',
     url: `/api/monitoring/dtList?${queryString}`,
@@ -98,7 +98,6 @@ const DarkWebPage = () => {
               options={[{ value: '카테고리', label: '카테고리' }]}
             />
           </Box>
-
           <Box>
             <CustomSelect label={'해킹 여부'} options={hackingOptions} />
           </Box>
@@ -123,6 +122,18 @@ const DarkWebPage = () => {
               onChange={(e) => setTitle(e.target.value)}
             />
           </Box>
+          <Box>
+            <CustomInput
+              id={'url'}
+              label={'URL'}
+              placeholder={'내용을 입력하세요.'}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </Box>
+          <Box></Box>
+          <Box></Box>
+          <Box></Box>
           <Box></Box>
           <Box>
             <ButtonContainer>
@@ -131,7 +142,6 @@ const DarkWebPage = () => {
                 onClick={handleOnSelectChange}
                 text={'조회'}
               />
-
               <Button
                 type={'secondary'}
                 onClick={handleOnSelectChange}
@@ -180,7 +190,7 @@ const DarkWebPage = () => {
         <DarkwebCard onClick={() => navigate('detail')} />
       </Stack>
       <CustomPagination
-        total={1}
+        total={dtList.data?.count || 1}
         page={page}
         handlePageChange={(newPage) => handlePageChange(newPage as number)}
       />
@@ -203,20 +213,20 @@ const StyledCheckBox = styled(Checkbox)`
   right: 265px;
 
   @media (max-width: 576px) {
-    top: 325px;
+    top: 450px;
   }
 
   @media (min-width: 577px) and (max-width: 767px) {
-    top: 202px;
+    top: 265px;
   }
 
   @media (min-width: 768px) and (max-width: 991px) {
-    top: 156px;
-    right: 550px;
+    top: 202px;
+    right: 260px;
   }
 
   @media (min-width: 992px) {
-    top: 109px;
+    top: 155px;
   }
 
   svg {

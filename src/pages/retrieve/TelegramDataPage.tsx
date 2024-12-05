@@ -37,7 +37,7 @@ interface ttListType {
 const Telegram = () => {
   const { page, handlePageChange } = usePagination()
   const [title, setTitle] = useState<string>('')
-  const { hackingOptions } = useOptions()
+  const { hackingOptions, responseOptions } = useOptions()
 
   // 유저 관리 전체 리스트
   const ttList = useQueries<{ data: ttListType[] }>({
@@ -89,6 +89,9 @@ const Telegram = () => {
             <CustomSelect label={'해킹 여부'} options={hackingOptions} />
           </Box>
           <Box>
+            <CustomSelect label={'대응 여부'} options={responseOptions} />
+          </Box>
+          <Box>
             <CustomInput
               id={'writer'}
               label={'작성자'}
@@ -115,7 +118,6 @@ const Telegram = () => {
               onChange={(e) => setTitle(e.target.value)}
             />
           </Box>
-          <Box></Box>
           <Box></Box>
           <Box>
             <ButtonContainer>

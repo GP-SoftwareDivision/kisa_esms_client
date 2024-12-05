@@ -10,7 +10,6 @@ import CustomButton from '@/components/elements/Button.tsx'
 import CustomModal from '@/components/elements/Modal.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
-import { GroupColumns } from '@/constants/tableColumns.ts'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useGroupAddMutation } from '@/hooks/mutations/useGroupAddMutation.tsx'
@@ -78,6 +77,25 @@ const GroupPage = () => {
   }
 
   const columns = [
+    // 그룹 관리 테이블 컬럼 정의
+    {
+      header: '그룹명',
+      accessorKey: 'groupname',
+    },
+    {
+      header: '설명',
+      accessorKey: 'comment',
+    },
+    {
+      header: '알람방식',
+      accessorKey: 'alram',
+    },
+    {
+      header: '사용여부',
+      accessorKey: 'useflag',
+      cell: ({ row }: any) =>
+        row.original?.useflag === 'Y' ? <span>사용</span> : <span>미사용</span>,
+    },
     {
       header: '수정',
       accessorKey: '',
@@ -100,7 +118,7 @@ const GroupPage = () => {
   return (
     <ContentContainer>
       <PageTitle
-        text={'그룹 관리'}
+        text={'알람 관리'}
         children={
           <Button type={'secondary'} onClick={openInsertGroup} text={'추가'} />
         }
@@ -111,7 +129,7 @@ const GroupPage = () => {
             <CustomTable
               loading={groupList.isLoading}
               data={groupList.data.data}
-              columns={GroupColumns.concat(columns)}
+              columns={columns}
             />
             <CustomPagination
               total={1}

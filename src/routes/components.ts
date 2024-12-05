@@ -19,7 +19,7 @@ export const DarkWebDetail = lazy(
 export const Telegram = lazy(
   () => import('@/pages/retrieve/TelegramDataPage.tsx')
 )
-export const Alert = lazy(() => import('@/pages/main/AlertPage.tsx'))
+export const Alert = lazy(() => import('@/pages/manage/AlertPage.tsx'))
 export const Keyword = lazy(() => import('@/pages/manage/KeywordPage.tsx'))
 export const Ruleset = lazy(() => import('@/pages/manage/RulesetPage.tsx'))
 export const Group = lazy(() => import('@/pages/manage/GroupPage.tsx'))

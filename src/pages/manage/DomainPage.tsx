@@ -27,7 +27,7 @@ interface ServerType {
 
 const DomainPage = () => {
   const { page, handlePageChange } = usePagination()
-  const [url, setUrl] = useState<string>('')
+  const [channel, setChannel] = useState<string>('')
 
   const domainList = useQueries<{ data: ServerType[]; count: number }>({
     queryKey: `domainList_${page}`,
@@ -43,7 +43,7 @@ const DomainPage = () => {
   return (
     <ContentContainer>
       <PageTitle
-        text={'도메인 관리'}
+        text={'수집 채널 관리'}
         children={
           <Button
             type={'secondary'}
@@ -55,11 +55,11 @@ const DomainPage = () => {
       <SelectContainer columns={[1, 2]}>
         <StyledBox>
           <CustomInput
-            id={'url'}
-            label={'URL'}
+            id={'channel'}
+            label={'채널명'}
             placeholder={'내용을 입력하세요.'}
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            value={channel}
+            onChange={(e) => setChannel(e.target.value)}
           />
         </StyledBox>
         <ButtonContainer>

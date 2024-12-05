@@ -11,16 +11,12 @@ const DarkwebCard = (props: DarkwebCardProps) => {
   const { onClick } = props
   return (
     <Card.Root size='sm' onClick={onClick} cursor='pointer'>
-      <Card.Body color='fg.muted'>
+      <Card.Body color='fg.muted' gap={'0.5rem'}>
         <NavLayout>
           <StyledNavContainer>
             <StyledCaptionBox>
-              <StyledLabel>카테고리</StyledLabel>
-              <Caption text={'korea'} type={'blue'} />
-            </StyledCaptionBox>
-            <StyledCaptionBox>
-              <StyledLabel>수집 키워드</StyledLabel>
-              <Caption text={'https://t.me/COHP7'} type={'black'} />
+              <StyledLabel>작성시간</StyledLabel>
+              <Caption text={'2024-10-10 10:00:00'} type={'blue'} />
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>작성자</StyledLabel>
@@ -28,18 +24,14 @@ const DarkwebCard = (props: DarkwebCardProps) => {
             </StyledCaptionBox>
           </StyledNavContainer>
           <StyledCaptionBox>
-            <StyledLabel>작성시간</StyledLabel>
-            <Caption text={'2024-10-10 10:00:00'} type={'blue'} />
+            <StyledLabel>카테고리</StyledLabel>
+            <Caption text={'korea'} type={'blue'} />
           </StyledCaptionBox>
         </NavLayout>
         <BodyLayout>
           <StyledBodyBox>
             <StyledLabel>제목</StyledLabel>
             <Caption text={'Webshell / Cpanel / Smtp / Rdp'} type={'black'} />
-          </StyledBodyBox>
-          <StyledBodyBox>
-            <StyledLabel>URL</StyledLabel>
-            <Caption text={'https://gumgum.com'} type={'black'} />
           </StyledBodyBox>
           <StyledBodyBox>
             <StyledLabel>내용</StyledLabel>
@@ -50,20 +42,32 @@ const DarkwebCard = (props: DarkwebCardProps) => {
               type={'black'}
             />
           </StyledBodyBox>
+          <StyledBodyBox>
+            <StyledLabel>URL</StyledLabel>
+            <Caption text={'https://gumgum.com'} type={'black'} />
+          </StyledBodyBox>
         </BodyLayout>
         <NavLayout>
           <StyledNavContainer>
             <StyledCaptionBox>
-              <StyledLabel>해킹여부</StyledLabel>
-              <Caption text={'해킹'} type={'red'} />
-            </StyledCaptionBox>
-            <StyledCaptionBox>
-              <StyledLabel>대응여부</StyledLabel>
+              <StyledLabel>수집 키워드</StyledLabel>
               <Caption text={'https://t.me/COHP7'} type={'black'} />
             </StyledCaptionBox>
             <StyledCaptionBox>
-              <StyledLabel>판단키워드</StyledLabel>
+              <StyledLabel>판단 키워드</StyledLabel>
               <Caption text={'email'} type={'blue'} />
+            </StyledCaptionBox>
+          </StyledNavContainer>
+        </NavLayout>
+        <NavLayout>
+          <StyledNavContainer>
+            <StyledCaptionBox>
+              <StyledLabel>해킹 여부</StyledLabel>
+              <Caption text={'해킹'} type={'red'} />
+            </StyledCaptionBox>
+            <StyledCaptionBox>
+              <StyledLabel>대응 여부</StyledLabel>
+              <Caption text={'대응'} type={'black'} />
             </StyledCaptionBox>
           </StyledNavContainer>
           <HtmlIcon />
@@ -84,14 +88,13 @@ const StyledNavContainer = styled.div`
 `
 const StyledLabel = styled.span`
   font-weight: bold !important;
-  ${({ theme }) => theme.typography.body};
+  ${({ theme }) => theme.typography.body2};
 `
 
 const StyledCaptionBox = styled.div`
   display: flex;
   gap: 0.5rem;
   align-items: baseline;
-  ${({ theme }) => theme.typography.body2};
 `
 
 const BodyLayout = styled.div`
@@ -104,8 +107,8 @@ const BodyLayout = styled.div`
 const StyledBodyBox = styled.div`
   display: flex;
   flex-direction: column;
-  ${({ theme }) => theme.typography.body2};
 `
+
 const HtmlIcon = styled(PiFileHtmlDuotone)`
   ${({ theme }) => theme.typography.h4};
   cursor: pointer;
