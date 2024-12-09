@@ -2,8 +2,13 @@
   {
     "label": "메인",
     "key": "main",
-    "subMenu": { "title": "메인", "items": [{ "label": "대시보드", "key": "dashboard" }
-    ]}
+    "subMenu": {
+      "title": "데이터 조회",
+      "items": [
+        { "label": "대시보드", "key": "dashboard" },
+        { "label": "모니터링", "key": "monitoring" }
+      ]
+    }
   },
   {
     "label": "데이터 조회",
@@ -24,21 +29,40 @@
       "items": [{ "label": "이슈 대응 이력", "key": "tracking" }, { "label": "침해 정보 판별", "key": "Infringement" }]
     }
   },
-
   {
     "label": "관리",
     "key": "manage",
     "subMenu": {
       "title": "관리",
       "items": [
-        { "label": "유저 관리", "key": "user" },
-        { "label": "알람 관리", "key": "group" },
-        { "label": "알림 내역", "key": "alert" },
-        { "label": "수집 키워드 관리", "key": "keyword" },
-        { "label": "룰셋 관리", "key": "ruleset" },
-        { "label": "서버 관리", "key": "server" },
+        { "label": "판단 키워드 관리", "key": "judgment" },
         { "label": "검색 기록 관리", "key": "searchhistory" },
-        { "label": "도메인 관리", "key": "domain"}
+        { "label": "수집 채널 관리", "key": "domain"}
+      ]
+    }
+  },
+  {
+    "label": "설정",
+    "key": "setting",
+    "subMenu": {
+      "title": "설정",
+      "items": [
+        {
+          "label": "사용자 관리",
+          "key": "user"
+        },
+        {
+          "label": "알람 관리",
+          "key": "group"
+        },
+        {
+          "label": "알림 내역",
+          "key": "alert"
+        },
+        {
+          "label": "서버 관리",
+          "key": "server"
+        }
       ]
     }
   }

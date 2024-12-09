@@ -34,14 +34,16 @@ const Header = () => {
       enddate: '2024-11-01',
       page: '1',
       threatflag: '',
+      responseflag: '',
       category: '',
+      title: '',
       keyword: '',
       contents: '',
+      url: '',
     }).toString()
 
     if (subItemKey) {
       const pathName = subItemKey.split('/')[1]
-      console.log(pathName)
       if (pathName === 'darkweb') navigate(`/${subItemKey}?${darkwebParams}`)
       else if (pathName === 'telegram') navigate(`/${subItemKey}`)
       else navigate(`/${subItemKey}`)

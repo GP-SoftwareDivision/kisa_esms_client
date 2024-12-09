@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Box, SimpleGrid, Stack } from '@chakra-ui/react'
-import { useNavigate } from 'react-router-dom'
-import { Checkbox } from '@/components/ui/checkbox'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 import {
   ButtonContainer,
   ContentContainer,
   SelectContainer,
 } from '@/assets/styles/global.ts'
+import { Checkbox } from '@/components/ui/checkbox'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomDatePicker from '@/components/elements/DatePicker.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
@@ -20,6 +20,7 @@ import DarkwebCard from '@/components/templates/DarkwebCard.tsx'
 import styled from '@emotion/styled'
 import CustomAccordion from '@/components/elements/Accordion.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
+import TelegramCard from '@/components/templates/TelegramCard.tsx'
 
 interface dtListType {
   seqidx: number
@@ -27,12 +28,12 @@ interface dtListType {
   keyword: string
   writetime: string
   url: string
-  writer: null
+  writer: string
   title: string
   contents: string
   threatflag: string
-  threatlog: null
-  issueresponseflag: null
+  threatlog: string
+  issueresponseflag: string
   htmlpath: string
 }
 
@@ -40,28 +41,46 @@ const DarkWebPage = () => {
   const navigate = useNavigate()
   const { page, handlePageChange } = usePagination()
   const { responseOptions, hackingOptions } = useOptions()
-  const [title, setTitle] = useState<string>('')
 
-  const params = {
-    startdate: '2024-11-01',
-    enddate: '2024-11-01',
-    page: page.toString(),
-    threatflag: '',
-    category: '',
-    keyword: '',
-    contents: '',
-  }
-  const queryString = new URLSearchParams(params).toString()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
 
-  // 유저 관리 전체 리스트
+  const [date, setDate] = useState({
+    startdate: queryParams.get('startdate') || '',
+    enddate: queryParams.get('enddate') || '',
+  })
+  const [category, setCategory] = useState<string>(
+    queryParams.get('category') || ''
+  )
+  const [threatflag, setThreatFlag] = useState<string>(
+    queryParams.get('threatflag') || ''
+  )
+  const [responseflag, setResponseFlag] = useState<string>(
+    queryParams.get('responseflag') || ''
+  )
+  const [title, setTitle] = useState<string>(queryParams.get('title') || '')
+  const [keyword, setKeyword] = useState<string>(
+    queryParams.get('keyword') || ''
+  )
+  const [url, setUrl] = useState<string>(queryParams.get('url') || '')
+
   const dtList = useQueries<{ data: dtListType[]; count: number }>({
     queryKey: 'dtList',
     method: 'GET',
-    url: `/api/monitoring/dtList?${queryString}`,
+    url: `/api/monitoring/dtList?${new URLSearchParams({
+      startdate: date.startdate,
+      enddate: date.enddate,
+      page: page.toString(),
+      threatflag,
+      category,
+      responseflag,
+      title,
+      keyword,
+      url,
+    }).toString()}`,
   })
 
   console.log(dtList)
-
   const handleOnSelectChange = () => {}
 
   return (
@@ -187,7 +206,23 @@ const DarkWebPage = () => {
         />
       </Stack>
       <Stack margin={'1rem 0'}>
-        <DarkwebCard onClick={() => navigate('detail')} />
+        {dtList.isSuccess &&
+          dtList.data?.data.map((v: dtListType) => (
+            <DarkwebCard
+              onClick={() => navigate(`detail?id=${v.seqidx}`)}
+              contents={v.contents}
+              issueresponseflag={v.issueresponseflag}
+              keyword={v.keyword}
+              seqidx={v.seqidx}
+              threatflag={v.threatflag}
+              threatlog={v.threatlog}
+              title={v.title}
+              url={v.url}
+              writer={v.writer}
+              writetime={v.writetime}
+              target={v.target}
+            />
+          ))}
       </Stack>
       <CustomPagination
         total={dtList.data?.count || 1}

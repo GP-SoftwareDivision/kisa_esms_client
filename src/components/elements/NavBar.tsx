@@ -33,6 +33,32 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(
     pathname[2]
   )
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null) // 호버만 하고 이동하지 않을 시 메뉴 제 자리
+
+  const handleOnMouseLeave = () => {
+    // 기존 타이머가 있다면 정리
+    if (timer) clearTimeout(timer)
+
+    // 새 타이머 설정
+    const newTimer = setTimeout(() => {
+      // 현재 활성 메뉴가 pathname[1]과 다를 때만 업데이트
+      setActiveMenu((prevActiveMenu) => {
+        if (prevActiveMenu !== pathname[1]) {
+          return pathname[1]
+        }
+        return prevActiveMenu
+      })
+    }, 2000) // 2초로 시간 단축
+
+    setTimer(newTimer)
+  }
+
+  // 컴포넌트가 언마운트될 때 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [timer])
 
   const handleMenuClick = (menuKey: string, subItemKey?: string) => {
     setActiveMenu(menuKey)
@@ -41,20 +67,6 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
       onSubMenuSelect?.(`${menuKey}/${subItemKey}`)
     }
   }
-
-  useEffect(() => {
-    const path = location.pathname.split('/')[1]
-    if (path) {
-      const matchingMenu = menus.find((menu) =>
-        menu.subMenu?.items.some((subItem) => subItem.key === path)
-      )
-      if (matchingMenu) {
-        //상태 동기화
-        setActiveMenu(matchingMenu.key)
-        setSelectedSubMenu(path)
-      }
-    }
-  }, [menus, location])
 
   return (
     <nav css={navBarStyle}>
@@ -66,8 +78,8 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
           {menus.map((menu) => (
             <div
               key={menu.key}
-              // onMouseEnter={() => setActiveMenu(menu.key)}
-              onClick={() => handleMenuClick(menu.key)}
+              onMouseEnter={() => setActiveMenu(menu.key)}
+              onMouseLeave={handleOnMouseLeave}
               css={[
                 menuItemStyle,
                 activeMenu === menu.key && selectedMainMenuStyle, // 메인 메뉴 스타일 적용

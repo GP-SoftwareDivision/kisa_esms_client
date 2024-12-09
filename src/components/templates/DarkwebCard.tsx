@@ -4,58 +4,80 @@ import { PiFileHtmlDuotone } from 'react-icons/pi'
 
 import { Caption } from '@/components/elements/Caption.tsx'
 
-interface DarkwebCardProps {
+interface dtListType {
+  contents: string
+  htmlpath?: string
+  issueresponseflag: string
+  keyword: string
+  seqidx: number
+  target: string
+  threatflag: string
+  threatlog: string
+  title: string
+  url: string
+  writer: string
+  writetime: string
   onClick?: () => void
 }
-const DarkwebCard = (props: DarkwebCardProps) => {
-  const { onClick } = props
+
+const DarkwebCard = (props: dtListType) => {
+  const {
+    contents,
+    // htmlpath,
+    issueresponseflag,
+    keyword,
+    seqidx,
+    target,
+    threatflag,
+    threatlog,
+    title,
+    url,
+    writer,
+    writetime,
+    onClick,
+  } = props
   return (
-    <Card.Root size='sm' onClick={onClick} cursor='pointer'>
+    <Card.Root size='sm' onClick={onClick} cursor='pointer' key={seqidx}>
       <Card.Body color='fg.muted' gap={'0.5rem'}>
         <NavLayout>
           <StyledNavContainer>
             <StyledCaptionBox>
               <StyledLabel>작성시간</StyledLabel>
-              <Caption text={'2024-10-10 10:00:00'} type={'blue'} />
+              <Caption text={writetime} type={'blue'} />
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>작성자</StyledLabel>
-              <Caption text={'TBD'} type={'blue'} />
+              <Caption text={writer} type={'blue'} />
             </StyledCaptionBox>
           </StyledNavContainer>
           <StyledCaptionBox>
             <StyledLabel>카테고리</StyledLabel>
-            <Caption text={'korea'} type={'blue'} />
+            <Caption text={target} type={'blue'} />
           </StyledCaptionBox>
         </NavLayout>
         <BodyLayout>
           <StyledBodyBox>
             <StyledLabel>제목</StyledLabel>
-            <Caption text={'Webshell / Cpanel / Smtp / Rdp'} type={'black'} />
+            <Caption text={title} type={'black'} />
           </StyledBodyBox>
           <StyledBodyBox>
             <StyledLabel>내용</StyledLabel>
-            <Caption
-              text={
-                'SHUTTLE SMS AND EMAIL SPAMMINGWe accept spam, gambling content and so much more Dm for your bulk EMAIL & SMS servicesBulk emails and sms services available for countries around the globeCanadaTurkey ChinaIndiaHungry Israel  Kuwait United Kingdom  USAJapan Singapore Hungry south Korea Australia And many more countries ① Delivery Rate 100%② High Speed Sending③ Non Spam Filters④ Accept Any Contents & Msg⑤ Multi-alphabet ⑥ Unicode Characters⑦ Sender ID Customizable⑧ Countries available more than 40⑨ PC, Laptop, MacBook , PhoneADMIN @stonebulks       @stonebulks DM THE ADMIN FORPURCHASE ONLY WhatsApp +1 (682) 280-2550",'
-              }
-              type={'black'}
-            />
+            <Caption text={contents} type={'black'} />
           </StyledBodyBox>
           <StyledBodyBox>
             <StyledLabel>URL</StyledLabel>
-            <Caption text={'https://gumgum.com'} type={'black'} />
+            <Caption text={url} type={'black'} />
           </StyledBodyBox>
         </BodyLayout>
         <NavLayout>
           <StyledNavContainer>
             <StyledCaptionBox>
               <StyledLabel>수집 키워드</StyledLabel>
-              <Caption text={'https://t.me/COHP7'} type={'black'} />
+              <Caption text={keyword} type={'black'} />
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>판단 키워드</StyledLabel>
-              <Caption text={'email'} type={'blue'} />
+              <Caption text={threatlog} type={'blue'} />
             </StyledCaptionBox>
           </StyledNavContainer>
         </NavLayout>
@@ -63,11 +85,11 @@ const DarkwebCard = (props: DarkwebCardProps) => {
           <StyledNavContainer>
             <StyledCaptionBox>
               <StyledLabel>해킹 여부</StyledLabel>
-              <Caption text={'해킹'} type={'red'} />
+              <Caption text={threatflag} type={'red'} />
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>대응 여부</StyledLabel>
-              <Caption text={'대응'} type={'black'} />
+              <Caption text={issueresponseflag} type={'black'} />
             </StyledCaptionBox>
           </StyledNavContainer>
           <HtmlIcon />

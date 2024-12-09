@@ -122,38 +122,6 @@ export const issueTrackingColumns = [
   },
 ]
 
-// 유저 관리 테이블 컬럼 정의
-export const UserColumns = [
-  {
-    header: 'ID',
-    accessorKey: 'id',
-  },
-  {
-    header: '이름',
-    accessorKey: 'name',
-  },
-  {
-    header: '권한',
-    accessorKey: 'usertype',
-  },
-  {
-    header: '번호',
-    accessorKey: 'phonenum',
-  },
-  {
-    header: '이메일',
-    accessorKey: 'email',
-  },
-  {
-    header: '그룹명',
-    accessorKey: 'groupname',
-  },
-  {
-    header: '등록일',
-    accessorKey: 'regdate',
-  },
-]
-
 // 도메인 관리 테이블 컬럼 정의
 export const DomainColumns = [
   {

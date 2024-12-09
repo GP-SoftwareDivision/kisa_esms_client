@@ -26,7 +26,7 @@ interface RulesetType {
   regdate: string
 }
 
-const RulesetPage = () => {
+const JudgmentPage = () => {
   // 삭제 목록
   const [deleteItems, setDeleteItems] = useState<number[]>([])
 
@@ -66,7 +66,7 @@ const RulesetPage = () => {
     },
   })
 
-  // 룰셋 관리 테이블 컬럼 정의
+  // 판단 키워드 관리 테이블 컬럼 정의
   const RulesetColumns = [
     {
       header: '',
@@ -144,13 +144,13 @@ const RulesetPage = () => {
     },
   ]
 
-  // 룰셋 추가 액션
+  // 판단 키워드 추가 액션
   const handleInsertKeywordAction = () => {
     const { rule } = fields
     insertRuleset.mutate({ rule, apitype, hackingflag })
   }
 
-  // 룰셋 추가 취소 액션
+  // 판단 키워드 추가 취소 액션
   const handleOnCancelAction = () => {
     closeInsertRuleset()
     handleOnCleanForm()
@@ -159,7 +159,7 @@ const RulesetPage = () => {
   return (
     <ContentContainer>
       <PageTitle
-        text={'룰셋 관리'}
+        text={'판단 키워드 관리'}
         children={
           <TitleButtonWrapper>
             <Button
@@ -198,7 +198,7 @@ const RulesetPage = () => {
         )}
       </ContentBox>
 
-      {/*룰셋 추가 모달*/}
+      {/*판단 키워드 추가 모달*/}
       <CustomModal
         isOpen={insertRulesetOpen}
         title='수집 키워드 추가'
@@ -249,7 +249,7 @@ const RulesetPage = () => {
         }
       />
 
-      {/*룰셋 수정 모달*/}
+      {/*판단 키워드 수정 모달*/}
       <CustomModal
         isOpen={updateRulesetOpen}
         title='그룹 수정'
@@ -320,7 +320,7 @@ const RulesetPage = () => {
     </ContentContainer>
   )
 }
-export default RulesetPage
+export default JudgmentPage
 
 const TitleButtonWrapper = styled.div`
   display: flex;

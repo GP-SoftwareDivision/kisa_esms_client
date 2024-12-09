@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import { Flex, Input } from '@chakra-ui/react'
+import { Box, Flex, Input } from '@chakra-ui/react'
 import { withMask } from 'use-mask-input'
 
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
@@ -13,13 +13,15 @@ import CustomSelect from '@/components/elements/Select.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { Field } from '@/components/ui/field.tsx'
 import { PasswordInput } from '@/components/ui/password-input.tsx'
-import { UserColumns } from '@/constants/tableColumns.ts'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useUserAddMutation } from '@/hooks/mutations/useUserAddMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
 import { useUserUpdateMutation } from '@/hooks/mutations/useUserUpdateMutation.tsx'
 import { formatPhoneNumber } from '@/utils/regexChecks.ts'
+import { useState } from 'react'
+import { Checkbox } from '@/components/ui/checkbox.tsx'
+import { usePasswordUpdateMutation } from '@/hooks/mutations/usePasswordUpdateMutation.tsx'
 
 interface UserType {
   seqidx: number
@@ -29,7 +31,7 @@ interface UserType {
   phonenum: string
   groupcode: string
   groupname: string
-  activeflag: string
+  useflag: string
 }
 
 interface UserGroupType {
@@ -40,6 +42,8 @@ interface UserGroupType {
 const UserPage = () => {
   const { page, handlePageChange } = usePagination()
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
+
+  // 사용자 추가 hooks
   const {
     insertUser,
     handleOnAddUser,
@@ -49,6 +53,7 @@ const UserPage = () => {
     setGroupCode,
   } = useUserAddMutation()
 
+  // 사용자 수정 hooks
   const {
     updateUser,
     deleteUser,
@@ -60,6 +65,17 @@ const UserPage = () => {
     handleUpdateOption,
     handleOnUpdateText,
   } = useUserUpdateMutation()
+
+  // 사용자 비밀번호 hooks
+  const {
+    updatePassword,
+    OpenUpdatePassword,
+    CancelUpdatePassword,
+    isUpdatePasswordOpen,
+  } = usePasswordUpdateMutation()
+
+  // 삭제 목록
+  const [deleteItems, setDeleteItems] = useState<number[]>([])
 
   // 사용자 관리 전체 리스트
   const userList = useQueries<{ data: UserType[] }>({
@@ -78,6 +94,70 @@ const UserPage = () => {
 
   const columns = [
     {
+      header: '',
+      accessorKey: '',
+      id: 'delete',
+      cell: ({ row }: any) => {
+        return (
+          <Checkbox
+            checked={deleteItems.includes(row.original.seqidx)}
+            size={'xs'}
+            onCheckedChange={(checked) => {
+              const itemId = row.original.seqidx
+              if (checked.checked) {
+                // 체크된 경우: 배열에 추가 (중복 방지)
+                setDeleteItems((prev) =>
+                  prev.includes(itemId) ? prev : [...prev, itemId]
+                )
+              } else {
+                setDeleteItems((prev) => prev.filter((id) => id !== itemId))
+              }
+            }}
+          />
+        )
+      },
+    },
+    {
+      header: 'ID',
+      accessorKey: 'id',
+    },
+    {
+      header: '이름',
+      accessorKey: 'name',
+    },
+    {
+      header: '권한',
+      accessorKey: 'usertype',
+      cell: ({ row }: any) =>
+        row.original?.usertype === 'administrator' ? (
+          <span>관리자</span>
+        ) : (
+          <span>사용자</span>
+        ),
+    },
+    {
+      header: '번호',
+      accessorKey: 'phonenum',
+    },
+    {
+      header: '이메일',
+      accessorKey: 'email',
+    },
+    {
+      header: '그룹명',
+      accessorKey: 'groupname',
+    },
+    {
+      header: '등록일',
+      accessorKey: 'regdate',
+    },
+    {
+      header: '사용여부',
+      accessorKey: 'useflag',
+      cell: ({ row }: any) =>
+        row.original?.useflag === 'Y' ? <span>사용</span> : <span>미사용</span>,
+    },
+    {
       header: '수정',
       accessorKey: '',
       id: 'actions',
@@ -94,20 +174,6 @@ const UserPage = () => {
         </TableButtonWrapper>
       ),
     },
-    {
-      header: '삭제',
-      accessorKey: '',
-      id: 'deletes',
-      cell: ({ row }: any) => (
-        <TableButtonWrapper>
-          <Button
-            type={'danger'}
-            text={'삭제'}
-            onClick={() => deleteUser.mutate({ seqidx: row.original.seqidx })}
-          />
-        </TableButtonWrapper>
-      ),
-    },
   ]
 
   // 사용자 추가 액션
@@ -120,7 +186,6 @@ const UserPage = () => {
       password,
       passwordConfirm,
       phonenum: phonenum && formatPhoneNumber(phonenum),
-      activeflag: 'Y',
     })
   }
 
@@ -130,12 +195,33 @@ const UserPage = () => {
     handleOnCleanForm()
   }
 
+  // 비밀번호 변경 액션
+  const handleOnChangePassword = () => {
+    handleOnUpdateUserCancel()
+    OpenUpdatePassword()
+  }
+
   return (
     <ContentContainer>
       <PageTitle
         text={'사용자 관리'}
         children={
-          <Button type={'secondary'} onClick={handleOnAddUser} text={'추가'} />
+          <TitleButtonWrapper>
+            <Button
+              type={'secondary'}
+              onClick={handleOnAddUser}
+              text={'추가'}
+            />
+            <Button
+              type={deleteItems.length === 0 ? 'ghost' : 'primary'}
+              onClick={() => {
+                deleteUser.mutate({ items: deleteItems })
+                setDeleteItems([])
+              }}
+              disabled={deleteItems.length === 0}
+              text={'삭제'}
+            />
+          </TitleButtonWrapper>
         }
       />
       <ContentBox>
@@ -144,7 +230,7 @@ const UserPage = () => {
             <CustomTable
               loading={userList.isLoading}
               data={userList.data.data}
-              columns={UserColumns.concat(columns)}
+              columns={columns}
             />
             <CustomPagination
               total={1}
@@ -275,24 +361,7 @@ const UserPage = () => {
                 onChange={handleOnUpdateText}
                 required
               />
-              <StyledField label={'비밀번호'} required>
-                <PasswordInput
-                  id='updatePassword'
-                  value={fields.updatePassword || ''}
-                  placeholder={
-                    '영문,숫자,특수문자를 포함한 8자 이상을 입력하세요.'
-                  }
-                  onChange={handleOnChange}
-                />
-              </StyledField>
-              <StyledField label={' '}>
-                <PasswordInput
-                  id='updatePasswordConfirm'
-                  value={fields.updatePasswordConfirm || ''}
-                  placeholder={'비밀번호를 한 번 더 입력하세요.'}
-                  onChange={handleOnChange}
-                />
-              </StyledField>
+
               <StyledField label={'전화번호'} required>
                 <Input
                   id='update_phonenum'
@@ -328,27 +397,83 @@ const UserPage = () => {
               />
               <CustomSelect
                 label={'사용'}
-                value={updateData.activeflag}
+                value={updateData.useflag}
                 options={[
                   { label: '사용', value: 'Y' },
                   { label: '미사용', value: 'N' },
                 ]}
                 setState={(value) =>
-                  handleUpdateOption('activeflag', value as string)
+                  handleUpdateOption('useflag', value as string)
                 }
                 required
               />
             </Flex>
+            <Box
+              display={'flex'}
+              justifyContent={'space-between'}
+              alignItems={'center'}
+            >
+              <CustomButton
+                type='primary'
+                text='비밀번호 변경'
+                onClick={handleOnChangePassword}
+              />
+              <ButtonWrapper>
+                <CustomButton
+                  type='outline'
+                  text='취소'
+                  onClick={handleOnUpdateUserCancel}
+                />
+                <CustomButton
+                  type='primary'
+                  text='수정'
+                  onClick={updateUser.mutate}
+                />
+              </ButtonWrapper>
+            </Box>
+          </ModalContents>
+        }
+      />
+      <CustomModal
+        isOpen={isUpdatePasswordOpen}
+        title='비밀번호 변경'
+        onCancel={CancelUpdatePassword}
+        content={
+          <ModalContents>
+            <StyledField label={'비밀번호'} required>
+              <PasswordInput
+                id='updatePassword'
+                value={fields.updatePassword || ''}
+                placeholder={
+                  '영문,숫자,특수문자를 포함한 8자 이상을 입력하세요.'
+                }
+                onChange={handleOnChange}
+              />
+            </StyledField>
+            <StyledField label={' '}>
+              <PasswordInput
+                id='updatePasswordConfirm'
+                value={fields.updatePasswordConfirm || ''}
+                placeholder={'비밀번호를 한 번 더 입력하세요.'}
+                onChange={handleOnChange}
+              />
+            </StyledField>
             <ButtonWrapper>
               <CustomButton
                 type='outline'
                 text='취소'
-                onClick={handleOnUpdateUserCancel}
+                onClick={CancelUpdatePassword}
               />
               <CustomButton
                 type='primary'
-                text='수정'
-                onClick={updateUser.mutate}
+                text='변경'
+                onClick={() =>
+                  updatePassword.mutate({
+                    seqidx: updateData.seqidx,
+                    updatePassword: fields.updatePassword,
+                    updatePasswordConfirm: fields.updatePasswordConfirm,
+                  })
+                }
               />
             </ButtonWrapper>
           </ModalContents>
@@ -359,6 +484,11 @@ const UserPage = () => {
 }
 export default UserPage
 
+const TitleButtonWrapper = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`
+
 const TableButtonWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -368,7 +498,6 @@ const TableButtonWrapper = styled.div`
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 0.5rem;
   gap: 10px;
 `
 

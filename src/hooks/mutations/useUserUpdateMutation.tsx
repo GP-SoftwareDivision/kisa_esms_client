@@ -10,26 +10,28 @@ import { hasEmptyValue } from '@/utils/hasEmptyValue.ts'
 import { isValidEmail } from '@/utils/regexChecks.ts'
 
 interface UserRowType {
+  seqidx: number
   name: string
   email: string
   password: string
   phonenum: string
   usertype: string
   groupcode: string
-  activeflag: string
+  useflag: string
 }
 
 export const useUserUpdateMutation = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [updateData, setUpdateData] = useState<UserRowType>({
+    seqidx: 0,
     name: '',
     email: '',
     password: '',
     phonenum: '',
     usertype: '',
     groupcode: '',
-    activeflag: '',
+    useflag: '',
   })
   const { openModal, closeModal, isOpen } = useModal()
 
@@ -81,10 +83,12 @@ export const useUserUpdateMutation = () => {
   // 유저 수정 API
   const deleteUser = useMutation({
     mutationKey: ['updateUser'],
-    mutationFn: async (request: { seqidx: number }) => {
+    mutationFn: async (request: { items: number[] }) => {
       const isConfirm = confirm('삭제하시겠습니까?')
       if (!isConfirm) throw new Error()
-      const response = await instance.post('/api/manage/userDelete', request)
+      const response = await instance.post('/api/manage/userDelete', {
+        seqidx: request.items.join(','),
+      })
       return response.data
     },
     onError: (error) => {

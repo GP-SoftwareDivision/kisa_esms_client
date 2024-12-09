@@ -14,7 +14,9 @@ const { RangePicker } = DatePicker
 
 interface DatePickerProps {
   label: string
-  setDate?: Dispatch<React.SetStateAction<{ start: string; end: string }>>
+  setDate?: Dispatch<
+    React.SetStateAction<{ startdate: string; enddate: string }>
+  >
 }
 
 const CustomDatePicker = memo(({ label, setDate }: DatePickerProps) => {
@@ -23,7 +25,7 @@ const CustomDatePicker = memo(({ label, setDate }: DatePickerProps) => {
     dateStrings: string[]
   ) => {
     if (dates && setDate) {
-      setDate({ start: dateStrings[0], end: dateStrings[1] })
+      setDate({ startdate: dateStrings[0], enddate: dateStrings[1] })
     } else {
       console.log('Clear')
     }
