@@ -8,14 +8,14 @@ interface SearchSaveMutationType {
   type: string
   searchdata: string
 }
+
 export const useSearchSave = () => {
   const navigate = useNavigate()
-
-  const SaveSearch = useMutation({
+  return useMutation({
     mutationKey: ['SaveSearch'],
     mutationFn: async (data: SearchSaveMutationType) => {
       const response = await instance.post(
-        '/api/manage/search/history/insert',
+        '/api/manage/searchHistoryInsert',
         data
       )
       return response.data
@@ -43,8 +43,4 @@ export const useSearchSave = () => {
       notifySuccess('저장되었습니다.')
     },
   })
-
-  return {
-    SaveSearch,
-  }
 }

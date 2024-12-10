@@ -9,27 +9,61 @@ const Pie = () => {
     title: {
       text: '대응 현황',
     },
-    labels: ['진행중', '대기', '완료'],
-    colors: ['#3366d6', '#71a3f6', '#4285f4', '#d0dffc'],
+    labels: ['개인', '기업', '공공', '교육', '금융', '의료', '기타'],
+    colors: [
+      '#142956',
+      '#1f3d80',
+      '#2952ab',
+      '#3366d6',
+      '#4285f4',
+      '#71a3f6',
+      '#d0dffc',
+    ],
+    dataLabels: {
+      enabled: true,
+      style: {
+        fontSize: '10px !important',
+      },
+      formatter: function (_val: number, opts: any) {
+        return opts.w.config.labels[opts.seriesIndex]
+      },
+    },
     legend: {
       show: true,
       showForSingleSeries: true,
       position: 'right',
-      customLegendItems: ['진행중', '대기', '완료'],
+      customLegendItems: [
+        '개인',
+        '기업',
+        '공공',
+        '교육',
+        '금융',
+        '의료',
+        '기타(해외)',
+      ],
       markers: {
-        fillColors: ['#3366d6', '#71a3f6', '#4285f4', '#d0dffc'],
+        fillColors: [
+          '#142956',
+          '#1f3d80',
+          '#2952ab',
+          '#3366d6',
+          '#4285f4',
+          '#71a3f6',
+          '#d0dffc',
+        ],
       },
     },
   }
-  const series = [44, 55, 13]
+  const series = [48, 30, 28, 20, 15, 9, 7]
 
   return (
     <ReactApexChart
       options={options}
       series={series}
       type='pie'
-      height={250}
-      width={350}
+      height={280}
+      width={380}
+      className='custom-chart'
     />
   )
 }

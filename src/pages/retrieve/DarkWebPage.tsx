@@ -22,6 +22,7 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import useOptions from '@/hooks/common/useOptions.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
+import { useSearchSave } from '@/hooks/mutations/useSearchSave.tsx'
 
 interface dtListType {
   seqidx: number
@@ -84,6 +85,8 @@ const DarkWebPage = () => {
     method: 'GET',
     url: `/api/monitoring/dtList${location.search}&page=${page}`,
   })
+
+  const SaveSearch = useSearchSave()
 
   // 검색 조건 적용 후 파라미터 변경
   const handleOnSearch = () => {
@@ -242,7 +245,21 @@ const DarkWebPage = () => {
               <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
               <Button
                 type={'secondary'}
-                onClick={() => console.log('')}
+                onClick={() =>
+                  SaveSearch.mutate({
+                    type: 'darkweb',
+                    searchdata: new URLSearchParams({
+                      startdate: date.startdate,
+                      enddate: date.enddate,
+                      threatflag,
+                      responseflag,
+                      category,
+                      title,
+                      keyword,
+                      url,
+                    }).toString(),
+                  })
+                }
                 text={'조회 조건 저장'}
               />
             </ButtonContainer>

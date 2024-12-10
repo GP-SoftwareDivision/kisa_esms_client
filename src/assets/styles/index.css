@@ -84,3 +84,26 @@ input::-webkit-inner-spin-button {
 .ant-picker-outlined:focus, :where(.css-dev-only-do-not-override-qnu6hi).ant-picker-outlined:focus-within {
   border-color: #d9d9d9;
 }
+/**/
+
+/*apexchart 커스텀*/
+.apexcharts-text tspan {
+  font-size: .785rem;
+}
+
+.apexcharts-title-text {
+  font-weight: bold;
+}
+
+.apexcharts-legend {
+  height: fit-content;
+  border : 1px solid #E9EBED;
+  border-radius: 6px;
+}
+
+.custom-chart .apexcharts-datalabel-label,
+.custom-chart .apexcharts-datalabel-value {
+  font-size: 10px !important;
+}
+/**/
+
