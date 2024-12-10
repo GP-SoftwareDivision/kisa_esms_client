@@ -63,15 +63,14 @@ const TelegramCard = (props: ttListType) => {
         </NavLayout>
         <BodyLayout>
           <StyledBodyBox>
-            <StyledLabel>대화방(URL)</StyledLabel>
-            <Caption text={`${channel}  (${channelurl})`} type={'black'} />
+            <StyledLabel style={{ minWidth: '80px' }}>대화방(URL)</StyledLabel>
+            <StyledContents>{`${channel}  (${channelurl})`} </StyledContents>
           </StyledBodyBox>
           <StyledBodyBox>
-            <StyledLabel>내용</StyledLabel>
-            <Caption
-              text={isTranslation ? trancontents : contents}
-              type={'black'}
-            />
+            <StyledLabel style={{ minWidth: '80px' }}>내용</StyledLabel>
+            <StyledContents>
+              {isTranslation ? trancontents : contents}
+            </StyledContents>
           </StyledBodyBox>
         </BodyLayout>
         <NavLayout>
@@ -124,6 +123,21 @@ const StyledLabel = styled.span`
   ${({ theme }) => theme.typography.body2};
 `
 
+const StyledContents = styled.span`
+  ${({ theme }) => theme.typography.body3};
+  border: 1px solid ${({ theme }) => theme.color.gray200};
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-word;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  padding: 4px 8px;
+  border-radius: 2px;
+`
+
 const StyledCaptionBox = styled(Box)`
   display: flex;
   align-items: baseline;
@@ -138,5 +152,5 @@ const BodyLayout = styled.div`
 
 const StyledBodyBox = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
 `
