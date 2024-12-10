@@ -23,7 +23,7 @@ const DashBoardPage = () => {
         <GridItem>
           <Flex direction='column' height='100%'>
             <PageTitle
-              text={'이슈 모니터링'}
+              text={'대시보드'}
               children={
                 <TitleCaption>
                   {oneWeekAgo} ~ {today.format('YYYY-MM-DD')}

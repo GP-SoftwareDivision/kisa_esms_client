@@ -26,6 +26,12 @@ const TrackingPage = () => {
   const [title, setTitle] = useState<string>('')
   const { page, handlePageChange } = usePagination()
 
+  // 조회기간
+  const [date, setDate] = useState({
+    startdate: '2024-12-03',
+    enddate: '2024-12-03',
+  })
+
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
     setTitle(e.target.value)
@@ -54,7 +60,7 @@ const TrackingPage = () => {
       />
       <SelectContainer columns={[1, 2, 3, 4]}>
         <Box>
-          <CustomDatePicker label={'조회 기간'} />
+          <CustomDatePicker label={'조회 기간'} date={date} setDate={setDate} />
         </Box>
         <Box>
           <CustomSelect
