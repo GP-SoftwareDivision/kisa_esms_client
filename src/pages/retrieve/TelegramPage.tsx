@@ -222,6 +222,17 @@ const Telegram = () => {
             />
           </Box>
           <Box></Box>
+          <Box></Box>
+          <Box>
+            <CustomSelect
+              label={'정규표현식'}
+              options={responseOptions}
+              value={responseflag}
+              setState={setResponseFlag}
+            />
+          </Box>
+          <Box></Box>
+          <Box></Box>
           <Box>
             <ButtonContainer>
               <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
@@ -297,20 +308,20 @@ const StyledCheckBox = styled(Checkbox)`
   right: 265px;
 
   @media (max-width: 576px) {
-    top: 325px;
+    top: 450px;
   }
 
   @media (min-width: 577px) and (max-width: 767px) {
-    top: 202px;
+    top: 265px;
   }
 
   @media (min-width: 768px) and (max-width: 991px) {
-    top: 156px;
-    right: 550px;
+    top: 202px;
+    right: 260px;
   }
 
   @media (min-width: 992px) {
-    top: 109px;
+    top: 155px;
   }
 
   svg {

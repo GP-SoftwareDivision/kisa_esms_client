@@ -97,6 +97,7 @@ const DarkWebPage = () => {
       keyword,
       url,
     }).toString()
+
     setPage(1)
     navigate(`?${params}`)
   }
@@ -226,7 +227,14 @@ const DarkWebPage = () => {
             />
           </Box>
           <Box></Box>
-          <Box></Box>
+          <Box>
+            <CustomSelect
+              label={'정규표현식'}
+              options={responseOptions}
+              value={responseflag}
+              setState={setResponseFlag}
+            />
+          </Box>
           <Box></Box>
           <Box></Box>
           <Box>
