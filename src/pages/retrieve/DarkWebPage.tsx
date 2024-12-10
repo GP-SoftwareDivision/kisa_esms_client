@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Box, SimpleGrid, Stack } from '@chakra-ui/react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import styled from '@emotion/styled'
 
 import {
   ButtonContainer,
@@ -14,13 +15,13 @@ import CustomSelect from '@/components/elements/Select.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
-import { usePagination } from '@/hooks/common/usePagination.tsx'
-import useOptions from '@/hooks/common/useOptions.tsx'
-import DarkwebCard from '@/components/templates/DarkwebCard.tsx'
-import styled from '@emotion/styled'
 import CustomAccordion from '@/components/elements/Accordion.tsx'
+import DarkwebCard from '@/components/templates/DarkwebCard.tsx'
+import Empty from '@/components/elements/Empty.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
-import TelegramCard from '@/components/templates/TelegramCard.tsx'
+import useOptions from '@/hooks/common/useOptions.tsx'
+import { usePagination } from '@/hooks/common/usePagination.tsx'
+import { Loading } from '@/components/elements/Loading.tsx'
 
 interface dtListType {
   seqidx: number
@@ -39,49 +40,107 @@ interface dtListType {
 
 const DarkWebPage = () => {
   const navigate = useNavigate()
-  const { page, handlePageChange } = usePagination()
+  const { page, setPage, handlePageChange } = usePagination()
   const { responseOptions, hackingOptions } = useOptions()
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
 
+  // 조회기간
   const [date, setDate] = useState({
     startdate: queryParams.get('startdate') || '',
     enddate: queryParams.get('enddate') || '',
   })
+
+  // 카테고리
   const [category, setCategory] = useState<string>(
     queryParams.get('category') || ''
   )
+
+  // 해킹 여부
   const [threatflag, setThreatFlag] = useState<string>(
     queryParams.get('threatflag') || ''
   )
+
+  // 대응 여부
   const [responseflag, setResponseFlag] = useState<string>(
     queryParams.get('responseflag') || ''
   )
+
+  // 제목
   const [title, setTitle] = useState<string>(queryParams.get('title') || '')
+
+  // 키워드
   const [keyword, setKeyword] = useState<string>(
     queryParams.get('keyword') || ''
   )
+
+  // URL
   const [url, setUrl] = useState<string>(queryParams.get('url') || '')
 
+  // 다크웹 데이터 조회 API
   const dtList = useQueries<{ data: dtListType[]; count: number }>({
-    queryKey: 'dtList',
+    queryKey: `dtList`,
     method: 'GET',
-    url: `/api/monitoring/dtList?${new URLSearchParams({
+    url: `/api/monitoring/dtList${location.search}&page=${page}`,
+  })
+
+  // 검색 조건 적용 후 파라미터 변경
+  const handleOnSearch = () => {
+    const params = new URLSearchParams({
       startdate: date.startdate,
       enddate: date.enddate,
-      page: page.toString(),
       threatflag,
-      category,
       responseflag,
+      category,
       title,
       keyword,
       url,
-    }).toString()}`,
-  })
+    }).toString()
+    setPage(1)
+    navigate(`?${params}`)
+  }
 
-  console.log(dtList)
-  const handleOnSelectChange = () => {}
+  // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
+  const renderDarkwebList = useMemo(() => {
+    if (dtList.isLoading) return <Loading />
+    if (dtList.isSuccess && dtList.data.count === 0)
+      return (
+        <EmptyBox>
+          <Empty />
+        </EmptyBox>
+      )
+    if (dtList.isSuccess && dtList.data.count > 0)
+      return (
+        <>
+          <Stack margin={'1rem 0'}>
+            {dtList.data?.data.map((v: dtListType) => (
+              <DarkwebCard
+                key={v.seqidx}
+                onClick={() => navigate(`detail?id=${v.seqidx}`)}
+                contents={v.contents}
+                issueresponseflag={v.issueresponseflag}
+                keyword={v.keyword}
+                seqidx={v.seqidx}
+                threatflag={v.threatflag}
+                threatlog={v.threatlog}
+                title={v.title}
+                url={v.url}
+                writer={v.writer}
+                writetime={v.writetime}
+                target={v.target}
+                htmlpath={v.htmlpath}
+              />
+            ))}
+          </Stack>
+          <CustomPagination
+            total={dtList.data?.count || 1}
+            page={page}
+            handlePageChange={(newPage) => handlePageChange(newPage as number)}
+          />
+        </>
+      )
+  }, [page, handlePageChange, navigate, dtList])
 
   return (
     <ContentContainer>
@@ -90,7 +149,7 @@ const DarkWebPage = () => {
         children={
           <Button
             type={'secondary'}
-            onClick={handleOnSelectChange}
+            onClick={() => console.log('')}
             text={'엑셀 다운로드'}
           />
         }
@@ -103,25 +162,41 @@ const DarkWebPage = () => {
           />
           <Button
             type={'primary'}
-            onClick={handleOnSelectChange}
+            onClick={() => console.log('')}
             text={'적용'}
           />
         </StyledLoad>
         <SelectContainer columns={[1, 2, 3, 4]}>
           <Box>
-            <CustomDatePicker label={'조회 기간'} />
+            <CustomDatePicker
+              label={'조회 기간'}
+              date={date}
+              setDate={setDate}
+            />
           </Box>
           <Box>
             <CustomSelect
               label={'카테고리'}
               options={[{ value: '카테고리', label: '카테고리' }]}
+              value={category}
+              setState={setCategory}
             />
           </Box>
           <Box>
-            <CustomSelect label={'해킹 여부'} options={hackingOptions} />
+            <CustomSelect
+              label={'해킹 여부'}
+              options={hackingOptions}
+              value={threatflag}
+              setState={setThreatFlag}
+            />
           </Box>
           <Box>
-            <CustomSelect label={'대응 여부'} options={responseOptions} />
+            <CustomSelect
+              label={'대응 여부'}
+              options={responseOptions}
+              value={responseflag}
+              setState={setResponseFlag}
+            />
           </Box>
           <Box>
             <CustomInput
@@ -137,8 +212,8 @@ const DarkWebPage = () => {
               id={'keyword'}
               label={'키워드'}
               placeholder={'내용을 입력하세요.'}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
             />
           </Box>
           <Box>
@@ -146,8 +221,8 @@ const DarkWebPage = () => {
               id={'url'}
               label={'URL'}
               placeholder={'내용을 입력하세요.'}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
             />
           </Box>
           <Box></Box>
@@ -156,14 +231,10 @@ const DarkWebPage = () => {
           <Box></Box>
           <Box>
             <ButtonContainer>
-              <Button
-                type={'primary'}
-                onClick={handleOnSelectChange}
-                text={'조회'}
-              />
+              <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
               <Button
                 type={'secondary'}
-                onClick={handleOnSelectChange}
+                onClick={() => console.log('')}
                 text={'조회 조건 저장'}
               />
             </ButtonContainer>
@@ -190,14 +261,14 @@ const DarkWebPage = () => {
                   label={'키워드'}
                   placeholder={'내용을 입력하세요.'}
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => setKeyword(e.target.value)}
                 />
               </Box>
               <Box></Box>
               <ButtonContainer>
                 <Button
                   type={'primary'}
-                  onClick={handleOnSelectChange}
+                  onClick={handleOnSearch}
                   text={'재검색'}
                 />
               </ButtonContainer>
@@ -205,34 +276,11 @@ const DarkWebPage = () => {
           }
         />
       </Stack>
-      <Stack margin={'1rem 0'}>
-        {dtList.isSuccess &&
-          dtList.data?.data.map((v: dtListType) => (
-            <DarkwebCard
-              onClick={() => navigate(`detail?id=${v.seqidx}`)}
-              contents={v.contents}
-              issueresponseflag={v.issueresponseflag}
-              keyword={v.keyword}
-              seqidx={v.seqidx}
-              threatflag={v.threatflag}
-              threatlog={v.threatlog}
-              title={v.title}
-              url={v.url}
-              writer={v.writer}
-              writetime={v.writetime}
-              target={v.target}
-            />
-          ))}
-      </Stack>
-      <CustomPagination
-        total={dtList.data?.count || 1}
-        page={page}
-        handlePageChange={(newPage) => handlePageChange(newPage as number)}
-      />
+      {renderDarkwebList}
     </ContentContainer>
   )
 }
-export default DarkWebPage
+export default React.memo(DarkWebPage)
 
 const StyledLoad = styled.div`
   display: flex;
@@ -283,4 +331,9 @@ const AccordionContainer = styled(SimpleGrid)`
     width: 120px;
     height: 30px;
   }
+`
+
+const EmptyBox = styled(Box)`
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.color.gray200};
 `

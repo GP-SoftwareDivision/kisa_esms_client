@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 const useOptions = () => {
   const responseOptions = useMemo(
     () => [
-      { value: '전체', label: '전체' },
+      { value: '', label: '전체' },
       { value: '대응', label: '대응' },
       { value: '대기', label: '대기' },
     ],
@@ -12,7 +12,7 @@ const useOptions = () => {
 
   const fileTypeOptions = useMemo(
     () => [
-      { value: '전체', label: '전체' },
+      { value: '', label: '전체' },
       { value: 'xlsx', label: 'xlsx' },
       { value: 'csv', label: 'csv' },
       { value: 'txt', label: 'txt' },
@@ -22,7 +22,7 @@ const useOptions = () => {
 
   const hackingOptions = useMemo(
     () => [
-      { value: '전체', label: '전체' },
+      { value: '', label: '전체' },
       { value: '해킹', label: '해킹' },
       { value: '미해킹', label: '미해킹' },
       { value: '대기', label: '대기' },

@@ -41,7 +41,7 @@ const CustomSelect = memo(
         size='xs'
         required
         multiple={multiple}
-        defaultValue={!multiple ? ['전체'] : undefined}
+        defaultValue={!multiple ? [''] : undefined}
         flexDirection={'row'}
         alignItems={'center'}
         value={value ? isMultipleVal(value) : undefined}

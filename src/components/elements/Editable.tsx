@@ -28,7 +28,9 @@ const CustomEditable = (props: EditableProps) => {
 export default CustomEditable
 
 const StyledEditable = styled(Editable.Root)`
+  width: -webkit-fill-available !important;
   ${({ theme }) => theme.typography.body3};
+  width: auto;
 
   & input:focus {
     outline: none;

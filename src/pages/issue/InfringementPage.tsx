@@ -48,9 +48,11 @@ const InfringementPage = () => {
   const [filetype, setFiletype] = useState<string>('')
   const [uploader, setUploader] = useState<string>('')
   const [isResponse, setIsResponse] = useState<string>('')
-  const [date, setDate] = useState<{ start: string; end: string }>({
-    start: '',
-    end: '',
+
+  // 조회기간
+  const [date, setDate] = useState({
+    startdate: '2024-12-03',
+    enddate: '2024-12-03',
   })
 
   const [request, setRequest] = useState<object>({
@@ -58,8 +60,8 @@ const InfringementPage = () => {
     filetype: filetype,
     uploader: uploader,
     responsestatus: isResponse,
-    startdate: date.start,
-    enddate: date.end,
+    startdate: date.startdate,
+    enddate: date.enddate,
   })
 
   // 침해 정보 판별 리스트 전체 조회
@@ -163,7 +165,7 @@ const InfringementPage = () => {
       </UploadContainer>
       <SelectContainer columns={[1, 2, 3, 4]}>
         <Box>
-          <CustomDatePicker label={'조회 기간'} setDate={setDate} />
+          <CustomDatePicker label={'조회 기간'} date={date} setDate={setDate} />
         </Box>
         <Box>
           <CustomSelect
@@ -214,8 +216,8 @@ const InfringementPage = () => {
                   filetype: filetype,
                   uploader: uploader,
                   responsestatus: isResponse,
-                  startdate: date.start,
-                  enddate: date.end,
+                  startdate: date.startdate,
+                  enddate: date.enddate,
                 })
               }
               text={'조회'}

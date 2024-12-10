@@ -23,7 +23,7 @@ interface dtListType {
 const DarkwebCard = (props: dtListType) => {
   const {
     contents,
-    // htmlpath,
+    htmlpath,
     issueresponseflag,
     keyword,
     seqidx,
@@ -36,6 +36,13 @@ const DarkwebCard = (props: dtListType) => {
     writetime,
     onClick,
   } = props
+
+  // html 새 창으로 열기 이벤트
+  const ViewHtml = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+    e.stopPropagation()
+    window.open(htmlpath, '_blank')
+  }
+
   return (
     <Card.Root size='sm' onClick={onClick} cursor='pointer' key={seqidx}>
       <Card.Body color='fg.muted' gap={'0.5rem'}>
@@ -58,15 +65,15 @@ const DarkwebCard = (props: dtListType) => {
         <BodyLayout>
           <StyledBodyBox>
             <StyledLabel>제목</StyledLabel>
-            <Caption text={title} type={'black'} />
+            <StyledContents>{title}</StyledContents>
           </StyledBodyBox>
           <StyledBodyBox>
             <StyledLabel>내용</StyledLabel>
-            <Caption text={contents} type={'black'} />
+            <StyledContents>{contents}</StyledContents>
           </StyledBodyBox>
           <StyledBodyBox>
             <StyledLabel>URL</StyledLabel>
-            <Caption text={url} type={'black'} />
+            <StyledContents>{url}</StyledContents>
           </StyledBodyBox>
         </BodyLayout>
         <NavLayout>
@@ -85,14 +92,21 @@ const DarkwebCard = (props: dtListType) => {
           <StyledNavContainer>
             <StyledCaptionBox>
               <StyledLabel>해킹 여부</StyledLabel>
-              <Caption text={threatflag} type={'red'} />
+              <Caption
+                text={threatflag === 'Y' ? '해킹' : '미해킹'}
+                type={threatflag === 'Y' ? 'red' : 'blue'}
+              />
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>대응 여부</StyledLabel>
-              <Caption text={issueresponseflag} type={'black'} />
+              <Caption text={issueresponseflag} type={'blue'} />
             </StyledCaptionBox>
           </StyledNavContainer>
-          <HtmlIcon />
+          <HtmlIcon
+            onClick={(e: React.MouseEvent<SVGElement, MouseEvent>) =>
+              ViewHtml(e)
+            }
+          />
         </NavLayout>
       </Card.Body>
     </Card.Root>
@@ -110,13 +124,28 @@ const StyledNavContainer = styled.div`
 `
 const StyledLabel = styled.span`
   font-weight: bold !important;
+  min-width: 50px;
   ${({ theme }) => theme.typography.body2};
+`
+const StyledContents = styled.span`
+  ${({ theme }) => theme.typography.body3};
+  border: 1px solid ${({ theme }) => theme.color.gray200};
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-word;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  padding: 4px 8px;
+  border-radius: 2px;
 `
 
 const StyledCaptionBox = styled.div`
   display: flex;
   gap: 0.5rem;
-  align-items: baseline;
+  align-items: center;
 `
 
 const BodyLayout = styled.div`
@@ -128,7 +157,7 @@ const BodyLayout = styled.div`
 
 const StyledBodyBox = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
 `
 
 const HtmlIcon = styled(PiFileHtmlDuotone)`

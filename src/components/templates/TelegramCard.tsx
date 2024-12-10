@@ -1,12 +1,14 @@
 import styled from '@emotion/styled'
 import { Box, Card, SimpleGrid } from '@chakra-ui/react'
-import { PiFileHtmlDuotone } from 'react-icons/pi'
 
 import { Caption } from '@/components/elements/Caption.tsx'
+import { useState } from 'react'
+import CustomSwitch from '@/components/elements/Switch.tsx'
 
 interface ttListType {
   channelurl: string
   contents: string
+  trancontents: string
   issueresponseflag: string
   keyword: string
   seqidx: number
@@ -15,12 +17,14 @@ interface ttListType {
   threatlog: string
   username: string
   writetime: string
+  onClick: () => void
 }
 
 const TelegramCard = (props: ttListType) => {
   const {
     channelurl,
     contents,
+    trancontents,
     issueresponseflag,
     keyword,
     seqidx,
@@ -29,13 +33,17 @@ const TelegramCard = (props: ttListType) => {
     threatlog,
     username,
     writetime,
+    onClick,
   } = props
 
+  // 번역 여부
+  const [isTranslation, setTranslation] = useState<boolean>(false)
+
   return (
-    <Card.Root size='sm' onClick={() => console.log(seqidx)}>
+    <Card.Root size='sm' cursor={'pointer'} onClick={onClick}>
       <Card.Body color='fg.muted' gap={'0.5rem'} key={seqidx}>
         <NavLayout>
-          <StyledNavContainer column={[1, 2, 3, 4]}>
+          <StyledNavContainer>
             <StyledCaptionBox>
               <StyledLabel>작성시간</StyledLabel>
               <Caption text={writetime} type={'blue'} />
@@ -45,7 +53,13 @@ const TelegramCard = (props: ttListType) => {
               <Caption text={username} type={'blue'} />
             </StyledCaptionBox>
           </StyledNavContainer>
-          <StyledNavContainer column={[1, 2, 3, 4]}></StyledNavContainer>
+          <StyledCaptionBox>
+            <CustomSwitch
+              label={'번역'}
+              checked={isTranslation}
+              setChecked={setTranslation}
+            />
+          </StyledCaptionBox>
         </NavLayout>
         <BodyLayout>
           <StyledBodyBox>
@@ -54,7 +68,10 @@ const TelegramCard = (props: ttListType) => {
           </StyledBodyBox>
           <StyledBodyBox>
             <StyledLabel>내용</StyledLabel>
-            <Caption text={contents} type={'black'} />
+            <Caption
+              text={isTranslation ? trancontents : contents}
+              type={'black'}
+            />
           </StyledBodyBox>
         </BodyLayout>
         <NavLayout>
@@ -69,25 +86,22 @@ const TelegramCard = (props: ttListType) => {
             </StyledCaptionBox>
           </StyledNavContainer>
         </NavLayout>
-        <NavLayout>
-          <StyledNavContainer>
-            <StyledCaptionBox>
-              <StyledLabel>해킹 여부</StyledLabel>
-              <Caption
-                text={threatflag === 'Y' ? '해킹' : '미해킹'}
-                type={'red'}
-              />
-            </StyledCaptionBox>
-            <StyledCaptionBox>
-              <StyledLabel>대응 여부</StyledLabel>
-              <Caption
-                text={issueresponseflag === 'Y' ? '대응' : '미대응'}
-                type={'black'}
-              />
-            </StyledCaptionBox>
-          </StyledNavContainer>
-          <HtmlIcon />
-        </NavLayout>
+        <StyledNavContainer>
+          <StyledCaptionBox>
+            <StyledLabel>해킹 여부</StyledLabel>
+            <Caption
+              text={threatflag === 'Y' ? '해킹' : '미해킹'}
+              type={threatflag === 'Y' ? 'red' : 'blue'}
+            />
+          </StyledCaptionBox>
+          <StyledCaptionBox>
+            <StyledLabel>대응 여부</StyledLabel>
+            <Caption
+              text={issueresponseflag === 'Y' ? '대응' : '미대응'}
+              type={'black'}
+            />
+          </StyledCaptionBox>
+        </StyledNavContainer>
       </Card.Body>
     </Card.Root>
   )
@@ -125,10 +139,4 @@ const BodyLayout = styled.div`
 const StyledBodyBox = styled.div`
   display: flex;
   flex-direction: column;
-`
-
-const HtmlIcon = styled(PiFileHtmlDuotone)`
-  ${({ theme }) => theme.typography.h4};
-  cursor: pointer;
-  margin: 0;
 `

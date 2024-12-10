@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { css } from '@emotion/react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
@@ -28,37 +28,36 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
   const navigate = useNavigate()
   const { logout } = useLoginMutation()
 
-  const pathname = location.pathname.split('/')
-  const [activeMenu, setActiveMenu] = useState<string | null>(pathname[1])
+  // const pathname = location.pathname.split('/')
+  const pathnameRef = useRef(location.pathname.split('/')[1])
+  const [activeMenu, setActiveMenu] = useState<string | null>(
+    pathnameRef.current
+  )
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(
-    pathname[2]
+    location.pathname.split('/')[2]
   )
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null) // 호버만 하고 이동하지 않을 시 메뉴 제 자리
 
+  useEffect(() => {
+    pathnameRef.current = location.pathname.split('/')[1]
+    setActiveMenu(pathnameRef.current)
+    setSelectedSubMenu(location.pathname.split('/')[2])
+  }, [location])
+
   const handleOnMouseLeave = () => {
-    // 기존 타이머가 있다면 정리
     if (timer) clearTimeout(timer)
 
-    // 새 타이머 설정
     const newTimer = setTimeout(() => {
-      // 현재 활성 메뉴가 pathname[1]과 다를 때만 업데이트
       setActiveMenu((prevActiveMenu) => {
-        if (prevActiveMenu !== pathname[1]) {
-          return pathname[1]
+        if (prevActiveMenu !== pathnameRef.current) {
+          return pathnameRef.current
         }
         return prevActiveMenu
       })
-    }, 2000) // 2초로 시간 단축
+    }, 2000)
 
     setTimer(newTimer)
   }
-
-  // 컴포넌트가 언마운트될 때 타이머 정리
-  useEffect(() => {
-    return () => {
-      if (timer) clearTimeout(timer)
-    }
-  }, [timer])
 
   const handleMenuClick = (menuKey: string, subItemKey?: string) => {
     setActiveMenu(menuKey)
@@ -67,6 +66,13 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
       onSubMenuSelect?.(`${menuKey}/${subItemKey}`)
     }
   }
+
+  // 컴포넌트가 언마운트될 때 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [timer])
 
   return (
     <nav css={navBarStyle}>

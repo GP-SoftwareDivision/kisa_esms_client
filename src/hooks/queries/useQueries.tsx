@@ -22,7 +22,7 @@ export function useQueries<TData>({
 }: QueryConfig) {
   const navigate = useNavigate()
   return useQuery<TData, AxiosError>({
-    queryKey: [queryKey, body],
+    queryKey: [queryKey, url, body],
     queryFn: async () => {
       try {
         const response = await instance({

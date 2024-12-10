@@ -6,6 +6,7 @@ import menu from '@/data/menu.json'
 import NavBar from '@/components/elements/NavBar.tsx'
 import { mq } from '@/utils/mediaQueries.ts'
 import instance from '../apis/instance.ts'
+import dayjs from 'dayjs'
 
 interface UserInfoType {
   name: string
@@ -30,22 +31,32 @@ const Header = () => {
 
   const onSubMenuSelect = (subItemKey: string | null) => {
     const darkwebParams = new URLSearchParams({
-      startdate: '2024-11-01',
-      enddate: '2024-11-01',
-      page: '1',
+      startdate: '2024-11-03',
+      enddate: '2024-11-03',
       threatflag: '',
-      responseflag: '',
       category: '',
-      title: '',
       keyword: '',
-      contents: '',
+      title: '',
       url: '',
+      responseflag: '',
+    }).toString()
+
+    const telegramParams = new URLSearchParams({
+      // startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
+      startdate: '2024-11-01',
+      enddate: dayjs().format('YYYY-MM-DD'),
+      threatflag: '',
+      username: '',
+      channel: '',
+      contents: '',
+      responseflag: '',
     }).toString()
 
     if (subItemKey) {
       const pathName = subItemKey.split('/')[1]
       if (pathName === 'darkweb') navigate(`/${subItemKey}?${darkwebParams}`)
-      else if (pathName === 'telegram') navigate(`/${subItemKey}`)
+      else if (pathName === 'telegram')
+        navigate(`/${subItemKey}?${telegramParams}`)
       else navigate(`/${subItemKey}`)
     }
   }

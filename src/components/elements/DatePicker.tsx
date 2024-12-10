@@ -12,22 +12,24 @@ import styled from '@emotion/styled'
 
 const { RangePicker } = DatePicker
 
-interface DatePickerProps {
-  label: string
-  setDate?: Dispatch<
-    React.SetStateAction<{ startdate: string; enddate: string }>
-  >
+interface DateRangePickerProps {
+  startdate: string
+  enddate: string
 }
 
-const CustomDatePicker = memo(({ label, setDate }: DatePickerProps) => {
+interface DatePickerProps {
+  label: string
+  date: DateRangePickerProps
+  setDate: Dispatch<React.SetStateAction<DateRangePickerProps>>
+}
+
+const CustomDatePicker = memo(({ label, date, setDate }: DatePickerProps) => {
   const onRangeChange = (
     dates: null | (Dayjs | null)[],
     dateStrings: string[]
   ) => {
-    if (dates && setDate) {
+    if (dates) {
       setDate({ startdate: dateStrings[0], enddate: dateStrings[1] })
-    } else {
-      console.log('Clear')
     }
   }
 
@@ -50,7 +52,11 @@ const CustomDatePicker = memo(({ label, setDate }: DatePickerProps) => {
           presets={rangePresets}
           onChange={onRangeChange}
           disabledDate={disabledDate}
-          defaultValue={[dayjs().subtract(7, 'd'), dayjs()]}
+          defaultValue={
+            date
+              ? [dayjs(date.startdate), dayjs(date.enddate)]
+              : [dayjs().subtract(7, 'd'), dayjs()]
+          }
         />
       </SelectBox>
     </ConfigProvider>

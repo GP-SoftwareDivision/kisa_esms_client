@@ -7,7 +7,7 @@ export const MonitoringPage = lazy(
   () => import('@/pages/main/MonitoringPage.tsx')
 )
 
-export const User = lazy(() => import('@/pages/manage/UserPage.tsx'))
+export const User = lazy(() => import('@/pages/setting/UserPage.tsx'))
 
 export const Tracking = lazy(() => import('@/pages/issue/TrackingPage.tsx'))
 export const TrackingDetailPage = lazy(
@@ -22,14 +22,16 @@ export const DarkWebDetail = lazy(
   () => import('@/pages/retrieve/DarkWebDetailPage.tsx')
 )
 
-export const Telegram = lazy(
-  () => import('@/pages/retrieve/TelegramDataPage.tsx')
+export const Telegram = lazy(() => import('@/pages/retrieve/TelegramPage.tsx'))
+export const TelegramDetail = lazy(
+  () => import('@/pages/retrieve/TelegramDetailPage.tsx')
 )
-export const Alert = lazy(() => import('@/pages/manage/AlertPage.tsx'))
+
+export const Alert = lazy(() => import('@/pages/setting/AlertPage.tsx'))
 // export const Keyword = lazy(() => import('@/pages/manage/KeywordPage.tsx'))
 export const Judgment = lazy(() => import('@/pages/manage/JudgmentPage.tsx'))
-export const Group = lazy(() => import('@/pages/manage/GroupPage.tsx'))
-export const Server = lazy(() => import('@/pages/manage/ServerPage.tsx'))
+export const Group = lazy(() => import('@/pages/setting/GroupPage.tsx'))
+export const Server = lazy(() => import('@/pages/setting/ServerPage.tsx'))
 export const Domain = lazy(() => import('@/pages/manage/DomainPage.tsx'))
 export const SearchHistory = lazy(
   () => import('@/pages/manage/SearchHistoryPage.tsx')
