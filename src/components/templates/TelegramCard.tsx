@@ -50,7 +50,10 @@ const TelegramCard = (props: ttListType) => {
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>작성자</StyledLabel>
-              <Caption text={username} type={'blue'} />
+              <Caption
+                text={username === 'None' ? '-' : username}
+                type={'blue'}
+              />
             </StyledCaptionBox>
           </StyledNavContainer>
           <StyledCaptionBox>
@@ -89,15 +92,15 @@ const TelegramCard = (props: ttListType) => {
           <StyledCaptionBox>
             <StyledLabel>해킹 여부</StyledLabel>
             <Caption
-              text={threatflag === 'Y' ? '해킹' : '미해킹'}
-              type={threatflag === 'Y' ? 'red' : 'blue'}
+              text={threatflag}
+              type={threatflag === '해킹' ? 'red' : 'blue'}
             />
           </StyledCaptionBox>
           <StyledCaptionBox>
             <StyledLabel>대응 여부</StyledLabel>
             <Caption
-              text={issueresponseflag === 'Y' ? '대응' : '미대응'}
-              type={'black'}
+              text={issueresponseflag}
+              type={issueresponseflag === '대응' ? 'blue' : 'black'}
             />
           </StyledCaptionBox>
         </StyledNavContainer>

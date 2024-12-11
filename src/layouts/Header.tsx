@@ -36,9 +36,13 @@ const Header = () => {
       threatflag: '',
       category: '',
       keyword: '',
+      re_keyword: '',
       title: '',
+      re_title: '',
       url: '',
       responseflag: '',
+      regex: '',
+      page: '1',
     }).toString()
 
     const telegramParams = new URLSearchParams({
@@ -50,6 +54,11 @@ const Header = () => {
       channel: '',
       contents: '',
       responseflag: '',
+      page: '1',
+      re_channel: '',
+      re_contents: '',
+      regex: '',
+      re_username: '',
     }).toString()
 
     if (subItemKey) {
@@ -57,6 +66,8 @@ const Header = () => {
       if (pathName === 'darkweb') navigate(`/${subItemKey}?${darkwebParams}`)
       else if (pathName === 'telegram')
         navigate(`/${subItemKey}?${telegramParams}`)
+      else if (pathName === 'monitoring')
+        navigate(`/${subItemKey}?type=darkweb`)
       else navigate(`/${subItemKey}`)
     }
   }

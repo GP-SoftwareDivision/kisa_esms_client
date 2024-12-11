@@ -32,7 +32,7 @@ const KeywordPage = () => {
   // 삭제 목록
   const [deleteItems, setDeleteItems] = useState<number[]>([])
 
-  const { page, handlePageChange } = usePagination()
+  const { page, handlePageChange } = usePagination(1)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
   // 키워드 추가 hooks

@@ -2,17 +2,37 @@ import dayjs from 'dayjs'
 import styled from '@emotion/styled'
 import { Box, Grid, GridItem, Flex, VStack } from '@chakra-ui/react'
 
-import data from '@/data/dashboard.json'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Bar from '@/components/charts/Bar.tsx'
 import Pie from '@/components/charts/Pie.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomList from '@/components/charts/List.tsx'
-import { dashBoardColumns } from '@/constants/tableColumns.ts'
+import { hackingListColumns } from '@/constants/tableColumns.ts'
+import { useQueries } from '@/hooks/queries/useQueries.tsx'
+import { Loading } from '@/components/elements/Loading.tsx'
+
+// 대응 이력 현황 타입 정의
+interface HackingListType {
+  seqidx: number
+  regdate: string
+  targettype: string
+  hackedorganization: string
+  incidenttype: string
+  channeltype: string
+  darktelegramname: string
+  firstrecogition: string
+}
 
 const DashBoardPage = () => {
-  const today = dayjs()
-  const oneWeekAgo = today.subtract(1, 'month').format('YYYY-MM-DD')
+  // 모니터링 데이터 조회 API
+  const hackingList = useQueries<{ data: HackingListType[] }>({
+    queryKey: `hackingList`,
+    method: 'POST',
+    url: `/api/main/hacking/status`,
+    body: {
+      page: 1,
+    },
+  })
 
   return (
     <>
@@ -23,7 +43,8 @@ const DashBoardPage = () => {
               text={'대응현황'}
               children={
                 <TitleCaption>
-                  {oneWeekAgo} ~ {today.format('YYYY-MM-DD')}
+                  {dayjs().subtract(7, 'd').format('YYYY-MM-DD')} ~{' '}
+                  {dayjs().format('YYYY-MM-DD')}
                 </TitleCaption>
               }
             />
@@ -49,11 +70,11 @@ const DashBoardPage = () => {
               p={4}
             >
               <VStack align='stretch' height='-webkit-fill-available'>
-                <ListSubTitle>해킹 탐지 건수</ListSubTitle>
-                <CustomList label={'금일'} value={'1'} />
-                <CustomList label={'금주'} value={'10'} />
-                <CustomList label={'금월'} value={'30'} />
-                <ListSubTitle>대응 완료 건수</ListSubTitle>
+                <ListSubTitle>데이터 수집</ListSubTitle>
+                <CustomList label={'수집 건수'} value={'1'} />
+                <CustomList label={'해킹 판단 건수'} value={'10'} />
+                <CustomList label={'대응 건수'} value={'30'} />
+                <ListSubTitle>Top 10 수집 채널</ListSubTitle>
                 <CustomList label={'금일'} value={'1'} />
                 <CustomList label={'금주'} value={'10'} />
                 <CustomList label={'금월'} value={'30'} />
@@ -64,9 +85,17 @@ const DashBoardPage = () => {
       </Grid>
       <Box mt={4}>
         <PageTitle text={'대응 이력 현황'} />
-        <Box border='1px solid' borderColor='gray.100' borderRadius='4px' p={4}>
-          <CustomTable loading={false} data={data} columns={dashBoardColumns} />
-        </Box>
+        <ChartContainer>
+          {hackingList.isLoading ? (
+            <Loading />
+          ) : (
+            <CustomTable
+              loading={false}
+              data={hackingList.data?.data ? hackingList.data?.data : []}
+              columns={hackingListColumns}
+            />
+          )}
+        </ChartContainer>
       </Box>
     </>
   )
@@ -86,6 +115,7 @@ const ChartContainer = styled(Box)`
   padding: 12px;
   display: flex;
   flex-wrap: wrap;
+  width: 100%;
 `
 
 const ChartWrapper = styled.div`

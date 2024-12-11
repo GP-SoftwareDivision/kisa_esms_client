@@ -33,7 +33,7 @@ interface AccountListType {
 }
 
 const InfringementPage = () => {
-  const { page, handlePageChange } = usePagination()
+  const { page, handlePageChange } = usePagination(1)
   const {
     uploadFile,
     uploadFileName,

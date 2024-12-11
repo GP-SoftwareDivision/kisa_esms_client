@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import styled from '@emotion/styled'
 import { Box, Stack } from '@chakra-ui/react'
@@ -9,6 +9,8 @@ import Button from '@/components/elements/Button.tsx'
 import CustomEditable from '@/components/elements/Editable.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import CustomSwitch from '@/components/elements/Switch.tsx'
+import { Loading } from '@/components/elements/Loading.tsx'
+import Empty from '@/components/elements/Empty.tsx'
 
 interface TelegramDetailType {
   seqidx: number
@@ -27,8 +29,11 @@ interface TelegramDetailType {
 interface TelegramDetailHistory {
   contents: string
   contents2: string
+  trancontents: string
+  trancontents2: string
   seqidx: number
   threatflag: string
+  writetime: string
 }
 
 const TelegramDetailPage = () => {
@@ -60,6 +65,36 @@ const TelegramDetailPage = () => {
       type: 'default',
     },
   })
+
+  const renderHistories = useMemo(() => {
+    if (ttDetail.isLoading || ttHistoryData.isLoading) return <Loading />
+    else if (
+      ttHistoryData.isSuccess &&
+      Object.keys(ttHistoryData.data.data).length === 0
+    )
+      return <Empty />
+    else
+      return ttHistoryData.data?.data.map((v: TelegramDetailHistory) => (
+        <StyledContentsBox $current={v.seqidx === Number(id)} key={v.seqidx}>
+          <span>{isTranslation ? v.trancontents : v.contents}</span>
+          <StyledInfoBox>
+            <p>{v.writetime}</p>
+            <ButtonWrapper>
+              <Button
+                text={'이슈대응'}
+                type={'primary'}
+                onClick={() => console.log('test')}
+              />
+              <Button
+                text={v.threatflag}
+                type={v.threatflag === '해킹' ? 'danger' : 'tertiary'}
+                onClick={() => console.log('test')}
+              />
+            </ButtonWrapper>
+          </StyledInfoBox>
+        </StyledContentsBox>
+      ))
+  }, [ttHistoryData])
 
   return (
     <ContentContainer>
@@ -118,29 +153,7 @@ const TelegramDetailPage = () => {
               <LabelTd>내용</LabelTd>
               <Td colSpan={5}>
                 <StyledContentsContainer>
-                  {ttHistoryData.isSuccess &&
-                    ttHistoryData.data?.data.map((v: TelegramDetailHistory) => (
-                      <StyledContentsBox
-                        $current={v.seqidx === Number(id)}
-                        key={v.seqidx}
-                      >
-                        <span>{v.contents}</span>
-                        <ButtonWrapper>
-                          <Button
-                            text={'이슈대응'}
-                            type={'primary'}
-                            onClick={() => console.log('test')}
-                          />
-                          <Button
-                            text={v.threatflag}
-                            type={
-                              v.threatflag === '해킹' ? 'danger' : 'tertiary'
-                            }
-                            onClick={() => console.log('test')}
-                          />
-                        </ButtonWrapper>
-                      </StyledContentsBox>
-                    ))}
+                  {renderHistories}
                 </StyledContentsContainer>
               </Td>
             </tr>
@@ -194,6 +207,16 @@ const StyledContentsBox = styled(Box)<{ $current: boolean }>`
     props.$current ? 'rgba(113, 163, 247, 0.2)' : '#fff'};
 `
 
+const StyledInfoBox = styled(Box)`
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+
+  p {
+    color: #3366d6;
+    ${({ theme }) => theme.typography.caption1} !important;
+  }
+`
 const ButtonWrapper = styled.div`
   display: flex;
   gap: 0.5rem;

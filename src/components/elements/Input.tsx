@@ -10,12 +10,21 @@ interface InputProps {
   placeholder: string
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   required?: boolean
+  disabled?: boolean
 }
 
 const CustomInput = memo(
-  ({ id, value, label, placeholder, onChange, required }: InputProps) => {
+  ({
+    id,
+    value,
+    label,
+    placeholder,
+    onChange,
+    required,
+    disabled,
+  }: InputProps) => {
     return (
-      <StyledField label={label} required={required}>
+      <StyledField label={label} required={required} disabled={disabled}>
         <Input
           id={id}
           value={value || ''}

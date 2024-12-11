@@ -80,6 +80,7 @@ export default CustomTable
 
 const TableWrapper = styled.div`
   overflow-x: auto;
+  width: 100%;
 `
 
 const StyledTable = styled.table`

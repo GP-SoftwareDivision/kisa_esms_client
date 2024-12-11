@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import instance from '@/apis/instance.ts'
 
@@ -11,11 +11,13 @@ interface SearchSaveMutationType {
 
 export const useSearchSave = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationKey: ['SaveSearch'],
     mutationFn: async (data: SearchSaveMutationType) => {
       const response = await instance.post(
-        '/api/manage/searchHistoryInsert',
+        '/api/manage/search/history/insert',
         data
       )
       return response.data
@@ -41,6 +43,7 @@ export const useSearchSave = () => {
     },
     onSuccess: () => {
       notifySuccess('저장되었습니다.')
+      queryClient?.invalidateQueries({ queryKey: ['searchHistory'] })
     },
   })
 }

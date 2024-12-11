@@ -18,7 +18,7 @@ interface AlertType {
 }
 
 const AlertPage = () => {
-  const { page, handlePageChange } = usePagination()
+  const { page, handlePageChange } = usePagination(1)
 
   const alertList = useQueries<{ data: AlertType[]; count: number }>({
     queryKey: `alertList`,

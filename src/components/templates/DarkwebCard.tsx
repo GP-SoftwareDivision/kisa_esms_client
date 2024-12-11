@@ -3,9 +3,12 @@ import styled from '@emotion/styled'
 import { PiFileHtmlDuotone } from 'react-icons/pi'
 
 import { Caption } from '@/components/elements/Caption.tsx'
+import CustomSwitch from '@/components/elements/Switch.tsx'
+import { useState } from 'react'
 
 interface dtListType {
   contents: string
+  trancontents: string
   htmlpath?: string
   issueresponseflag: string
   keyword: string
@@ -23,6 +26,7 @@ interface dtListType {
 const DarkwebCard = (props: dtListType) => {
   const {
     contents,
+    trancontents,
     htmlpath,
     issueresponseflag,
     keyword,
@@ -36,6 +40,9 @@ const DarkwebCard = (props: dtListType) => {
     writetime,
     onClick,
   } = props
+
+  // 번역 여부
+  const [isTranslation, setTranslation] = useState<boolean>(false)
 
   // html 새 창으로 열기 이벤트
   const ViewHtml = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
@@ -56,23 +63,32 @@ const DarkwebCard = (props: dtListType) => {
               <StyledLabel>작성자</StyledLabel>
               <Caption text={writer} type={'blue'} />
             </StyledCaptionBox>
+            <StyledCaptionBox>
+              <StyledLabel>카테고리</StyledLabel>
+              <Caption text={target} type={'blue'} />
+            </StyledCaptionBox>
           </StyledNavContainer>
           <StyledCaptionBox>
-            <StyledLabel>카테고리</StyledLabel>
-            <Caption text={target} type={'blue'} />
+            <CustomSwitch
+              label={'번역'}
+              checked={isTranslation}
+              setChecked={setTranslation}
+            />
           </StyledCaptionBox>
         </NavLayout>
         <BodyLayout>
           <StyledBodyBox>
-            <StyledLabel>제목</StyledLabel>
+            <StyledLabel style={{ minWidth: '50px' }}>제목</StyledLabel>
             <StyledContents>{title}</StyledContents>
           </StyledBodyBox>
           <StyledBodyBox>
-            <StyledLabel>내용</StyledLabel>
-            <StyledContents>{contents}</StyledContents>
+            <StyledLabel style={{ minWidth: '50px' }}>내용</StyledLabel>
+            <StyledContents>
+              {isTranslation ? trancontents : contents}
+            </StyledContents>
           </StyledBodyBox>
           <StyledBodyBox>
-            <StyledLabel>URL</StyledLabel>
+            <StyledLabel style={{ minWidth: '50px' }}>URL</StyledLabel>
             <StyledContents>{url}</StyledContents>
           </StyledBodyBox>
         </BodyLayout>
@@ -84,7 +100,10 @@ const DarkwebCard = (props: dtListType) => {
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>판단 키워드</StyledLabel>
-              <Caption text={threatlog} type={'blue'} />
+              <Caption
+                text={threatlog === null ? '-' : threatlog}
+                type={'blue'}
+              />
             </StyledCaptionBox>
           </StyledNavContainer>
         </NavLayout>
@@ -93,13 +112,16 @@ const DarkwebCard = (props: dtListType) => {
             <StyledCaptionBox>
               <StyledLabel>해킹 여부</StyledLabel>
               <Caption
-                text={threatflag === 'Y' ? '해킹' : '미해킹'}
-                type={threatflag === 'Y' ? 'red' : 'blue'}
+                text={threatflag}
+                type={threatflag === '해킹' ? 'red' : 'blue'}
               />
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>대응 여부</StyledLabel>
-              <Caption text={issueresponseflag} type={'blue'} />
+              <Caption
+                text={issueresponseflag}
+                type={issueresponseflag === '대응' ? 'blue' : 'black'}
+              />
             </StyledCaptionBox>
           </StyledNavContainer>
           <HtmlIcon
@@ -124,7 +146,7 @@ const StyledNavContainer = styled.div`
 `
 const StyledLabel = styled.span`
   font-weight: bold !important;
-  min-width: 50px;
+  //min-width: 50px;
   ${({ theme }) => theme.typography.body2};
 `
 const StyledContents = styled.span`

@@ -30,7 +30,7 @@ interface ttListType {
   contents2: string
   trancontents: string
   trancontents2: string
-  responseflag: string
+  issueresponseflag: string
   keyword: string
   seqidx: number
   channel: string
@@ -43,12 +43,14 @@ interface ttListType {
 const Telegram = () => {
   const navigate = useNavigate()
 
-  const { page, setPage, handlePageChange } = usePagination()
-  const { hackingOptions, responseOptions, regularExpressionOptions } =
-    useOptions()
-
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
+  const { page, setPage, handlePageChange } = usePagination(
+    Number(queryParams.get('page')) || 1
+  )
+
+  const { hackingOptions, responseOptions, regularExpressionOptions } =
+    useOptions()
 
   // 조회기간
   const [date, setDate] = useState({
@@ -79,11 +81,47 @@ const Telegram = () => {
     queryParams.get('contents') || ''
   )
 
+  // 재검색 내용
+  const [reContents, setReContents] = useState<string>(
+    queryParams.get('re_contents') || ''
+  )
+  // 재검색 대화방
+  const [reChannel, setReChannel] = useState<string>(
+    queryParams.get('re_channel') || ''
+  )
+
+  // 재검색 작성자
+  const [reUsername, setReUsername] = useState<string>(
+    queryParams.get('re_username') || ''
+  )
+
+  // 정규표현식
+  const [regex, setRegex] = useState<string>(queryParams.get('regex') || '')
+
+  // 결과 내 재검색
+  const [isReSearch, setIsReSearch] = useState<boolean>(
+    queryParams.get('re_contents') !== '' ||
+      queryParams.get('re_channel') !== '' ||
+      queryParams.get('re_username') !== ''
+  )
+
   // 텔레그램 데이터 조회 API
   const ttList = useQueries<{ data: ttListType[]; count: number }>({
     queryKey: `ttList`,
     method: 'GET',
-    url: `/api/monitoring/ttList${location.search}&page=${page}`,
+    url: `/api/monitoring/ttList${location.search}`,
+  })
+
+  // 검색 기록 불러오기
+  const searchHistory = useQueries<{
+    data: { searchlog: string; title: string }[]
+  }>({
+    queryKey: `searchHistory`,
+    method: 'POST',
+    url: `/api/manage/search/history/data`,
+    body: {
+      type: 'tt',
+    },
   })
 
   // 검색 조건 적용 후 파라미터 변경
@@ -96,6 +134,11 @@ const Telegram = () => {
       channel,
       contents,
       responseflag,
+      page: page.toString(),
+      regex,
+      re_contents: reContents,
+      re_channel: reChannel,
+      re_username: reUsername,
     }).toString()
     setPage(1)
     navigate(`?${params}`)
@@ -122,7 +165,7 @@ const Telegram = () => {
                 trancontents={
                   v.trancontents ? v.trancontents + v.trancontents2 : ''
                 }
-                issueresponseflag={v.responseflag}
+                issueresponseflag={v.issueresponseflag}
                 keyword={v.keyword}
                 seqidx={v.seqidx}
                 threatflag={v.threatflag}
@@ -136,9 +179,11 @@ const Telegram = () => {
             <CustomPagination
               total={ttList.data.count || 1}
               page={page}
-              handlePageChange={(newPage) =>
+              handlePageChange={(newPage) => {
                 handlePageChange(newPage as number)
-              }
+                queryParams.set('page', newPage.toString())
+                navigate(`?${queryParams.toString()}`)
+              }}
             />
           </Stack>
         </>
@@ -163,7 +208,15 @@ const Telegram = () => {
         <StyledLoad>
           <CustomSelect
             label={'불러오기'}
-            options={[{ value: '식', label: '식' }]}
+            options={
+              searchHistory.isSuccess &&
+              Object.entries(searchHistory.data?.data).length !== 0
+                ? searchHistory.data?.data?.map((v) => ({
+                    label: v.title,
+                    value: v.searchlog,
+                  }))
+                : []
+            }
           />
           <Button
             type={'primary'}
@@ -177,6 +230,7 @@ const Telegram = () => {
               label={'조회 기간'}
               date={date}
               setDate={setDate}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -185,6 +239,7 @@ const Telegram = () => {
               options={hackingOptions}
               value={threatflag}
               setState={setThreatFlag}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -193,6 +248,7 @@ const Telegram = () => {
               options={responseOptions}
               value={responseflag}
               setState={setResponseFlag}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -202,6 +258,7 @@ const Telegram = () => {
               placeholder={'내용을 입력하세요.'}
               value={writer}
               onChange={(e) => setWriter(e.target.value)}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -211,6 +268,7 @@ const Telegram = () => {
               placeholder={'내용을 입력하세요.'}
               value={channel}
               onChange={(e) => setChannel(e.target.value)}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -220,6 +278,7 @@ const Telegram = () => {
               placeholder={'내용을 입력하세요.'}
               value={contents}
               onChange={(e) => setContents(e.target.value)}
+              disabled={isReSearch}
             />
           </Box>
           <Box></Box>
@@ -228,8 +287,9 @@ const Telegram = () => {
             <CustomSelect
               label={'정규표현식'}
               options={regularExpressionOptions}
-              value={responseflag}
-              setState={setResponseFlag}
+              value={regex}
+              setState={setRegex}
+              disabled={isReSearch}
             />
           </Box>
           <Box></Box>
@@ -248,8 +308,17 @@ const Telegram = () => {
 
         {/*결과 내 재검색 아코디언*/}
         <CustomAccordion
+          collapsible={isReSearch ? 'isReSearch' : ''}
           id={'telegram'}
-          trigger={<StyledCheckBox size={'sm'}>결과 내 재검색</StyledCheckBox>}
+          trigger={
+            <StyledCheckBox
+              size={'sm'}
+              checked={isReSearch}
+              onCheckedChange={(e) => setIsReSearch(!!e.checked)}
+            >
+              결과 내 재검색
+            </StyledCheckBox>
+          }
           content={
             <AccordionContainer columns={[1, 2, 3, 4]}>
               <Box>
@@ -257,8 +326,8 @@ const Telegram = () => {
                   id={'writer'}
                   label={'작성자'}
                   placeholder={'내용을 입력하세요.'}
-                  value={writer}
-                  onChange={(e) => setWriter(e.target.value)}
+                  value={reUsername}
+                  onChange={(e) => setReUsername(e.target.value)}
                 />
               </Box>
               <Box>
@@ -266,8 +335,8 @@ const Telegram = () => {
                   id={'channel'}
                   label={'대화방'}
                   placeholder={'내용을 입력하세요.'}
-                  value={channel}
-                  onChange={(e) => setChannel(e.target.value)}
+                  value={reChannel}
+                  onChange={(e) => setReChannel(e.target.value)}
                 />
               </Box>
               <Box>
@@ -275,8 +344,8 @@ const Telegram = () => {
                   id={'content'}
                   label={'내용'}
                   placeholder={'내용을 입력하세요.'}
-                  value={contents}
-                  onChange={(e) => setContents(e.target.value)}
+                  value={reContents}
+                  onChange={(e) => setReContents(e.target.value)}
                 />
               </Box>
               <Box display={'flex'} justifyContent={'flex-end'}>

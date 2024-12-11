@@ -30,7 +30,7 @@ interface GroupType {
 }
 
 const GroupPage = () => {
-  const { page, handlePageChange } = usePagination()
+  const { page, handlePageChange } = usePagination(1)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
   // 그룹 추가 hooks

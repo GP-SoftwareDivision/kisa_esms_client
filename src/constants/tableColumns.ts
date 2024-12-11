@@ -19,34 +19,34 @@ export const AlertColumns = [
 ]
 
 // 메인 대시보드 테이블 컬럼 정의
-export const dashBoardColumns = [
+export const hackingListColumns = [
   {
-    header: '구분',
-    accessorKey: 'type',
+    header: '등록일시',
+    accessorKey: 'regdate',
   },
   {
-    header: '카테고리',
-    accessorKey: 'category',
+    header: '대상구분',
+    accessorKey: 'targettype',
   },
   {
-    header: '키워드',
-    accessorKey: 'keyword',
+    header: '피해기관',
+    accessorKey: 'hackedorganization',
   },
   {
-    header: 'URL',
-    accessorKey: 'url',
+    header: '사고유',
+    accessorKey: 'incidenttype',
   },
   {
-    header: '제목/채팅방명',
-    accessorKey: 'title',
+    header: '채널구분',
+    accessorKey: 'channeltype',
   },
   {
-    header: '내용',
-    accessorKey: 'content',
+    header: '채널명',
+    accessorKey: 'darktelegramname',
   },
   {
-    header: '작성일시',
-    accessorKey: 'writeTime',
+    header: '최초인지',
+    accessorKey: 'firstrecogition',
   },
 ]
 

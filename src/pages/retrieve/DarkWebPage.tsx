@@ -33,6 +33,7 @@ interface dtListType {
   writer: string
   title: string
   contents: string
+  trancontents: string
   threatflag: string
   threatlog: string
   issueresponseflag: string
@@ -41,12 +42,14 @@ interface dtListType {
 
 const DarkWebPage = () => {
   const navigate = useNavigate()
-  const { page, setPage, handlePageChange } = usePagination()
-  const { responseOptions, hackingOptions, regularExpressionOptions } =
-    useOptions()
-
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
+
+  const { page, setPage, handlePageChange } = usePagination(
+    Number(queryParams.get('page')) || 1
+  )
+  const { responseOptions, hackingOptions, regularExpressionOptions } =
+    useOptions()
 
   // 조회기간
   const [date, setDate] = useState({
@@ -72,19 +75,73 @@ const DarkWebPage = () => {
   // 제목
   const [title, setTitle] = useState<string>(queryParams.get('title') || '')
 
+  // 재검색 제목
+  const [reTitle, setRetitle] = useState<string>(
+    queryParams.get('re_title') || ''
+  )
+
   // 키워드
   const [keyword, setKeyword] = useState<string>(
     queryParams.get('keyword') || ''
   )
 
+  // 재검색 키워드
+  const [reKeyword, setReKeyword] = useState<string>(
+    queryParams.get('re_keyword') || ''
+  )
+
   // URL
   const [url, setUrl] = useState<string>(queryParams.get('url') || '')
+
+  // 정규표현식
+  const [regex, setRegex] = useState<string>(queryParams.get('regex') || '')
+
+  // 결과 내 재검색
+  const [isReSearch, setIsReSearch] = useState<boolean>(
+    queryParams.get('re_title') !== '' || queryParams.get('re_keyword') !== ''
+  )
+
+  // const [test, setTest] = useState<string>()
+
+  // useEffect(() => {
+  //   if (test) {
+  //     const params = new URLSearchParams(test)
+  //     setDate({
+  //       startdate: params.get('startdate') || '',
+  //       enddate: params.get('enddate') || '',
+  //     })
+  //     setCategory(params.get('category') || '')
+  //     setThreatFlag(params.get('threatflag') || '')
+  //     setResponseFlag(params.get('responseflag') || '')
+  //     setTitle(params.get('title') || '')
+  //     setRetitle(params.get('re_title') || '')
+  //     setKeyword(params.get('keyword') || '')
+  //     setReKeyword(params.get('re_keyword') || '')
+  //     setUrl(params.get('url') || '')
+  //     setRegex(params.get('regex') || '')
+  //     setIsReSearch(
+  //       params.get('re_title') !== '' || params.get('re_keyword') !== ''
+  //     )
+  //   }
+  // }, [test])
 
   // 다크웹 데이터 조회 API
   const dtList = useQueries<{ data: dtListType[]; count: number }>({
     queryKey: `dtList`,
     method: 'GET',
-    url: `/api/monitoring/dtList${location.search}&page=${page}`,
+    url: `/api/monitoring/dtList${location.search}`,
+  })
+
+  // 검색 기록 불러오기
+  const searchHistory = useQueries<{
+    data: { searchlog: string; title: string }[]
+  }>({
+    queryKey: `searchHistory`,
+    method: 'POST',
+    url: `/api/manage/search/history/data`,
+    body: {
+      type: 'dt',
+    },
   })
 
   // 검색조건 저장
@@ -101,6 +158,10 @@ const DarkWebPage = () => {
       title,
       keyword,
       url,
+      regex,
+      re_title: reTitle,
+      re_keyword: reKeyword,
+      page: page.toString(),
     }).toString()
 
     setPage(1)
@@ -125,6 +186,7 @@ const DarkWebPage = () => {
                 key={v.seqidx}
                 onClick={() => navigate(`detail?id=${v.seqidx}`)}
                 contents={v.contents}
+                trancontents={v.trancontents}
                 issueresponseflag={v.issueresponseflag}
                 keyword={v.keyword}
                 seqidx={v.seqidx}
@@ -142,11 +204,15 @@ const DarkWebPage = () => {
           <CustomPagination
             total={dtList.data?.count || 1}
             page={page}
-            handlePageChange={(newPage) => handlePageChange(newPage as number)}
+            handlePageChange={(newPage) => {
+              handlePageChange(newPage as number)
+              queryParams.set('page', newPage.toString())
+              navigate(`?${queryParams.toString()}`)
+            }}
           />
         </>
       )
-  }, [page, handlePageChange, navigate, dtList])
+  }, [page, navigate, dtList])
 
   return (
     <ContentContainer>
@@ -164,7 +230,15 @@ const DarkWebPage = () => {
         <StyledLoad>
           <CustomSelect
             label={'불러오기'}
-            options={[{ value: '식', label: '식' }]}
+            options={
+              searchHistory.isSuccess
+                ? searchHistory.data?.data.map((v) => ({
+                    label: v.title,
+                    value: v.searchlog,
+                  }))
+                : []
+            }
+            // setState={setTest}
           />
           <Button
             type={'primary'}
@@ -178,6 +252,7 @@ const DarkWebPage = () => {
               label={'조회 기간'}
               date={date}
               setDate={setDate}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -190,6 +265,7 @@ const DarkWebPage = () => {
               ]}
               value={category}
               setState={setCategory}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -198,6 +274,7 @@ const DarkWebPage = () => {
               options={hackingOptions}
               value={threatflag}
               setState={setThreatFlag}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -206,6 +283,7 @@ const DarkWebPage = () => {
               options={responseOptions}
               value={responseflag}
               setState={setResponseFlag}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -215,6 +293,7 @@ const DarkWebPage = () => {
               placeholder={'내용을 입력하세요.'}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -224,6 +303,7 @@ const DarkWebPage = () => {
               placeholder={'내용을 입력하세요.'}
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
+              disabled={isReSearch}
             />
           </Box>
           <Box>
@@ -233,6 +313,7 @@ const DarkWebPage = () => {
               placeholder={'내용을 입력하세요.'}
               value={url}
               onChange={(e) => setUrl(e.target.value)}
+              disabled={isReSearch}
             />
           </Box>
           <Box></Box>
@@ -240,8 +321,9 @@ const DarkWebPage = () => {
             <CustomSelect
               label={'정규표현식'}
               options={regularExpressionOptions}
-              value={responseflag}
-              setState={setResponseFlag}
+              value={regex}
+              setState={setRegex}
+              disabled={isReSearch}
             />
           </Box>
           <Box></Box>
@@ -263,6 +345,9 @@ const DarkWebPage = () => {
                       title,
                       keyword,
                       url,
+                      regex,
+                      re_title: reTitle,
+                      re_keyword: reKeyword,
                     }).toString(),
                   })
                 }
@@ -273,8 +358,17 @@ const DarkWebPage = () => {
         </SelectContainer>
         {/*결과 내 재검색 아코디언*/}
         <CustomAccordion
+          collapsible={isReSearch ? 'isReSearch' : ''}
           id={'telegram'}
-          trigger={<StyledCheckBox size={'sm'}>결과 내 재검색</StyledCheckBox>}
+          trigger={
+            <StyledCheckBox
+              size={'sm'}
+              checked={isReSearch}
+              onCheckedChange={(e) => setIsReSearch(!!e.checked)}
+            >
+              결과 내 재검색
+            </StyledCheckBox>
+          }
           content={
             <AccordionContainer columns={[1, 2, 3, 4]}>
               <Box>
@@ -282,8 +376,8 @@ const DarkWebPage = () => {
                   id={'title'}
                   label={'제목'}
                   placeholder={'내용을 입력하세요.'}
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  value={reTitle}
+                  onChange={(e) => setRetitle(e.target.value)}
                 />
               </Box>
               <Box>
@@ -291,8 +385,8 @@ const DarkWebPage = () => {
                   id={'keyword'}
                   label={'키워드'}
                   placeholder={'내용을 입력하세요.'}
-                  value={title}
-                  onChange={(e) => setKeyword(e.target.value)}
+                  value={reKeyword}
+                  onChange={(e) => setReKeyword(e.target.value)}
                 />
               </Box>
               <Box></Box>

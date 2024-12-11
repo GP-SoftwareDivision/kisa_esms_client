@@ -24,7 +24,7 @@ const TrackingPage = () => {
   const { responseOptions } = useOptions()
   const navigate = useNavigate()
   const [title, setTitle] = useState<string>('')
-  const { page, handlePageChange } = usePagination()
+  const { page, handlePageChange } = usePagination(1)
 
   // 조회기간
   const [date, setDate] = useState({

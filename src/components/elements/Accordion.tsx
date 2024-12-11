@@ -12,13 +12,14 @@ interface AccordionType {
   id: string
   trigger: ReactNode
   content: ReactNode
+  collapsible: string
 }
 const CustomAccordion = (props: AccordionType) => {
-  const { id, trigger, content } = props
+  const { id, trigger, content, collapsible } = props
 
   return (
-    <AccordionRoot collapsible>
-      <AccordionItem key={id} value={'accordion'} border={'none'}>
+    <AccordionRoot collapsible defaultValue={[collapsible]}>
+      <AccordionItem key={id} value={'isReSearch'} border={'none'}>
         <StyledTrigger>
           <Stack gap='1'>{trigger}</Stack>
         </StyledTrigger>

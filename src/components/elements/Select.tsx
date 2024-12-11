@@ -19,10 +19,19 @@ interface SelectProps {
   setState?: Dispatch<React.SetStateAction<string>>
   multiple?: boolean
   required?: boolean
+  disabled?: boolean
 }
 
 const CustomSelect = memo(
-  ({ options, value, label, setState, multiple, required }: SelectProps) => {
+  ({
+    options,
+    value,
+    label,
+    setState,
+    multiple,
+    required,
+    disabled,
+  }: SelectProps) => {
     const handleOnChange = (selected: string[]) => {
       if (setState) setState(selected.join())
     }
@@ -40,6 +49,7 @@ const CustomSelect = memo(
         })}
         size='xs'
         required
+        disabled={disabled}
         multiple={multiple}
         defaultValue={!multiple ? [''] : undefined}
         flexDirection={'row'}
@@ -60,7 +70,7 @@ const CustomSelect = memo(
           {createListCollection({
             items: options,
           }).items.map((item) => (
-            <SelectItem item={item} key={item.value}>
+            <SelectItem item={item} key={item.label}>
               {item.label}
             </SelectItem>
           ))}

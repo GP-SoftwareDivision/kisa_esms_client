@@ -40,7 +40,7 @@ interface UserGroupType {
 }
 
 const UserPage = () => {
-  const { page, handlePageChange } = usePagination()
+  const { page, handlePageChange } = usePagination(1)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
   // 사용자 추가 hooks

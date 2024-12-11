@@ -26,7 +26,7 @@ interface ServerType {
 }
 
 const DomainPage = () => {
-  const { page, handlePageChange } = usePagination()
+  const { page, handlePageChange } = usePagination(1)
   const [channel, setChannel] = useState<string>('')
 
   const domainList = useQueries<{ data: ServerType[]; count: number }>({
