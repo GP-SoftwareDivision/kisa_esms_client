@@ -49,7 +49,10 @@ export const useUserUpdateMutation = () => {
         notifyError('이메일 형식이 맞지 않습니다.')
         throw new Error()
       }
-      const response = await instance.post('/api/manage/userUpdate', updateData)
+      const response = await instance.post(
+        '/api/manage/user/update',
+        updateData
+      )
       return response.data
     },
     onError: (error) => {
@@ -86,7 +89,7 @@ export const useUserUpdateMutation = () => {
     mutationFn: async (request: { items: number[] }) => {
       const isConfirm = confirm('삭제하시겠습니까?')
       if (!isConfirm) throw new Error()
-      const response = await instance.post('/api/manage/userDelete', {
+      const response = await instance.post('/api/manage/user/delete', {
         seqidx: request.items.join(','),
       })
       return response.data

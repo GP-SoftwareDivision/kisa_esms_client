@@ -51,8 +51,8 @@ const InfringementPage = () => {
 
   // 조회기간
   const [date, setDate] = useState({
-    startdate: '2024-12-03',
-    enddate: '2024-12-03',
+    startdate: '2024-12-06',
+    enddate: '2024-12-06',
   })
 
   const [request, setRequest] = useState<object>({
@@ -68,7 +68,7 @@ const InfringementPage = () => {
   const accountList = useQueries<AccountListType>({
     queryKey: `accountList_${page}`,
     method: 'POST',
-    url: '/api/accountList',
+    url: '/api/account/list',
     body: { ...request, page: page },
   })
 
@@ -76,7 +76,7 @@ const InfringementPage = () => {
   const uploaderList = useQueries<{ uploaderlist: string[] }>({
     queryKey: 'uploaderList',
     method: 'POST',
-    url: '/api/uploaderList',
+    url: '/api/account/uploader',
   })
 
   // 파일 업로드
@@ -88,7 +88,7 @@ const InfringementPage = () => {
         withCredentials: true,
       })
       if (response.status === 200) {
-        await instance.post(`/api/accountUpload`, {
+        await instance.post(`/api/account/upload`, {
           filename: uploadFile?.name,
           uploader: 'syjin',
         })

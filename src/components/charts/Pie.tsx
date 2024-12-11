@@ -6,9 +6,9 @@ const Pie = () => {
     chart: {
       type: 'pie',
     },
-    title: {
-      text: '대응 현황',
-    },
+    // title: {
+    //   text: '대응 현황',
+    // },
     labels: ['개인', '기업', '공공', '교육', '금융', '의료', '기타'],
     colors: [
       '#142956',
@@ -25,7 +25,7 @@ const Pie = () => {
         fontSize: '10px !important',
       },
       formatter: function (_val: number, opts: any) {
-        return opts.w.config.labels[opts.seriesIndex]
+        return `${opts.w.config.labels[opts.seriesIndex]}`
       },
     },
     legend: {
@@ -52,6 +52,9 @@ const Pie = () => {
           '#d0dffc',
         ],
       },
+      formatter: function (legendName: string, opts: any) {
+        return `${legendName} ${opts.w.globals.series[opts.seriesIndex]}건`
+      },
     },
   }
   const series = [48, 30, 28, 20, 15, 9, 7]
@@ -61,9 +64,9 @@ const Pie = () => {
       options={options}
       series={series}
       type='pie'
-      height={280}
+      // height={300}
       width={380}
-      className='custom-chart'
+      className='charts-custom'
     />
   )
 }

@@ -61,7 +61,7 @@ const GroupPage = () => {
   const groupList = useQueries<{ data: GroupType[] }>({
     queryKey: 'groupList',
     method: 'POST',
-    url: '/api/manage/groupList',
+    url: '/api/manage/group',
   })
 
   // 그룹 추가 액션

@@ -32,7 +32,7 @@ export const useKeywordUpdateMutation = () => {
     mutationKey: ['updateKeyword'],
     mutationFn: async () => {
       const response = await instance.post(
-        '/api/manage/keywordUpdate',
+        '/api/manage/keyword/update',
         updateData
       )
       return response.data
@@ -73,7 +73,7 @@ export const useKeywordUpdateMutation = () => {
       const isConfirm = confirm('삭제하시겠습니까?')
       if (!isConfirm) throw new Error()
 
-      const response = await instance.post('/api/manage/keywordDelete', {
+      const response = await instance.post('/api/manage/keyword/delete', {
         seqidx: request.items.join(','),
       })
       return response.data

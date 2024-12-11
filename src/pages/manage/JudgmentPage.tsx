@@ -60,7 +60,7 @@ const JudgmentPage = () => {
   const ruleList = useQueries<{ data: RulesetType[]; count: number }>({
     queryKey: `ruleList`,
     method: 'POST',
-    url: '/api/manage/ruleList',
+    url: '/api/manage/rule',
     body: {
       page: page,
     },

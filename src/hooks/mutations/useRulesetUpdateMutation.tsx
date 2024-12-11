@@ -40,7 +40,7 @@ export const useRulesetUpdateMutation = () => {
         useflag: updateData.useflag,
         hackingflag: updateData.hackingflag,
       }
-      const response = await instance.post('/api/manage/ruleUpdate', request)
+      const response = await instance.post('/api/manage/rule/update', request)
       return response.data
     },
     onError: (error) => {
@@ -79,7 +79,7 @@ export const useRulesetUpdateMutation = () => {
       const isConfirm = confirm('삭제하시겠습니까?')
       if (!isConfirm) throw new Error()
 
-      const response = await instance.post('/api/manage/ruleDelete', {
+      const response = await instance.post('/api/manage/rule/delete', {
         seqidx: request.items.join(','),
       })
       return response.data

@@ -31,8 +31,8 @@ const Header = () => {
 
   const onSubMenuSelect = (subItemKey: string | null) => {
     const darkwebParams = new URLSearchParams({
-      startdate: '2024-11-03',
-      enddate: '2024-11-03',
+      startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
+      enddate: dayjs().format('YYYY-MM-DD'),
       threatflag: '',
       category: '',
       keyword: '',

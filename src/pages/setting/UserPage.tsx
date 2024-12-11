@@ -81,14 +81,14 @@ const UserPage = () => {
   const userList = useQueries<{ data: UserType[] }>({
     queryKey: 'userList',
     method: 'POST',
-    url: '/api/manage/userList',
+    url: '/api/manage/user',
   })
 
   // 추가 시 그룹 리스트
   const userGroupList = useQueries<{ data: UserGroupType[] }>({
     queryKey: 'userGroupList',
     method: 'POST',
-    url: '/api/manage/userGroupList',
+    url: '/api/manage/user/groups',
     enabled: userList.isSuccess && !!userList.data.data?.length,
   })
 

@@ -27,22 +27,16 @@ const DashBoardPage = () => {
                 </TitleCaption>
               }
             />
-            <Grid
-              templateColumns={{ base: '1fr', md: '1fr 1fr' }}
-              gap={4}
-              border='1px solid'
-              borderColor='gray.100'
-              borderRadius='4px'
-              p={4}
-              flex={1}
-            >
-              <GridItem>
+            <ChartContainer>
+              <ChartWrapper>
+                <h3>유출 사고 유형</h3>
                 <Bar />
-              </GridItem>
-              <GridItem>
+              </ChartWrapper>
+              <ChartWrapper>
+                <h3>대응 현황</h3>
                 <Pie />
-              </GridItem>
-            </Grid>
+              </ChartWrapper>
+            </ChartContainer>
           </Flex>
         </GridItem>
         <GridItem>
@@ -85,4 +79,21 @@ const ListSubTitle = styled.p`
 `
 const TitleCaption = styled.span`
   ${({ theme }) => theme.typography.caption1};
+`
+const ChartContainer = styled(Box)`
+  border: 1px solid ${({ theme }) => theme.color.gray200};
+  border-radius: 4px;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+`
+
+const ChartWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  h3 {
+    ${({ theme }) => theme.typography.subtitle};
+  }
 `

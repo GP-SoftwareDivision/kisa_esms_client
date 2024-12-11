@@ -30,7 +30,21 @@ const useOptions = () => {
     []
   )
 
-  return { responseOptions, fileTypeOptions, hackingOptions }
+  const regularExpressionOptions = useMemo(
+    () => [
+      { value: 'email', label: '이메일' },
+      { value: 'phone', label: '전화번호' },
+      { value: 'RRN', label: '주민등록번호' },
+    ],
+    []
+  )
+
+  return {
+    responseOptions,
+    fileTypeOptions,
+    hackingOptions,
+    regularExpressionOptions,
+  }
 }
 
 export default useOptions

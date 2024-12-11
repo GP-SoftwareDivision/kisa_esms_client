@@ -17,7 +17,7 @@ export const theme = {
     h3: {
       fontSize: '1.5rem',
       lineHeight: 1.45,
-      fontWeight: 600,
+      fontWeight: 700,
       letterSpacing: '-0.01rem',
       marginBottom: '0.5em',
     },

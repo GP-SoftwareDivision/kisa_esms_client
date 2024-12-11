@@ -17,27 +17,81 @@ const Bar = () => {
         distributed: true,
       },
     },
-    title: {
-      text: '유출 사고 유형',
-    },
+    // title: {
+    //   text: '유출 사고 유형',
+    // },
     xaxis: {
-      categories: ['정보유출', '서버해킹', '기업/개인', '기타'],
+      categories: [
+        '정보유출',
+        '정보유출(협박)',
+        '공격예고(협박)',
+        'DDos',
+        '랜섬웨어',
+        '웹변조',
+        '취약점',
+        '정보노출',
+        '확인불가',
+        '기타해킹',
+        '기타',
+      ],
     },
-    colors: ['#3366d6', '#4285f4', '#71a3f6', '#d0dffc'],
+    dataLabels: {
+      enabled: false,
+    },
+    colors: [
+      '#142956',
+      '#1f3d80',
+      '#103d73',
+      '#204c91',
+      '#2952ab',
+      '#3366d6',
+      '#3a76cc',
+      '#4285f4',
+      '#71a3f6',
+      '#8fb3f9',
+      '#d0dffc',
+    ],
     legend: {
       show: true,
       showForSingleSeries: true,
       position: 'right',
-      customLegendItems: ['정보유출', '서버해킹', '기업/개인', '기타'],
+      formatter: function (legendName: string, opts: any) {
+        return `${legendName} ${opts.w.globals.stackedSeriesTotals[opts.seriesIndex]}건`
+      },
+      customLegendItems: [
+        '정보유출',
+        '정보유출(협박)',
+        '공격예고(협박)',
+        'DDos',
+        '랜섬웨어',
+        '웹변조',
+        '취약점',
+        '정보노출',
+        '확인불가',
+        '기타해킹',
+        '기타',
+      ],
       markers: {
-        fillColors: ['#3366d6', '#4285f4', '#71a3f6', '#d0dffc'],
+        fillColors: [
+          '#142956',
+          '#1f3d80',
+          '#103d73',
+          '#204c91',
+          '#2952ab',
+          '#3366d6',
+          '#3a76cc',
+          '#4285f4',
+          '#71a3f6',
+          '#8fb3f9',
+          '#d0dffc',
+        ],
       },
     },
   }
   const series = [
     {
       name: '건수',
-      data: [30, 40, 35, 50],
+      data: [50, 40, 35, 30, 27, 23, 20, 26, 23, 10, 8],
     },
   ]
   return (
@@ -45,8 +99,9 @@ const Bar = () => {
       options={options}
       series={series}
       type='bar'
-      height={300}
-      width={450}
+      // height={350}
+      width={480}
+      className='charts-custom'
     />
   )
 }

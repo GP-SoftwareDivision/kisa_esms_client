@@ -27,7 +27,7 @@ export const useKeywordAddMutation = () => {
         notifyError('모든 항목을 전부 입력해주세요.')
         throw new Error()
       }
-      const response = await instance.post('/api/manage/keywordInsert', data)
+      const response = await instance.post('/api/manage/keyword/insert', data)
       return response.data
     },
     onError: (error) => {

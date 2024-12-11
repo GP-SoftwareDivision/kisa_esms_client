@@ -6,7 +6,7 @@ import instance from '@/apis/instance.ts'
 
 interface SearchSaveMutationType {
   type: string
-  searchdata: string
+  searchlog: string
 }
 
 export const useSearchSave = () => {

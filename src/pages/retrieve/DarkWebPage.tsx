@@ -42,7 +42,8 @@ interface dtListType {
 const DarkWebPage = () => {
   const navigate = useNavigate()
   const { page, setPage, handlePageChange } = usePagination()
-  const { responseOptions, hackingOptions } = useOptions()
+  const { responseOptions, hackingOptions, regularExpressionOptions } =
+    useOptions()
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -86,6 +87,7 @@ const DarkWebPage = () => {
     url: `/api/monitoring/dtList${location.search}&page=${page}`,
   })
 
+  // 검색조건 저장
   const SaveSearch = useSearchSave()
 
   // 검색 조건 적용 후 파라미터 변경
@@ -181,7 +183,11 @@ const DarkWebPage = () => {
           <Box>
             <CustomSelect
               label={'카테고리'}
-              options={[{ value: '카테고리', label: '카테고리' }]}
+              options={[
+                { value: '', label: '전체' },
+                { value: 'torurl', label: 'torurl' },
+                { value: 'url-deepweb', label: 'url-deepweb' },
+              ]}
               value={category}
               setState={setCategory}
             />
@@ -233,7 +239,7 @@ const DarkWebPage = () => {
           <Box>
             <CustomSelect
               label={'정규표현식'}
-              options={responseOptions}
+              options={regularExpressionOptions}
               value={responseflag}
               setState={setResponseFlag}
             />
@@ -247,8 +253,8 @@ const DarkWebPage = () => {
                 type={'secondary'}
                 onClick={() =>
                   SaveSearch.mutate({
-                    type: 'darkweb',
-                    searchdata: new URLSearchParams({
+                    type: 'dt',
+                    searchlog: new URLSearchParams({
                       startdate: date.startdate,
                       enddate: date.enddate,
                       threatflag,

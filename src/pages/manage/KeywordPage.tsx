@@ -60,7 +60,7 @@ const KeywordPage = () => {
   const keywordList = useQueries<{ data: KeywordType[]; count: number }>({
     queryKey: 'keywordList',
     method: 'POST',
-    url: '/api/manage/keywordList',
+    url: '/api/manage/keyword',
     body: {
       page: page,
     },

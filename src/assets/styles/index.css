@@ -88,7 +88,7 @@ input::-webkit-inner-spin-button {
 
 /*apexchart 커스텀*/
 .apexcharts-text tspan {
-  font-size: .785rem;
+  font-size: .725rem;
 }
 
 .apexcharts-title-text {
@@ -99,11 +99,26 @@ input::-webkit-inner-spin-button {
   height: fit-content;
   border : 1px solid #E9EBED;
   border-radius: 6px;
+  font-size: .725rem !important;
+
 }
 
-.custom-chart .apexcharts-datalabel-label,
-.custom-chart .apexcharts-datalabel-value {
-  font-size: 10px !important;
+.charts-custom {
+  font-size: .785rem !important;
+  display: flex;
+  align-items: center;
+}
+
+.apexcharts-legend {
+  right: 0 !important;
+}
+
+.apexcharts-legend-series {
+  gap : 4px
+}
+
+.apexcharts-legend-text {
+  font-size: 11px !important;
 }
 /**/
 

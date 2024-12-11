@@ -44,7 +44,8 @@ const Telegram = () => {
   const navigate = useNavigate()
 
   const { page, setPage, handlePageChange } = usePagination()
-  const { hackingOptions, responseOptions } = useOptions()
+  const { hackingOptions, responseOptions, regularExpressionOptions } =
+    useOptions()
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -226,7 +227,7 @@ const Telegram = () => {
           <Box>
             <CustomSelect
               label={'정규표현식'}
-              options={responseOptions}
+              options={regularExpressionOptions}
               value={responseflag}
               setState={setResponseFlag}
             />
