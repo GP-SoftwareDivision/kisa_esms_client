@@ -33,11 +33,6 @@ const LoginPage = () => {
     }
   }
 
-  // 인증 번호 체크
-  const handleAuthAction = () => {
-    checkAuth.mutate({ phoneNum })
-  }
-
   return (
     <LoginContainer>
       <LoginContent>
@@ -91,7 +86,11 @@ const LoginPage = () => {
                       type='number'
                       value={authNum}
                       onChange={(e) => setAuthNum(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleAuthAction}
+                      onKeyDown={(e) =>
+                        e.key === 'Enter'
+                          ? checkAuth.mutate({ phoneNum })
+                          : null
+                      }
                     />
                     <span>{FormatTimer(timeLeft)}</span>
                     <VerificationButton onClick={handleLoginAction}>
@@ -117,7 +116,7 @@ const LoginPage = () => {
               <CustomButton
                 type='primary'
                 text='확인'
-                onClick={handleAuthAction}
+                onClick={() => checkAuth.mutate({ phoneNum })}
               />
             </ButtonWrapper>
           </ModalContents>

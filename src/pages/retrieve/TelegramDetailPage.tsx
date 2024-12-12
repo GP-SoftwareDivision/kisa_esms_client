@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef, useEffect, useCallback } from 'react'
 import { useLocation } from 'react-router-dom'
 import styled from '@emotion/styled'
 import { Box, Stack } from '@chakra-ui/react'
@@ -11,6 +11,7 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import CustomSwitch from '@/components/elements/Switch.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 import Empty from '@/components/elements/Empty.tsx'
+import { useInfiniteQueries } from '@/hooks/queries/useInfiniteQueries.tsx'
 
 interface TelegramDetailType {
   seqidx: number
@@ -41,9 +42,15 @@ const TelegramDetailPage = () => {
   const location = useLocation()
   const urlParams = new URLSearchParams(location.search)
   const id = urlParams.get('id')
+  const [seqidx, setSeqidx] = useState<string>(id || '')
 
+  // 다음 데이터를 가져오기 위한 분기
+  const [type, setType] = useState<'prev' | 'default' | 'next'>('default')
   // 번역 여부
   const [isTranslation, setTranslation] = useState<boolean>(false)
+
+  // 텔레그램 현재 id의 메시지로 위치를 이동하기 위한 REF
+  const currentMessageRef = useRef<any>(null)
 
   // 텔레그램 데이터 상세 조회 API
   const ttDetail = useQueries<{ data: TelegramDetailType[] }>({
@@ -56,109 +63,162 @@ const TelegramDetailPage = () => {
   })
 
   // 텔레그램 메시지 API
-  const ttHistoryData = useQueries<{ data: TelegramDetailHistory[] }>({
-    queryKey: `ttHistoryData`,
-    method: 'POST',
-    url: `/api/monitoring/ttHistoryData`,
-    body: {
-      seqidx: id,
-      type: 'default',
-    },
-  })
+  const { ttHistoryData, infiniteData, isNextEnd, isPrevEnd } =
+    useInfiniteQueries({
+      queryKey: 'ttHistoryData',
+      seqidx: seqidx,
+      type: type,
+    })
 
+  console.log(ttHistoryData.isLoading)
+  // 메시지 쌓임
   const renderHistories = useMemo(() => {
-    if (ttDetail.isLoading || ttHistoryData.isLoading) return <Loading />
-    else if (
-      ttHistoryData.isSuccess &&
-      Object.keys(ttHistoryData.data.data).length === 0
-    )
+    if (ttDetail.isLoading) return <Loading />
+    if (ttHistoryData.isSuccess && infiniteData?.length === 0) {
       return <Empty />
-    else
-      return ttHistoryData.data?.data.map((v: TelegramDetailHistory) => (
-        <StyledContentsBox $current={v.seqidx === Number(id)} key={v.seqidx}>
-          <span>{isTranslation ? v.trancontents : v.contents}</span>
-          <StyledInfoBox>
-            <p>{v.writetime}</p>
-            <ButtonWrapper>
-              <Button
-                text={'이슈대응'}
-                type={'primary'}
-                onClick={() => console.log('test')}
-              />
-              <Button
-                text={v.threatflag}
-                type={v.threatflag === '해킹' ? 'danger' : 'tertiary'}
-                onClick={() => console.log('test')}
-              />
-            </ButtonWrapper>
-          </StyledInfoBox>
-        </StyledContentsBox>
-      ))
+    }
+
+    return infiniteData?.map((v: TelegramDetailHistory, index: number) => (
+      <StyledContentsBox
+        $current={v.seqidx === Number(id)}
+        key={`${id}_${index}`}
+        ref={v.seqidx === Number(id) ? currentMessageRef : null}
+      >
+        <span>{isTranslation ? v.trancontents : v.contents}</span>
+        <StyledInfoBox>
+          <p>{v.writetime}</p>
+          <ButtonWrapper>
+            <Button
+              text={'이슈대응'}
+              type={'primary'}
+              onClick={() => console.log('')}
+            />
+            <Button
+              text={v.threatflag}
+              type={v.threatflag === '해킹' ? 'danger' : 'tertiary'}
+              onClick={() => console.log('')}
+            />
+          </ButtonWrapper>
+        </StyledInfoBox>
+      </StyledContentsBox>
+    ))
+  }, [ttHistoryData, isTranslation])
+
+  // 더보기 버튼 이벤트
+  const moreHistoryData = useCallback(
+    (rel: 'prev' | 'default' | 'next') => {
+      const newSeqidx =
+        rel === 'prev'
+          ? infiniteData[0]?.seqidx
+          : infiniteData[infiniteData.length - 1]?.seqidx
+
+      setType(rel)
+      setSeqidx(newSeqidx?.toString())
+
+      ttHistoryData.fetchNextPage()
+    },
+    [infiniteData, ttHistoryData]
+  )
+
+  // 텔레그램 현재 id의 메시지로 위치를 이동
+  useEffect(() => {
+    if (type === 'default' && currentMessageRef.current) {
+      currentMessageRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+    }
   }, [ttHistoryData])
 
   return (
     <ContentContainer>
       <PageTitle text={'텔레그램 데이터 상세 조회'} />
       <Table>
-        {ttDetail.isSuccess && (
-          <tbody key={ttDetail.data?.data[0].seqidx}>
-            <tr>
-              <LabelTd>채널명</LabelTd>
-              <Td colSpan={2}>{ttDetail.data?.data[0].channel}</Td>
-              <LabelTd>URL</LabelTd>
-              <Td colSpan={2}>{ttDetail.data?.data[0].channelurl}</Td>
-            </tr>
-            <tr>
-              <LabelTd>작성자</LabelTd>
-              <Td colSpan={2}>{ttDetail.data?.data[0].username}</Td>
-              <LabelTd>작성시간</LabelTd>
-              <Td colSpan={2}>{ttDetail.data?.data[0].writetime}</Td>
-            </tr>
-            <tr>
-              <LabelTd>해킹 여부</LabelTd>
-              <Td colSpan={2}>{ttDetail.data?.data[0].threatflag}</Td>
-              <LabelTd>대응 여부</LabelTd>
-              <Td colSpan={2}>{ttDetail.data?.data[0].issueresponseflag}</Td>
-            </tr>
-            <tr>
-              <LabelTd>수집 키워드</LabelTd>
-              <Td colSpan={2}>{ttDetail.data?.data[0].keyword}</Td>
-              <LabelTd>핀단 키워드</LabelTd>
-              <Td colSpan={2}>{ttDetail.data?.data[0].threatlog}</Td>
-            </tr>
-            <tr>
-              <LabelTd>번역 보기</LabelTd>
-              <Td colSpan={5}>
-                <CustomSwitch
-                  label={''}
-                  checked={isTranslation}
-                  setChecked={setTranslation}
+        <tbody key={ttDetail.data?.data[0].seqidx}>
+          <tr>
+            <LabelTd>채널명</LabelTd>
+            <Td colSpan={2}>{ttDetail.data?.data[0].channel}</Td>
+            <LabelTd>URL</LabelTd>
+            <Td colSpan={2}>{ttDetail.data?.data[0].channelurl}</Td>
+          </tr>
+          <tr>
+            <LabelTd>작성자</LabelTd>
+            <Td colSpan={2}>{ttDetail.data?.data[0].username}</Td>
+            <LabelTd>작성시간</LabelTd>
+            <Td colSpan={2}>{ttDetail.data?.data[0].writetime}</Td>
+          </tr>
+          <tr>
+            <LabelTd>해킹 여부</LabelTd>
+            <Td colSpan={2}>{ttDetail.data?.data[0].threatflag}</Td>
+            <LabelTd>대응 여부</LabelTd>
+            <Td colSpan={2}>{ttDetail.data?.data[0].issueresponseflag}</Td>
+          </tr>
+          <tr>
+            <LabelTd>수집 키워드</LabelTd>
+            <Td colSpan={2}>{ttDetail.data?.data[0].keyword}</Td>
+            <LabelTd>핀단 키워드</LabelTd>
+            <Td colSpan={2}>{ttDetail.data?.data[0].threatlog}</Td>
+          </tr>
+          <tr>
+            <LabelTd>번역 보기</LabelTd>
+            <Td colSpan={5}>
+              <CustomSwitch
+                label={''}
+                checked={isTranslation}
+                setChecked={setTranslation}
+              />
+            </Td>
+          </tr>
+          <tr>
+            <LabelTd>검색</LabelTd>
+            <Td colSpan={5}>
+              <SearchContainer>
+                <CustomEditable />
+                <Button
+                  type={'primary'}
+                  onClick={() => console.log('')}
+                  text={'검색'}
                 />
-              </Td>
-            </tr>
-            <tr>
-              <LabelTd>검색</LabelTd>
-              <Td colSpan={5}>
-                <SearchContainer>
-                  <CustomEditable />
-                  <Button
-                    type={'primary'}
-                    onClick={() => console.log('')}
-                    text={'검색'}
-                  />
-                </SearchContainer>
-              </Td>
-            </tr>
-            <tr>
-              <LabelTd>내용</LabelTd>
-              <Td colSpan={5}>
-                <StyledContentsContainer>
-                  {renderHistories}
-                </StyledContentsContainer>
-              </Td>
-            </tr>
-          </tbody>
-        )}
+              </SearchContainer>
+            </Td>
+          </tr>
+          <tr>
+            <LabelTd>내용</LabelTd>
+            <Td colSpan={5}>
+              <StyledContentsContainer>
+                {!isPrevEnd &&
+                  (ttHistoryData.isLoading ? (
+                    <Button
+                      text={'가져오는 중 •••'}
+                      type={'outline'}
+                      onClick={() => {}}
+                    />
+                  ) : (
+                    <Button
+                      text={'더보기'}
+                      type={'outline'}
+                      onClick={() => moreHistoryData('prev')}
+                    />
+                  ))}
+                {renderHistories}
+                {!isNextEnd &&
+                  (ttHistoryData.isLoading ? (
+                    <Button
+                      text={'가져오는 중 •••'}
+                      type={'outline'}
+                      onClick={() => {}}
+                    />
+                  ) : (
+                    <Button
+                      text={'더보기'}
+                      type={'outline'}
+                      onClick={() => moreHistoryData('next')}
+                    />
+                  ))}
+              </StyledContentsContainer>
+            </Td>
+          </tr>
+        </tbody>
       </Table>
     </ContentContainer>
   )
