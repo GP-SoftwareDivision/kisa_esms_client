@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { Box, SimpleGrid, Stack } from '@chakra-ui/react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import styled from '@emotion/styled'
@@ -101,29 +101,34 @@ const DarkWebPage = () => {
     queryParams.get('re_title') !== '' || queryParams.get('re_keyword') !== ''
   )
 
-  // const [test, setTest] = useState<string>()
+  // 검색조건 불러오기
+  const [savedSearchCondition, setSavedSearchCondition] = useState<string>('')
 
-  // useEffect(() => {
-  //   if (test) {
-  //     const params = new URLSearchParams(test)
-  //     setDate({
-  //       startdate: params.get('startdate') || '',
-  //       enddate: params.get('enddate') || '',
-  //     })
-  //     setCategory(params.get('category') || '')
-  //     setThreatFlag(params.get('threatflag') || '')
-  //     setResponseFlag(params.get('responseflag') || '')
-  //     setTitle(params.get('title') || '')
-  //     setRetitle(params.get('re_title') || '')
-  //     setKeyword(params.get('keyword') || '')
-  //     setReKeyword(params.get('re_keyword') || '')
-  //     setUrl(params.get('url') || '')
-  //     setRegex(params.get('regex') || '')
-  //     setIsReSearch(
-  //       params.get('re_title') !== '' || params.get('re_keyword') !== ''
-  //     )
-  //   }
-  // }, [test])
+  useEffect(() => {
+    if (savedSearchCondition) {
+      const params = new URLSearchParams(savedSearchCondition)
+      setDate({
+        startdate: params.get('startdate') || '',
+        enddate: params.get('enddate') || '',
+      })
+      setCategory(params.get('category') || '')
+      setThreatFlag(params.get('threatflag') || '')
+      setResponseFlag(params.get('responseflag') || '')
+      setTitle(params.get('title') || '')
+      setRetitle(params.get('re_title') || '')
+      setKeyword(params.get('keyword') || '')
+      setReKeyword(params.get('re_keyword') || '')
+      setUrl(params.get('url') || '')
+      setRegex(params.get('regex') || '')
+      setIsReSearch(
+        params.get('re_title') !== '' || params.get('re_keyword') !== ''
+      )
+      navigate(`?${savedSearchCondition}`)
+    }
+  }, [savedSearchCondition])
+
+  // 검색조건 저장
+  const SaveSearch = useSearchSave()
 
   // 다크웹 데이터 조회 API
   const dtList = useQueries<{ data: dtListType[]; count: number }>({
@@ -143,9 +148,6 @@ const DarkWebPage = () => {
       type: 'dt',
     },
   })
-
-  // 검색조건 저장
-  const SaveSearch = useSearchSave()
 
   // 검색 조건 적용 후 파라미터 변경
   const handleOnSearch = () => {
@@ -231,14 +233,15 @@ const DarkWebPage = () => {
           <CustomSelect
             label={'불러오기'}
             options={
-              searchHistory.isSuccess
-                ? searchHistory.data?.data.map((v) => ({
+              searchHistory.isSuccess &&
+              Object.keys(searchHistory.data?.data).length !== 0
+                ? searchHistory.data?.data?.map((v) => ({
                     label: v.title,
                     value: v.searchlog,
                   }))
                 : []
             }
-            // setState={setTest}
+            setState={setSavedSearchCondition}
           />
           <Button
             type={'primary'}
@@ -348,6 +351,7 @@ const DarkWebPage = () => {
                       regex,
                       re_title: reTitle,
                       re_keyword: reKeyword,
+                      page: '1',
                     }).toString(),
                   })
                 }

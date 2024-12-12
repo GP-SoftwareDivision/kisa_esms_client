@@ -104,9 +104,9 @@ input::-webkit-inner-spin-button {
 }
 
 .charts-custom {
+  height: 100%;
   font-size: .785rem !important;
   display: flex;
-  align-items: center;
 }
 
 .apexcharts-legend {

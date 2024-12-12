@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Box, SimpleGrid } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -23,6 +23,7 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Empty from '@/components/elements/Empty.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
+import { useSearchSave } from '@/hooks/mutations/useSearchSave.tsx'
 
 interface ttListType {
   channelurl: string
@@ -124,6 +125,37 @@ const Telegram = () => {
     },
   })
 
+  // 검색조건 불러오기
+  const [savedSearchCondition, setSavedSearchCondition] = useState<string>('')
+
+  useEffect(() => {
+    if (savedSearchCondition) {
+      const params = new URLSearchParams(savedSearchCondition)
+      setDate({
+        startdate: params.get('startdate') || '',
+        enddate: params.get('enddate') || '',
+      })
+      setThreatFlag(params.get('threatflag') || '')
+      setResponseFlag(params.get('responseflag') || '')
+      setWriter(params.get('writer') || '')
+      setChannel(params.get('channel') || '')
+      setContents(params.get('contents') || '')
+      setReContents(params.get('re_contents') || '')
+      setReChannel(params.get('re_channel') || '')
+      setReUsername(params.get('re_username') || '')
+      setRegex(params.get('regex') || '')
+
+      setIsReSearch(
+        queryParams.get('re_contents') !== '' ||
+          queryParams.get('re_channel') !== '' ||
+          queryParams.get('re_username') !== ''
+      )
+      navigate(`?${savedSearchCondition}`)
+    }
+  }, [savedSearchCondition])
+
+  const SaveSearch = useSearchSave()
+
   // 검색 조건 적용 후 파라미터 변경
   const handleOnSearch = () => {
     const params = new URLSearchParams({
@@ -210,13 +242,14 @@ const Telegram = () => {
             label={'불러오기'}
             options={
               searchHistory.isSuccess &&
-              Object.entries(searchHistory.data?.data).length !== 0
+              Object.keys(searchHistory.data?.data).length !== 0
                 ? searchHistory.data?.data?.map((v) => ({
                     label: v.title,
                     value: v.searchlog,
                   }))
                 : []
             }
+            setState={setSavedSearchCondition}
           />
           <Button
             type={'primary'}
@@ -299,7 +332,25 @@ const Telegram = () => {
               <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
               <Button
                 type={'secondary'}
-                onClick={handleOnSelectChange}
+                onClick={() =>
+                  SaveSearch.mutate({
+                    type: 'tt',
+                    searchlog: new URLSearchParams({
+                      startdate: date.startdate,
+                      enddate: date.enddate,
+                      threatflag,
+                      username: writer,
+                      channel,
+                      contents,
+                      responseflag,
+                      page: '1',
+                      regex,
+                      re_contents: reContents,
+                      re_channel: reChannel,
+                      re_username: reUsername,
+                    }).toString(),
+                  })
+                }
                 text={'조회 조건 저장'}
               />
             </ButtonContainer>

@@ -20,7 +20,6 @@ export default CustomList
 const StyledList = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem;
 `
 const StyledLabel = styled.div`
   display: flex;
