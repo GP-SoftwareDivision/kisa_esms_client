@@ -29,10 +29,12 @@ export const TelegramDetail = lazy(
 
 export const Alert = lazy(() => import('@/pages/setting/AlertPage.tsx'))
 // export const Keyword = lazy(() => import('@/pages/manage/KeywordPage.tsx'))
-export const Judgment = lazy(() => import('@/pages/manage/JudgmentPage.tsx'))
+export const JudgmentKeyword = lazy(
+  () => import('@/pages/manage/JudgmentKeywordPage.tsx')
+)
 export const Group = lazy(() => import('@/pages/setting/GroupPage.tsx'))
 export const Server = lazy(() => import('@/pages/setting/ServerPage.tsx'))
-export const Domain = lazy(() => import('@/pages/manage/DomainPage.tsx'))
+export const Channel = lazy(() => import('@/pages/manage/ChannelPage.tsx'))
 export const SearchHistory = lazy(
   () => import('@/pages/manage/SearchHistoryPage.tsx')
 )

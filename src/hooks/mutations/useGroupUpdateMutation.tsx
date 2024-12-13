@@ -42,7 +42,7 @@ export const useGroupUpdateMutation = () => {
     mutationKey: ['updateGroup'],
     mutationFn: async () => {
       const response = await instance.post(
-        '/api/manage/group/update',
+        '/api/setting/group/update',
         updateData
       )
       return response.data

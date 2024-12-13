@@ -23,7 +23,7 @@ const AlertPage = () => {
   const alertList = useQueries<{ data: AlertType[]; count: number }>({
     queryKey: `alertList`,
     method: 'POST',
-    url: '/api/main/alarmList',
+    url: '/api/setting/alarm/list',
     body: {
       page: page,
     },

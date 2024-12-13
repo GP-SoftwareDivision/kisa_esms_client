@@ -39,20 +39,25 @@ export const useUserUpdateMutation = () => {
   const updateUser = useMutation({
     mutationKey: ['updateUser'],
     mutationFn: async () => {
-      const isRequestValid = hasEmptyValue(updateData)
-
+      const request = {
+        seqidx: updateData.seqidx,
+        groupcode: updateData.groupcode,
+        email: updateData.email,
+        name: updateData.name,
+        phonenum: updateData.phonenum,
+        usertype: updateData.usertype,
+        useflag: updateData.useflag,
+      }
+      const isRequestValid = hasEmptyValue(request)
       if (isRequestValid) {
         notifyError('모든 항목을 전부 입력해주세요.')
         throw new Error()
       }
-      if (!isValidEmail(updateData.email)) {
+      if (!isValidEmail(request.email)) {
         notifyError('이메일 형식이 맞지 않습니다.')
         throw new Error()
       }
-      const response = await instance.post(
-        '/api/manage/user/update',
-        updateData
-      )
+      const response = await instance.post('/api/setting/user/update', request)
       return response.data
     },
     onError: (error) => {
@@ -89,7 +94,7 @@ export const useUserUpdateMutation = () => {
     mutationFn: async (request: { items: number[] }) => {
       const isConfirm = confirm('삭제하시겠습니까?')
       if (!isConfirm) throw new Error()
-      const response = await instance.post('/api/manage/user/delete', {
+      const response = await instance.post('/api/setting/user/delete', {
         seqidx: request.items.join(','),
       })
       return response.data

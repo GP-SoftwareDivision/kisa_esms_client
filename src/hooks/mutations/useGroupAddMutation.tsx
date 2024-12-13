@@ -47,7 +47,7 @@ export const useGroupAddMutation = () => {
         notifyError('모든 항목을 전부 입력해주세요.')
         throw new Error()
       }
-      const response = await instance.post('/api/manage/group/insert', {
+      const response = await instance.post('/api/setting/group/insert', {
         ...request,
         comment: data.comment ? data.comment : '',
       })

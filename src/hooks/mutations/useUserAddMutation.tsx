@@ -54,7 +54,7 @@ export const useUserAddMutation = () => {
         notifyError('비밀번호와 비밀번호 확인이 일치하지 않습니다.')
         throw new Error()
       }
-      const response = await instance.post('/api/manage/user/insert', request)
+      const response = await instance.post('/api/setting/user/insert', request)
       return response.data
     },
     onError: (error) => {

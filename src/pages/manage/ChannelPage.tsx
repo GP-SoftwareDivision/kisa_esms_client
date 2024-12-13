@@ -25,14 +25,14 @@ interface ServerType {
   apitype: string
 }
 
-const DomainPage = () => {
+const ChannelPage = () => {
   const { page, handlePageChange } = usePagination(1)
   const [channel, setChannel] = useState<string>('')
 
   const domainList = useQueries<{ data: ServerType[]; count: number }>({
     queryKey: `domainList_${page}`,
     method: 'POST',
-    url: '/api/manage/domainList',
+    url: '/api/manage/channel/list',
     body: {
       page: page,
     },
@@ -87,7 +87,7 @@ const DomainPage = () => {
     </ContentContainer>
   )
 }
-export default DomainPage
+export default ChannelPage
 
 const StyledBox = styled(Box)`
   input {

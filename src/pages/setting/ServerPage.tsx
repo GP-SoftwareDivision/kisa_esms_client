@@ -14,7 +14,7 @@ const ServerPage = () => {
   const serverList = useQueries<{ data: ServerType[]; count: number }>({
     queryKey: `serverList`,
     method: 'POST',
-    url: '/api/manage/serverList',
+    url: '/api/setting/server',
   })
 
   // 서버 관리 테이블 컬럼 정의

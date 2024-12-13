@@ -42,7 +42,7 @@ export const usePasswordUpdateMutation = () => {
         throw new Error()
       }
 
-      const response = await instance.post('/api/manage/user/PwUpdate', {
+      const response = await instance.post('/api/setting/user/PwUpdate', {
         seqidx: request.seqidx,
         password: request.updatePassword,
         passwordConfirm: request.updatePasswordConfirm,

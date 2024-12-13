@@ -233,8 +233,7 @@ const DarkWebPage = () => {
           <CustomSelect
             label={'불러오기'}
             options={
-              searchHistory.isSuccess &&
-              Object.keys(searchHistory.data?.data).length !== 0
+              searchHistory.isSuccess && searchHistory.data?.data
                 ? searchHistory.data?.data?.map((v) => ({
                     label: v.title,
                     value: v.searchlog,

@@ -17,7 +17,7 @@ import CustomInput from '@/components/elements/Input.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 
-interface RulesetType {
+interface JudgmentListType {
   seqidx: number
   type: string
   rule: string
@@ -26,7 +26,7 @@ interface RulesetType {
   regdate: string
 }
 
-const JudgmentPage = () => {
+const JudgmentKeywordPage = () => {
   // 삭제 목록
   const [deleteItems, setDeleteItems] = useState<number[]>([])
 
@@ -57,8 +57,8 @@ const JudgmentPage = () => {
     handleOnUpdateText,
   } = useRulesetUpdateMutation()
 
-  const ruleList = useQueries<{ data: RulesetType[]; count: number }>({
-    queryKey: `ruleList`,
+  const ruleList = useQueries<{ data: JudgmentListType[]; count: number }>({
+    queryKey: `judgmentList`,
     method: 'POST',
     url: '/api/manage/rule',
     body: {
@@ -320,7 +320,7 @@ const JudgmentPage = () => {
     </ContentContainer>
   )
 }
-export default JudgmentPage
+export default JudgmentKeywordPage
 
 const TitleButtonWrapper = styled.div`
   display: flex;

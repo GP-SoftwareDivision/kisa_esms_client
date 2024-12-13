@@ -35,9 +35,9 @@
     "subMenu": {
       "title": "관리",
       "items": [
-        { "label": "판단 키워드 관리", "key": "judgment" },
+        { "label": "판단 키워드 관리", "key": "judgmentkeyword" },
         { "label": "검색 기록 관리", "key": "searchhistory" },
-        { "label": "수집 채널 관리", "key": "domain"}
+        { "label": "수집 채널 관리", "key": "channel"}
       ]
     }
   },
