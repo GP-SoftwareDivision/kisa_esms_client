@@ -1,11 +1,13 @@
-import styled from '@emotion/styled'
-import PageTitle from '@/components/elements/PageTitle.tsx'
-import { ContentContainer } from '@/assets/styles/global.ts'
-import Button from '@/components/elements/Button.tsx'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { useQueries } from '@/hooks/queries/useQueries.tsx'
+import styled from '@emotion/styled'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { PiFileHtmlDuotone } from 'react-icons/pi'
+
+import { ContentContainer } from '@/assets/styles/global.ts'
+import PageTitle from '@/components/elements/PageTitle.tsx'
+import Button from '@/components/elements/Button.tsx'
 import CustomSwitch from '@/components/elements/Switch.tsx'
+import { useQueries } from '@/hooks/queries/useQueries.tsx'
 
 interface DarkWebDetailType {
   seqidx: number
@@ -44,6 +46,11 @@ const DarkWebDetailPage = () => {
       seqidx: id,
     },
   })
+
+  // html 새 창으로 열기 이벤트
+  const ViewHtml = () => {
+    window.open(dtDetail.data?.data[0]?.htmlpath, '_blank')
+  }
 
   return (
     <ContentContainer>
@@ -84,16 +91,20 @@ const DarkWebDetailPage = () => {
               <LabelTd>URL</LabelTd>
               <Td colSpan={3}>{dtDetail.data?.data[0]?.url}</Td>
               <LabelTd>판단 키워드</LabelTd>
-              <Td>{dtDetail.data?.data[0]?.target}</Td>
+              <Td>{dtDetail.data?.data[0].threatlog}</Td>
             </tr>
             <tr>
               <LabelTd>번역 보기</LabelTd>
-              <Td colSpan={5}>
+              <Td colSpan={3}>
                 <CustomSwitch
                   label={''}
                   checked={isTranslation}
                   setChecked={setTranslation}
                 />
+              </Td>
+              <LabelTd>HTML 보기</LabelTd>
+              <Td>
+                <HtmlIcon onClick={ViewHtml} />
               </Td>
             </tr>
             <tr>
@@ -127,4 +138,9 @@ const Td = styled.td`
 const LabelTd = styled(Td)`
   //width: 25%;
   background-color: #f6f6f6;
+`
+const HtmlIcon = styled(PiFileHtmlDuotone)`
+  ${({ theme }) => theme.typography.h4};
+  cursor: pointer;
+  margin: 0;
 `

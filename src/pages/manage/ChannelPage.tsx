@@ -27,19 +27,22 @@ interface ServerType {
 
 const ChannelPage = () => {
   const { page, handlePageChange } = usePagination(1)
-  const [channel, setChannel] = useState<string>('')
+  const [channelName, setChannelName] = useState<string>('')
+  const [request, setRequest] = useState<{
+    page: string
+    channelName: string
+  }>()
 
   const domainList = useQueries<{ data: ServerType[]; count: number }>({
-    queryKey: `domainList_${page}`,
+    queryKey: `domainList`,
     method: 'POST',
     url: '/api/manage/channel/list',
-    body: {
-      page: page,
-      channelName: '',
-    },
+    body: request,
   })
 
-  const handleOnClick = () => {}
+  const handleOnClick = () => {
+    setRequest({ page: page.toString(), channelName })
+  }
 
   return (
     <ContentContainer>
@@ -59,8 +62,8 @@ const ChannelPage = () => {
             id={'channel'}
             label={'채널명'}
             placeholder={'내용을 입력하세요.'}
-            value={channel}
-            onChange={(e) => setChannel(e.target.value)}
+            value={channelName}
+            onChange={(e) => setChannelName(e.target.value)}
           />
         </StyledBox>
         <ButtonContainer>

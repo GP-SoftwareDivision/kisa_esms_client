@@ -259,7 +259,7 @@ const Telegram = () => {
         <SelectContainer columns={[1, 2, 3, 4]}>
           <Box>
             <CustomDatePicker
-              label={'조회 기간'}
+              label={'수집 기간'}
               date={date}
               setDate={setDate}
               disabled={isReSearch}

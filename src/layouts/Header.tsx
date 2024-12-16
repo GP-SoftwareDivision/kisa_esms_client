@@ -33,7 +33,7 @@ const Header = () => {
     const darkwebParams = new URLSearchParams({
       startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
       enddate: dayjs().format('YYYY-MM-DD'),
-      threatflag: '',
+      threatflag: '해킹',
       category: '',
       keyword: '',
       re_keyword: '',
@@ -46,10 +46,9 @@ const Header = () => {
     }).toString()
 
     const telegramParams = new URLSearchParams({
-      // startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
-      startdate: '2024-11-01',
+      startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
       enddate: dayjs().format('YYYY-MM-DD'),
-      threatflag: '',
+      threatflag: '해킹',
       username: '',
       channel: '',
       contents: '',
