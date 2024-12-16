@@ -34,6 +34,9 @@ export const useSearchSave = () => {
               navigate('/login')
             }, 2000)
             break
+          case 409:
+            notifyError(`이미 존재하는 조건입니다.`)
+            break
           default:
             notifyError(
               `일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`

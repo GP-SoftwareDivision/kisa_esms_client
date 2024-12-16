@@ -35,6 +35,7 @@ const ChannelPage = () => {
     url: '/api/manage/channel/list',
     body: {
       page: page,
+      channelName: '',
     },
   })
 

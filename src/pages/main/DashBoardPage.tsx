@@ -50,7 +50,7 @@ const DashBoardPage = () => {
             />
             <ChartBox>
               <ChartWrapper>
-                <h3>유출 사고 유형</h3>
+                <h3>사고 유형</h3>
                 <Bar />
               </ChartWrapper>
               <ChartWrapper>
@@ -62,7 +62,7 @@ const DashBoardPage = () => {
         </GridItem>
         <GridItem>
           <Flex direction='column' height='100%'>
-            <PageTitle text={'금주 이슈 내역'} />
+            <PageTitle text={'이슈 내역'} />
             <ListBox>
               <VStack
                 align='stretch'
@@ -123,6 +123,8 @@ const ChartBox = styled(Box)`
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  gap: 1rem;
+  justify-content: space-between;
   height: -webkit-fill-available;
 `
 
@@ -138,5 +140,6 @@ const ChartWrapper = styled.div`
 
   h3 {
     ${({ theme }) => theme.typography.subtitle};
+    padding-left: 1rem;
   }
 `

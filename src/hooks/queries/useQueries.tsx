@@ -51,7 +51,7 @@ export function useQueries<TData>({
             case 403:
               notifyError('페이지에 접근 권한이 없습니다.')
               setTimeout(() => {
-                navigate('/login')
+                navigate(-1)
               }, 2000)
               break
 

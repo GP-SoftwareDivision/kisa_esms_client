@@ -33,7 +33,7 @@ export const hackingListColumns = [
     accessorKey: 'hackedorganization',
   },
   {
-    header: '사고유',
+    header: '사고유형',
     accessorKey: 'incidenttype',
   },
   {

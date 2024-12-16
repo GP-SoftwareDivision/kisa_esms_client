@@ -100,7 +100,7 @@ const Bar = () => {
       series={series}
       type='bar'
       // height={350}
-      width={480}
+      width={420}
       className='charts-custom'
     />
   )

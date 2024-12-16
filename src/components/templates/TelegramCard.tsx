@@ -135,7 +135,7 @@ const StyledContents = styled.span`
   word-break: break-word;
 
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   padding: 4px 8px;
   border-radius: 2px;
