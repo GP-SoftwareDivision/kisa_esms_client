@@ -39,7 +39,6 @@ const GroupPage = () => {
     insertGroupOpen,
     openInsertGroup,
     closeInsertGroup,
-    setAutoSendFlag,
     setUseFlag,
     setEmailFlag,
     setKakaoFlag,
@@ -175,15 +174,6 @@ const GroupPage = () => {
                 required
               />
               <CustomSelect
-                label={'자동'}
-                options={[
-                  { value: 'Y', label: '발송' },
-                  { value: 'N', label: '미발송' },
-                ]}
-                setState={setAutoSendFlag}
-                required
-              />
-              <CustomSelect
                 label={'카카오톡'}
                 options={[
                   { value: 'Y', label: '발송' },
@@ -250,18 +240,6 @@ const GroupPage = () => {
                 ]}
                 setState={(value) =>
                   handleUpdateOption('useflag', value as string)
-                }
-                required
-              />
-              <CustomSelect
-                label={'자동'}
-                value={updateData?.autosendflag}
-                options={[
-                  { value: 'Y', label: '발송' },
-                  { value: 'N', label: '미발송' },
-                ]}
-                setState={(value) =>
-                  handleUpdateOption('autosendflag', value as string)
                 }
                 required
               />

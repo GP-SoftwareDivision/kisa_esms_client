@@ -7,7 +7,7 @@ import Bar from '@/components/charts/Bar.tsx'
 import Pie from '@/components/charts/Pie.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomList from '@/components/charts/List.tsx'
-import { hackingListColumns } from '@/constants/tableColumns.ts'
+import { responseListColumns } from '@/constants/tableColumns.ts'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 
@@ -99,7 +99,7 @@ const DashBoardPage = () => {
             <CustomTable
               loading={false}
               data={hackingList.data?.data ? hackingList.data?.data : []}
-              columns={hackingListColumns}
+              columns={responseListColumns}
             />
           )}
         </ChartBox>

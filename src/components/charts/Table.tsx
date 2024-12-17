@@ -3,6 +3,7 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
+  ColumnDef,
 } from '@tanstack/react-table'
 import { CustomSkeleton } from '@/components/elements/Skeleton.tsx'
 import { useNavigate } from 'react-router-dom'
@@ -10,12 +11,7 @@ import { useNavigate } from 'react-router-dom'
 interface TableProps {
   data: object[]
   loading: boolean
-  columns: {
-    header: string
-    accessorKey: string
-    id?: string
-    cell?: ({ row }: any) => JSX.Element | undefined
-  }[]
+  columns: ColumnDef<any>[]
   detailURL?: string
 }
 
@@ -46,11 +42,13 @@ const CustomTable = ({
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHeader key={header.id}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
+                  <TableHeader key={header.id} colSpan={header.colSpan}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHeader>
                 ))}
               </tr>
@@ -77,6 +75,8 @@ const CustomTable = ({
 }
 
 export default CustomTable
+
+// ... (스타일 컴포넌트는 그대로 유지)
 
 const TableWrapper = styled.div`
   overflow-x: auto;

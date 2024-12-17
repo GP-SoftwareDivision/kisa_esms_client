@@ -24,7 +24,7 @@ import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 import { useSearchSave } from '@/hooks/mutations/useSearchSave.tsx'
 
-interface dtListType {
+export interface dtListType {
   seqidx: number
   target: string
   keyword: string
@@ -48,8 +48,7 @@ const DarkWebPage = () => {
   const { page, setPage, handlePageChange } = usePagination(
     Number(queryParams.get('page')) || 1
   )
-  const { responseOptions, hackingOptions, regularExpressionOptions } =
-    useOptions()
+  const { responseOptions, hackingOptions } = useOptions()
 
   // 조회기간
   const [date, setDate] = useState({
@@ -169,7 +168,6 @@ const DarkWebPage = () => {
     setPage(1)
     navigate(`?${params}`)
   }
-
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderDarkwebList = useMemo(() => {
     if (dtList.isLoading) return <Loading />
@@ -320,11 +318,12 @@ const DarkWebPage = () => {
           </Box>
           <Box></Box>
           <Box>
-            <CustomSelect
+            <CustomInput
+              id={'regex'}
               label={'정규표현식'}
-              options={regularExpressionOptions}
+              placeholder={'내용을 입력하세요.'}
               value={regex}
-              setState={setRegex}
+              onChange={(e) => setRegex(e.target.value)}
               disabled={isReSearch}
             />
           </Box>

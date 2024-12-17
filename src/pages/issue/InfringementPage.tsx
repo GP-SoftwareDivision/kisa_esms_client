@@ -1,8 +1,8 @@
+import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Box } from '@chakra-ui/react'
 import styled from '@emotion/styled'
-import Dropzone from 'react-dropzone'
-import { MdUploadFile } from 'react-icons/md'
+// import { MdUploadFile } from 'react-icons/md'
 
 import {
   ButtonContainer,
@@ -10,99 +10,149 @@ import {
   ContentContainer,
   SelectContainer,
 } from '@/assets/styles/global'
-import instance from '@/apis/instance'
 import CustomDatePicker from '@/components/elements/DatePicker'
-import CustomSelect from '@/components/elements/Select'
-import CustomInput from '@/components/elements/Input'
 import Button from '@/components/elements/Button'
 import CustomTable from '@/components/charts/Table'
 import PageTitle from '@/components/elements/PageTitle'
-import { CloseButton } from '@/components/ui/close-button'
 import CustomPagination from '@/components/elements/Pagination.tsx'
-import { InfringementColumns } from '@/constants/tableColumns.ts'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
-import useFileDragDrop from '@/hooks/common/useFileDragDrop.tsx'
-import useOptions from '@/hooks/common/useOptions.tsx'
-import { notifyError } from '@/utils/notify.ts'
 
-interface AccountListType {
-  count: number
-  data: object[]
-  progress: 'Y' | 'N'
+interface DetectionListType {
+  seqidx: number
+  issueidx: string
+  uploaddate: string
+  filetype: string
+  filename: string
+  uploader: string
+  counts: {
+    total: string
+    public: string
+    education: string
+    portal: string
+    etc: string
+  }
+  file: string
 }
 
 const InfringementPage = () => {
   const { page, handlePageChange } = usePagination(1)
-  const {
-    uploadFile,
-    uploadFileName,
-    dragFile,
-    formData,
-    startUpload,
-    abortUpload,
-  } = useFileDragDrop()
-  const { responseOptions, fileTypeOptions } = useOptions()
-
-  const [filename, setFilename] = useState<string>('')
-  const [filetype, setFiletype] = useState<string>('')
-  const [uploader, setUploader] = useState<string>('')
-  const [isResponse, setIsResponse] = useState<string>('')
+  // const {
+  //   uploadFile,
+  //   uploadFileName,
+  //   dragFile,
+  //   formData,
+  //   startUpload,
+  //   abortUpload,
+  // } = useFileDragDrop()
 
   // 조회기간
   const [date, setDate] = useState({
-    startdate: '2024-12-06',
-    enddate: '2024-12-06',
+    startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
+    enddate: dayjs().format('YYYY-MM-DD'),
   })
 
+  // 유출 정보 판별 요청
   const [request, setRequest] = useState<object>({
-    filename: filename,
-    filetype: filetype,
-    uploader: uploader,
-    responsestatus: isResponse,
-    startdate: date.startdate,
-    enddate: date.enddate,
+    ...date,
   })
 
-  // 침해 정보 판별 리스트 전체 조회
-  const accountList = useQueries<AccountListType>({
-    queryKey: `accountList_${page}`,
+  // 유출 정보 판별 리스트 전체 조회
+  const detectionList = useQueries<{
+    data: DetectionListType[]
+    count: number
+  }>({
+    queryKey: `detectionList`,
     method: 'POST',
-    url: '/api/account/list',
+    url: '/api/issue/detection',
     body: { ...request, page: page },
   })
 
-  // 담당자 리스트 조회
-  const uploaderList = useQueries<{ uploaderlist: string[] }>({
-    queryKey: 'uploaderList',
-    method: 'POST',
-    url: '/api/account/uploader',
-  })
-
-  // 파일 업로드
-  const accountUpload = async () => {
-    await startUpload()
-    try {
-      const response = await instance.post('/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        withCredentials: true,
-      })
-      if (response.status === 200) {
-        await instance.post(`/api/account/upload`, {
-          filename: uploadFile?.name,
-          uploader: 'syjin',
-        })
-      }
-    } catch (error) {
-      console.error('Error uploading file', error)
-      notifyError(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
-    }
+  // 데이터 일차원 리스트로 변경
+  const flattenData = (dataArray: DetectionListType[]) => {
+    return dataArray.map((item) => {
+      const { counts, ...rest } = item
+      return { ...rest, ...counts }
+    })
   }
 
-  // 다운로드 컬럼 추가
-  const addDownloadColumns = [
+  // 천단위 콤마로 리턴 함수
+  const formatNumberWithCommas = (text: string) => {
+    const localString = text.split('(')
+    return (
+      <span>{`${Number(localString[0]).toLocaleString()}(${Number(localString[1].slice(0, -1)).toLocaleString()})`}</span>
+    )
+  }
+  // 파일 업로드
+  // const accountUpload = async () => {
+  //   await startUpload()
+  //   try {
+  //     const response = await instance.post('/upload', formData, {
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //       withCredentials: true,
+  //     })
+  //     if (response.status === 200) {
+  //       await instance.post(`/api/account/upload`, {
+  //         filename: uploadFile?.name,
+  //         uploader: 'syjin',
+  //       })
+  //     }
+  //   } catch (error) {
+  //     console.error('Error uploading file', error)
+  //     notifyError(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
+  //   }
+  // }
+
+  const InfringementColumns = [
     {
-      header: '다운로드',
+      header: '파일형식',
+      accessorKey: 'filetype',
+    },
+    {
+      header: '파일명',
+      accessorKey: 'filename',
+    },
+    {
+      header: '업로드 날짜',
+      accessorKey: 'uploaddate',
+    },
+    {
+      header: '담당자',
+      accessorKey: 'uploader',
+    },
+    {
+      header: '건수(중복제거)',
+      columns: [
+        {
+          header: '전체',
+          accessorKey: 'total',
+          cell: ({ row }: any) => formatNumberWithCommas(row.original?.total),
+        },
+        {
+          header: '공공',
+          accessorKey: 'public',
+          cell: ({ row }: any) => formatNumberWithCommas(row.original?.public),
+        },
+        {
+          header: '교육',
+          accessorKey: 'education',
+          cell: ({ row }: any) =>
+            formatNumberWithCommas(row.original?.education),
+        },
+        {
+          header: '포털',
+          accessorKey: 'portal',
+          cell: ({ row }: any) => formatNumberWithCommas(row.original?.portal),
+        },
+        {
+          header: '기타',
+          accessorKey: 'etc',
+          cell: ({ row }: any) => formatNumberWithCommas(row.original?.etc),
+        },
+      ],
+    },
+    {
+      header: '결과파일',
       accessorKey: '',
       id: 'actions',
       cell: ({ row }: any) => (
@@ -115,94 +165,70 @@ const InfringementPage = () => {
         </ButtonWrapper>
       ),
     },
+    {
+      header: '이력',
+      accessorKey: '',
+      cell: ({ row }: any) => (
+        <ButtonWrapper>
+          <Button
+            type={'outline'}
+            text={'이동'}
+            onClick={() => console.log(row.original)}
+          />
+        </ButtonWrapper>
+      ),
+    },
   ]
 
   return (
     <ContentContainer>
-      <PageTitle text={'침해 정보 판별'} />
-      <UploadContainer>
-        <Dropzone onDrop={dragFile}>
-          {({ getRootProps, getInputProps }) => (
-            <StyledFileUpload {...getRootProps()}>
-              <input
-                {...getInputProps()}
-                accept={
-                  '.xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain'
-                }
-              />
-              <StyledFileIcon />
-              <p>
-                {uploadFileName
-                  ? uploadFileName
-                  : '업로드할 파일 놓기 또는 파일 선택'}
-              </p>
-              {uploadFile && (
-                <CloseButton
-                  me='-1'
-                  size='xs'
-                  variant='plain'
-                  focusVisibleRing='inside'
-                  focusRingWidth='2px'
-                  pointerEvents='auto'
-                  color='fg.subtle'
-                  height={'auto'}
-                  onClick={abortUpload}
-                />
-              )}
-            </StyledFileUpload>
-          )}
-        </Dropzone>
-        <Button
-          text={'파일 업로드'}
-          type={
-            uploadFileName && accountList.data?.progress === 'N'
-              ? 'primary'
-              : 'ghost'
-          }
-          disabled={!uploadFileName && accountList.data?.progress === 'Y'}
-          onClick={accountUpload}
-        />
-      </UploadContainer>
+      <PageTitle text={'유출 정보 판별'} />
+      {/*<UploadContainer>*/}
+      {/*  <Dropzone onDrop={dragFile}>*/}
+      {/*    {({ getRootProps, getInputProps }) => (*/}
+      {/*      <StyledFileUpload {...getRootProps()}>*/}
+      {/*        <input*/}
+      {/*          {...getInputProps()}*/}
+      {/*          accept={*/}
+      {/*            '.xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain'*/}
+      {/*          }*/}
+      {/*        />*/}
+      {/*        <StyledFileIcon />*/}
+      {/*        <p>*/}
+      {/*          {uploadFileName*/}
+      {/*            ? uploadFileName*/}
+      {/*            : '업로드할 파일 놓기 또는 파일 선택'}*/}
+      {/*        </p>*/}
+      {/*        {uploadFile && (*/}
+      {/*          <CloseButton*/}
+      {/*            me='-1'*/}
+      {/*            size='xs'*/}
+      {/*            variant='plain'*/}
+      {/*            focusVisibleRing='inside'*/}
+      {/*            focusRingWidth='2px'*/}
+      {/*            pointerEvents='auto'*/}
+      {/*            color='fg.subtle'*/}
+      {/*            height={'auto'}*/}
+      {/*            onClick={abortUpload}*/}
+      {/*          />*/}
+      {/*        )}*/}
+      {/*      </StyledFileUpload>*/}
+      {/*    )}*/}
+      {/*  </Dropzone>*/}
+      {/*  <Button*/}
+      {/*    text={'파일 업로드'}*/}
+      {/*    type={*/}
+      {/*      uploadFileName && detectionList.data?.progress === 'N'*/}
+      {/*        ? 'primary'*/}
+      {/*        : 'ghost'*/}
+      {/*    }*/}
+      {/*    disabled={!uploadFileName && detectionList.data?.progress === 'Y'}*/}
+      {/*    onClick={accountUpload}*/}
+      {/*  />*/}
+      {/*</UploadContainer>*/}
       <SelectContainer columns={[1, 2, 3, 4]}>
         <Box>
           <CustomDatePicker label={'조회 기간'} date={date} setDate={setDate} />
-        </Box>
-        <Box>
-          <CustomSelect
-            label={'파일형식'}
-            setState={setFiletype}
-            options={fileTypeOptions}
-          />
-        </Box>
-        <Box>
-          <CustomSelect
-            label={'담당자'}
-            setState={setUploader}
-            options={
-              uploaderList.isSuccess
-                ? uploaderList.data?.uploaderlist.map((v) => ({
-                    label: v,
-                    value: v,
-                  }))
-                : []
-            }
-          />
-        </Box>
-        <Box>
-          <CustomSelect
-            label={'대응여부'}
-            setState={setIsResponse}
-            options={responseOptions}
-          />
-        </Box>
-        <Box>
-          <CustomInput
-            id={'filename'}
-            label={'파일명'}
-            placeholder={'내용을 입력하세요.'}
-            value={filename}
-            onChange={(e) => setFilename(e.target.value)}
-          />
         </Box>
         <Box></Box>
         <Box></Box>
@@ -212,10 +238,7 @@ const InfringementPage = () => {
               type={'primary'}
               onClick={() =>
                 setRequest({
-                  filename: filename,
-                  filetype: filetype,
-                  uploader: uploader,
-                  responsestatus: isResponse,
+                  page: 1,
                   startdate: date.startdate,
                   enddate: date.enddate,
                 })
@@ -226,15 +249,15 @@ const InfringementPage = () => {
         </Box>
       </SelectContainer>
       <ContentBox>
-        {accountList.isSuccess && (
+        {detectionList.isSuccess && (
           <>
             <CustomTable
-              loading={accountList.isLoading}
-              data={accountList.data.data}
-              columns={InfringementColumns.concat(addDownloadColumns)}
+              loading={detectionList.isLoading}
+              data={flattenData(detectionList.data.data)}
+              columns={InfringementColumns}
             />
             <CustomPagination
-              total={accountList.data.count}
+              total={detectionList.data.count}
               page={page}
               handlePageChange={(newPage) =>
                 handlePageChange(newPage as number)
@@ -249,31 +272,31 @@ const InfringementPage = () => {
 
 export default InfringementPage
 
-const UploadContainer = styled.div`
-  display: flex;
-  margin-top: 0.5rem;
-  gap: 1rem;
-`
-
-const StyledFileUpload = styled.div`
-  width: 100%;
-  display: flex;
-  border-width: 1px;
-  border-style: solid;
-  border-radius: 0.25rem;
-  align-items: center;
-  padding: 0.3rem 0.6rem;
-  cursor: pointer;
-
-  p {
-    ${({ theme }) => theme.typography.body2};
-  }
-`
-
-const StyledFileIcon = styled(MdUploadFile)`
-  margin-right: 0.3rem;
-  color: ${({ theme }) => theme.color.gray800};
-`
+// const UploadContainer = styled.div`
+//   display: flex;
+//   margin-top: 0.5rem;
+//   gap: 1rem;
+// `
+//
+// const StyledFileUpload = styled.div`
+//   width: 100%;
+//   display: flex;
+//   border-width: 1px;
+//   border-style: solid;
+//   border-radius: 0.25rem;
+//   align-items: center;
+//   padding: 0.3rem 0.6rem;
+//   cursor: pointer;
+//
+//   p {
+//     ${({ theme }) => theme.typography.body2};
+//   }
+// `
+//
+// const StyledFileIcon = styled(MdUploadFile)`
+//   margin-right: 0.3rem;
+//   color: ${({ theme }) => theme.color.gray800};
+// `
 
 const ButtonWrapper = styled.div`
   display: flex;

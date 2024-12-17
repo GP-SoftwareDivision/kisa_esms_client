@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from '@emotion/styled'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { PiFileHtmlDuotone } from 'react-icons/pi'
@@ -8,6 +8,7 @@ import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomSwitch from '@/components/elements/Switch.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
+import { highlightText } from '@/utils/highlightText.tsx'
 
 interface DarkWebDetailType {
   seqidx: number
@@ -37,6 +38,9 @@ const DarkWebDetailPage = () => {
   // 번역 여부
   const [isTranslation, setTranslation] = useState<boolean>(false)
 
+  const [keywordHighLight, setKeywordHighLight] = useState<string>('')
+  const [logHighLight, setLogHighLight] = useState<string[]>([])
+
   // 다크웹 데이터 상세 조회 API
   const dtDetail = useQueries<{ data: DarkWebDetailType[] }>({
     queryKey: `dtDetail`,
@@ -46,6 +50,15 @@ const DarkWebDetailPage = () => {
       seqidx: id,
     },
   })
+
+  useEffect(() => {
+    if (dtDetail.isSuccess) {
+      setKeywordHighLight(dtDetail.data?.data[0]?.keyword)
+
+      if (dtDetail.data?.data[0]?.threatlog)
+        setLogHighLight(dtDetail.data?.data[0]?.threatlog.split('/'))
+    }
+  }, [dtDetail.isSuccess])
 
   // html 새 창으로 열기 이벤트
   const ViewHtml = () => {
@@ -112,7 +125,11 @@ const DarkWebDetailPage = () => {
               <Td colSpan={5}>
                 {isTranslation
                   ? `${dtDetail.data?.data[0]?.trancontents}${dtDetail.data?.data[0]?.trancontents2}`
-                  : `${dtDetail.data?.data[0]?.contents}${dtDetail.data?.data[0]?.contents2}`}
+                  : highlightText(
+                      `${dtDetail.data?.data[0]?.contents}${dtDetail.data?.data[0]?.contents2}`,
+                      keywordHighLight,
+                      logHighLight
+                    )}
               </Td>
             </tr>
           </tbody>

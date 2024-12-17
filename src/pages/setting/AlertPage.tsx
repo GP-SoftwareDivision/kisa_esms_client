@@ -1,6 +1,5 @@
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
-import { AlertColumns } from '@/constants/tableColumns.ts'
 import { ContentBox, ContentContainer } from '@/assets/styles/global.ts'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
@@ -28,6 +27,31 @@ const AlertPage = () => {
       page: page,
     },
   })
+
+  const AlertColumns = [
+    {
+      header: '발송시간',
+      accessorKey: 'senddate',
+    },
+    {
+      header: '발송내용',
+      accessorKey: 'contents',
+    },
+    {
+      header: '발송 그룹',
+      accessorKey: 'groupname',
+    },
+    {
+      header: '대상 채널',
+      accessorKey: 'target',
+      cell: ({ row }: any) =>
+        row.original?.target === 'DT' ? (
+          <span>다크웹</span>
+        ) : (
+          <span>텔레그램</span>
+        ),
+    },
+  ]
 
   return (
     <>

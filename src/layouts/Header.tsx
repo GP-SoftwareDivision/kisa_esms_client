@@ -7,6 +7,7 @@ import NavBar from '@/components/elements/NavBar.tsx'
 import { mq } from '@/utils/mediaQueries.ts'
 import instance from '../apis/instance.ts'
 import dayjs from 'dayjs'
+import { notifyError } from '@/utils/notify.ts'
 
 interface UserInfoType {
   name: string
@@ -25,6 +26,9 @@ const Header = () => {
         return response.data
       } catch (error) {
         console.error(error)
+        notifyError(
+          `세션이 만료되었거나 권한이 없습니다. \n다시 로그인 후 이용해주세요.`
+        )
       }
     },
   })

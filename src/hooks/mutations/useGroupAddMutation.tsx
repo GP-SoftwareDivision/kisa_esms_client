@@ -16,7 +16,6 @@ interface GroupMutationType {
 interface RequestType extends GroupMutationType {
   kakaoflag: string
   emailflag: string
-  autosendflag: string
   useflag: string
 }
 
@@ -28,7 +27,6 @@ export const useGroupAddMutation = () => {
 
   const [kakaoFlag, setKakaoFlag] = useState<string>('')
   const [emailFlag, setEmailFlag] = useState<string>('')
-  const [autoSendFlag, setAutoSendFlag] = useState<string>('')
   const [useFlag, setUseFlag] = useState<string>('')
 
   // 그룹 추가 API
@@ -39,7 +37,6 @@ export const useGroupAddMutation = () => {
         groupname: data.groupname,
         kakaoflag: kakaoFlag,
         emailflag: emailFlag,
-        autosendflag: autoSendFlag,
         useflag: useFlag,
       }
       const isRequestValid = hasEmptyValue(request)
@@ -98,7 +95,6 @@ export const useGroupAddMutation = () => {
     openInsertGroup,
     closeInsertGroup,
     insertGroupOpen: isOpen('insert_group'),
-    setAutoSendFlag,
     setUseFlag,
     setEmailFlag,
     setKakaoFlag,

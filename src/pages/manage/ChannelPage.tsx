@@ -29,19 +29,19 @@ const ChannelPage = () => {
   const { page, handlePageChange } = usePagination(1)
   const [channelName, setChannelName] = useState<string>('')
   const [request, setRequest] = useState<{
-    page: string
+    page: number
     channelName: string
-  }>()
+  }>({ page, channelName })
 
-  const domainList = useQueries<{ data: ServerType[]; count: number }>({
-    queryKey: `domainList`,
+  const channelList = useQueries<{ data: ServerType[]; count: number }>({
+    queryKey: `channelList`,
     method: 'POST',
     url: '/api/manage/channel/list',
     body: request,
   })
 
   const handleOnClick = () => {
-    setRequest({ page: page.toString(), channelName })
+    setRequest({ page, channelName })
   }
 
   return (
@@ -71,11 +71,11 @@ const ChannelPage = () => {
         </ButtonContainer>
       </SelectContainer>
       <ContentBox>
-        {domainList.isSuccess && (
+        {channelList.isSuccess && (
           <>
             <CustomTable
-              loading={domainList.isLoading}
-              data={domainList.data.data}
+              loading={channelList.isLoading}
+              data={channelList.data.data}
               columns={DomainColumns}
             />
             <CustomPagination

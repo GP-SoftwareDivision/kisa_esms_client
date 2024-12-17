@@ -4,7 +4,7 @@ import styled from '@emotion/styled'
 const CustomTextarea = () => {
   return (
     <StyledTextarea autoResize={false}>
-      <Editable.Preview minH='200px' alignItems='flex-start' width='full' />
+      <Editable.Preview minH='100px' alignItems='flex-start' width='full' />
       <Editable.Textarea />
     </StyledTextarea>
   )
@@ -16,6 +16,7 @@ const StyledTextarea = styled(Editable.Root)`
 
   & textarea:focus {
     outline: none;
+    resize: none;
   }
   & [data-focus] {
     box-shadow: none;

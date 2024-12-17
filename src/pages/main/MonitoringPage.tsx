@@ -1,50 +1,18 @@
-import React, { useMemo, useState } from 'react'
-import { Box } from '@chakra-ui/react'
-import { Stack } from '@chakra-ui/react'
+import React, { useMemo, useState, useEffect } from 'react'
 import styled from '@emotion/styled'
+import { Box, Stack } from '@chakra-ui/react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { ContentContainer } from '@/assets/styles/global.ts'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import TelegramCard from '@/components/templates/TelegramCard.tsx'
-import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import Empty from '@/components/elements/Empty.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
-import { useLocation, useNavigate } from 'react-router-dom'
 import CustomTabs from '@/components/elements/Tabs.tsx'
 import DarkwebCard from '@/components/templates/DarkwebCard.tsx'
-
-// 다크웹 데이터 타입
-interface dtListType {
-  seqidx: number
-  target: string
-  keyword: string
-  writetime: string
-  url: string
-  writer: string
-  title: string
-  contents: string
-  threatflag: string
-  threatlog: string
-  issueresponseflag: string
-  htmlpath: string
-}
-
-// 텔레그램 데이터 타입
-interface ttListType {
-  channelurl: string
-  contents: string
-  contents2: string
-  trancontents: string
-  trancontents2: string
-  responseflag: string
-  keyword: string
-  seqidx: number
-  channel: string
-  threatflag: string
-  threatlog: string
-  username: string
-  writetime: string
-}
+import { useQueries } from '@/hooks/queries/useQueries.tsx'
+import { ttListType } from '@/pages/retrieve/TelegramPage.tsx'
+import { dtListType } from '@/pages/retrieve/DarkWebPage.tsx'
 
 interface MonitoringType {
   type: string
@@ -64,6 +32,15 @@ const DashBoardPage = () => {
     method: 'POST',
     url: `/api/main/monitoring`,
   })
+
+  // 30초마다 실행
+  useEffect(() => {
+    const interval = setInterval(() => {
+      issueMonitoring.refetch()
+    }, 30000)
+
+    return () => clearInterval(interval) // 컴포넌트가 언마운트될 때 인터벌 제거
+  }, [issueMonitoring])
 
   // 다크웹 | 텔레그램
   const renderMonitoringList = useMemo(() => {

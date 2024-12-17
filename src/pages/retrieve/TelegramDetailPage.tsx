@@ -12,6 +12,7 @@ import CustomSwitch from '@/components/elements/Switch.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 import Empty from '@/components/elements/Empty.tsx'
 import { useInfiniteQueries } from '@/hooks/queries/useInfiniteQueries.tsx'
+import { highlightText } from '@/utils/highlightText.tsx'
 
 interface TelegramDetailType {
   seqidx: number
@@ -70,7 +71,6 @@ const TelegramDetailPage = () => {
       type: type,
     })
 
-  console.log(ttHistoryData.isLoading)
   // 메시지 쌓임
   const renderHistories = useMemo(() => {
     if (ttDetail.isLoading) return <Loading />
@@ -84,7 +84,17 @@ const TelegramDetailPage = () => {
         key={`${id}_${index}`}
         ref={v.seqidx === Number(id) ? currentMessageRef : null}
       >
-        <span>{isTranslation ? v.trancontents : v.contents}</span>
+        {isTranslation ? (
+          <span>{v.trancontents}</span>
+        ) : ttDetail.isSuccess ? (
+          highlightText(
+            v.contents,
+            ttDetail.data?.data[0].keyword,
+            ttDetail.data?.data[0].threatlog.split('/')
+          )
+        ) : (
+          <span>{v.contents}</span>
+        )}
         <StyledInfoBox>
           <p>{v.writetime}</p>
           <ButtonWrapper>
@@ -189,7 +199,7 @@ const TelegramDetailPage = () => {
                 {!isPrevEnd &&
                   (ttHistoryData.isLoading ? (
                     <Button
-                      text={'가져오는 중 •••'}
+                      text={'가져오는 중'}
                       type={'outline'}
                       onClick={() => {}}
                     />
@@ -204,7 +214,7 @@ const TelegramDetailPage = () => {
                 {!isNextEnd &&
                   (ttHistoryData.isLoading ? (
                     <Button
-                      text={'가져오는 중 •••'}
+                      text={'가져오는 중'}
                       type={'outline'}
                       onClick={() => {}}
                     />

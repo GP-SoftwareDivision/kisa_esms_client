@@ -25,7 +25,7 @@ import Empty from '@/components/elements/Empty.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 import { useSearchSave } from '@/hooks/mutations/useSearchSave.tsx'
 
-interface ttListType {
+export interface ttListType {
   channelurl: string
   contents: string
   contents2: string
@@ -40,7 +40,6 @@ interface ttListType {
   username: string
   writetime: string
 }
-
 const Telegram = () => {
   const navigate = useNavigate()
 
@@ -50,8 +49,7 @@ const Telegram = () => {
     Number(queryParams.get('page')) || 1
   )
 
-  const { hackingOptions, responseOptions, regularExpressionOptions } =
-    useOptions()
+  const { hackingOptions, responseOptions } = useOptions()
 
   // 조회기간
   const [date, setDate] = useState({
@@ -316,11 +314,12 @@ const Telegram = () => {
           <Box></Box>
           <Box></Box>
           <Box>
-            <CustomSelect
+            <CustomInput
+              id={'regex'}
               label={'정규표현식'}
-              options={regularExpressionOptions}
+              placeholder={'내용을 입력하세요.'}
               value={regex}
-              setState={setRegex}
+              onChange={(e) => setRegex(e.target.value)}
               disabled={isReSearch}
             />
           </Box>

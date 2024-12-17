@@ -14,9 +14,13 @@ export const useSearchHistoryDeleteMutation = () => {
     mutationFn: async (request: { items: number[] }) => {
       const isConfirm = confirm('삭제하시겠습니까?')
       if (!isConfirm) throw new Error()
-      const response = await instance.post('/api/manage/rule/delete', {
-        seqidx: request.items.join(','),
-      })
+      const response = await instance.post(
+        '/api/manage/search/history/delete',
+        {
+          seqidx: request.items.join(','),
+        }
+      )
+
       return response.data
     },
     onError: (error) => {

@@ -17,6 +17,9 @@ export const TrackingDetailPage = lazy(
 export const Infringement = lazy(
   () => import('@/pages/issue/InfringementPage.tsx')
 )
+export const DamageTarget = lazy(
+  () => import('@/pages/issue/DamageTargetPage.tsx')
+)
 export const DarkWeb = lazy(() => import('@/pages/retrieve/DarkWebPage.tsx'))
 export const DarkWebDetail = lazy(
   () => import('@/pages/retrieve/DarkWebDetailPage.tsx')
