@@ -114,6 +114,7 @@ const Telegram = () => {
   // 검색 기록 불러오기
   const searchHistory = useQueries<{
     data: { searchlog: string; title: string }[]
+    message: string
   }>({
     queryKey: `searchHistory`,
     method: 'POST',
@@ -239,7 +240,8 @@ const Telegram = () => {
           <CustomSelect
             label={'불러오기'}
             options={
-              searchHistory.isSuccess && searchHistory.data?.data
+              searchHistory.isSuccess &&
+              searchHistory.data?.message !== 'nodata'
                 ? searchHistory.data?.data?.map((v) => ({
                     label: v.title,
                     value: v.searchlog,
