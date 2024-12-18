@@ -6,7 +6,7 @@ import { Box, Stack } from '@chakra-ui/react'
 import { ContentContainer } from '@/assets/styles/global.ts'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
-import CustomEditable from '@/components/elements/Editable.tsx'
+// import CustomEditable from '@/components/elements/Editable.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import CustomSwitch from '@/components/elements/Switch.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
@@ -104,8 +104,8 @@ const TelegramDetailPage = () => {
               onClick={() => console.log('')}
             />
             <Button
-              text={v.threatflag}
-              type={v.threatflag === '해킹' ? 'danger' : 'tertiary'}
+              text={v.threatflag === 'Y' ? '해킹' : '미해킹'}
+              type={v.threatflag === 'Y' ? 'danger' : 'tertiary'}
               onClick={() => console.log('')}
             />
           </ButtonWrapper>
@@ -182,14 +182,14 @@ const TelegramDetailPage = () => {
           <tr>
             <LabelTd>검색</LabelTd>
             <Td colSpan={5}>
-              <SearchContainer>
-                <CustomEditable />
-                <Button
-                  type={'primary'}
-                  onClick={() => console.log('')}
-                  text={'검색'}
-                />
-              </SearchContainer>
+              {/*<SearchContainer>*/}
+              {/*  <CustomEditable />*/}
+              {/*  <Button*/}
+              {/*    type={'primary'}*/}
+              {/*    onClick={() => console.log('')}*/}
+              {/*    text={'검색'}*/}
+              {/*  />*/}
+              {/*</SearchContainer>*/}
             </Td>
           </tr>
           <tr>
@@ -251,18 +251,18 @@ const LabelTd = styled(Td)`
   background-color: #f6f6f6;
 `
 
-const SearchContainer = styled(Box)`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-
-  span {
-    min-width: 10rem;
-  }
-  button {
-    min-width: 5rem;
-  }
-`
+// const SearchContainer = styled(Box)`
+//   display: flex;
+//   align-items: center;
+//   gap: 1rem;
+//
+//   span {
+//     min-width: 10rem;
+//   }
+//   button {
+//     min-width: 5rem;
+//   }
+// `
 const StyledContentsContainer = styled(Stack)`
   max-height: 50rem;
   overflow-y: auto;

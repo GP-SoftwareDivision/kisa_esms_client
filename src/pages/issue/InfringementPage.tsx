@@ -298,7 +298,7 @@ export default InfringementPage
 //   color: ${({ theme }) => theme.color.gray800};
 // `
 
-const ButtonWrapper = styled.div`
+const ButtonWrapper = styled(Box)`
   display: flex;
   width: 100%;
   justify-content: center;

@@ -1,17 +1,28 @@
-import { useState } from 'react'
+import { memo, useCallback } from 'react'
 import styled from '@emotion/styled'
 import { Editable } from '@chakra-ui/react'
 
 interface EditableProps {
+  id: string
+  value: string
+  onChange: (details: any) => void
   disabled?: boolean
 }
-const CustomEditable = (props: EditableProps) => {
-  const { disabled } = props
-  const [name, setName] = useState('')
+const CustomEditable = memo((props: EditableProps) => {
+  const { id, value, onChange, disabled } = props
+
+  const handleOnChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(e)
+    },
+    [onChange]
+  )
+
   return (
     <StyledEditable
-      value={name}
-      onValueChange={(e) => setName(e.value)}
+      id={id}
+      value={value}
+      onChange={handleOnChange}
       placeholder='내용을 입력하세요'
       disabled={disabled}
     >
@@ -23,18 +34,18 @@ const CustomEditable = (props: EditableProps) => {
       <Editable.Input />
     </StyledEditable>
   )
-}
+})
 
 export default CustomEditable
 
 const StyledEditable = styled(Editable.Root)`
-  width: -webkit-fill-available !important;
+  width: 100%; /* Use a percentage or 'auto' for dynamic sizes instead of !important */
   ${({ theme }) => theme.typography.body3};
-  width: auto;
 
   & input:focus {
     outline: none;
   }
+
   & [data-focus] {
     box-shadow: none;
   }

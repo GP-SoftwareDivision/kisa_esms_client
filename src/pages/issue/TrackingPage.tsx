@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
-import { responseListColumns } from '@/constants/tableColumns.ts'
 import CustomInput from '@/components/elements/Input.tsx'
 import CustomSelect from '@/components/elements/Select.tsx'
 import CustomDatePicker from '@/components/elements/DatePicker.tsx'
@@ -19,6 +18,7 @@ import CustomPagination from '@/components/elements/Pagination.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
+import dayjs from 'dayjs'
 
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
@@ -35,37 +35,40 @@ interface ResponseListType {
 const TrackingPage = () => {
   const navigate = useNavigate()
   const { page, handlePageChange } = usePagination(1)
-
   const { fields, handleOnChange } = useForm()
+
+  const targetList = [
+    // { value: '', label: '전체' },
+    { value: 'ind', label: '개인' },
+    { value: 'company', label: '기업' },
+    { value: 'pub', label: '공공' },
+    { value: 'edu', label: '교육' },
+    { value: 'fin', label: '금융' },
+    { value: 'med', label: '의료' },
+    { value: 'other', label: '기타(해외)' },
+  ]
 
   // 조회기간
   const [date, setDate] = useState({
-    startdate: '2024-12-03',
-    enddate: '2024-12-03',
+    startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
+    enddate: dayjs().format('YYYY-MM-DD'),
   })
 
   // 대상 구분 / 사고 유형 / 채널 구분 / 최초 인지
   const [selectFields, setSelectFields] = useState({
     targetType: '',
     incidentType: '',
-    channelType: '',
-    firstRecognition: '',
+    apiType: '',
+    originType: '',
   })
 
   // 요청 파라미터
   const [request, setRequest] = useState({
     startdate: date.startdate,
     enddate: date.enddate,
+    institution: '',
+    channelName: '',
     ...selectFields,
-    ...fields,
-  })
-
-  // 이슈 대응 이력 리스트 API
-  const responseList = useQueries<{ data: ResponseListType[] }>({
-    queryKey: `responseList`,
-    method: 'POST',
-    url: `/api/issue/history`,
-    body: { ...request, page: page },
   })
 
   // 조회 이벤트
@@ -73,20 +76,85 @@ const TrackingPage = () => {
     setRequest({
       startdate: date.startdate,
       enddate: date.enddate,
+      institution: fields.institution || '',
+      channelName: fields.channelName || '',
       ...selectFields,
-      ...fields,
     })
   }
+
+  // 이슈 대응 이력 리스트 API
+  const responseList = useQueries<{ data: ResponseListType[] }>({
+    queryKey: `responseList`,
+    method: 'POST',
+    url: `/api/issue/history`,
+    body: { type: 'I', page: page, ...request },
+  })
 
   // 셀렉트 박스 옵션 변경 이벤트
   const handleSelectChange = (field: string, value: any) => {
     setSelectFields((prev) => ({ ...prev, [field]: value }))
   }
 
+  // 테이블 컬럼
+  const responseListColumns = [
+    {
+      header: '등록일시',
+      accessorKey: 'registrationDate',
+    },
+    {
+      header: '대상구분',
+      accessorKey: 'targetType',
+      cell: ({ row }: any) => {
+        const matching = targetList
+          .filter((item) =>
+            row.original.targetType.split('/').includes(item.value)
+          )
+          .map((item) => item.label)
+        return matching.join('/')
+      },
+    },
+    {
+      header: '피해기관',
+      accessorKey: 'institution',
+    },
+    {
+      header: '사고유형',
+      accessorKey: 'incidentType',
+    },
+    {
+      header: '채널구분',
+      accessorKey: 'domainType',
+      cell: ({ row }: any) =>
+        row.original.domainType === 'dt' ? (
+          <span>다크웹</span>
+        ) : (
+          <span>텔레그램</span>
+        ),
+    },
+    {
+      header: '채널명',
+      accessorKey: 'channelName',
+    },
+    {
+      header: '최초인지',
+      accessorKey: 'originType',
+    },
+    {
+      header: '업로드',
+      accessorKey: '',
+      id: 'actions',
+      cell: () => (
+        <Box display={'flex'} justifyContent={'center'}>
+          <Button type={'outline'} text={'파일선택'} onClick={() => {}} />
+        </Box>
+      ),
+    },
+  ]
+
   return (
     <ContentContainer>
       <PageTitle
-        text={'이슈 대응 이력'}
+        text={'대응 이력'}
         children={
           <ButtonContainer>
             <Button
@@ -109,27 +177,17 @@ const TrackingPage = () => {
         <Box>
           <CustomSelect
             label={'대상구분'}
-            options={[
-              { value: '', label: '전체' },
-              { value: '개인', label: '개인' },
-              { value: '기업', label: '기업' },
-              { value: '협회', label: '협회' },
-              { value: '공공', label: '공공' },
-              { value: '교육', label: '교육' },
-              { value: '금융', label: '금융' },
-              { value: '의료', label: '의료' },
-              { value: '기타', label: '기타' },
-            ]}
+            options={targetList}
             value={selectFields.targetType}
             setState={(value) => handleSelectChange('targetType', value)}
           />
         </Box>
         <Box>
           <CustomInput
-            id={'hackedOrganization'}
+            id={'institution'}
             label={'피해기관'}
             placeholder={'내용을 입력하세요.'}
-            value={fields.hackedOrganization}
+            value={fields.institution}
             onChange={handleOnChange}
           />
         </Box>
@@ -165,8 +223,8 @@ const TrackingPage = () => {
               { value: '블로그', label: '블로그' },
               { value: '기타', label: '기타' },
             ]}
-            value={fields.channelType}
-            setState={(value) => handleSelectChange('channelType', value)}
+            value={fields.apiType}
+            setState={(value) => handleSelectChange('apiType', value)}
           />
         </Box>
         <Box>
@@ -190,8 +248,8 @@ const TrackingPage = () => {
               { value: '언론보도', label: '언론보도' },
               { value: '기타', label: '기타' },
             ]}
-            value={selectFields.firstRecognition}
-            setState={(value) => handleSelectChange('firstRecognition', value)}
+            value={selectFields.originType}
+            setState={(value) => handleSelectChange('originType', value)}
           />
         </Box>
         <ButtonContainer>
@@ -203,6 +261,7 @@ const TrackingPage = () => {
           loading={false}
           data={responseList.data?.data ? responseList.data?.data : []}
           columns={responseListColumns}
+          detailIdx={'issueIdx'}
         />
         <CustomPagination
           total={1}

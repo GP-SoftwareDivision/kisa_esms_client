@@ -6,30 +6,26 @@ import 'dayjs/locale/ko'
 
 import { SelectBox } from '@/assets/styles/global.ts'
 import React, { Dispatch } from 'react'
+import dayjs from 'dayjs'
 
 interface TimePickerProps {
-  setDate?: Dispatch<React.SetStateAction<string>>
+  date: string
+  setDate: Dispatch<React.SetStateAction<string>>
 }
 
 const CustomTimePicker = (props: TimePickerProps) => {
   const { setDate } = props
 
-  const onOk = (value: string | unknown) => {
-    if (value && setDate) {
-      setDate(value as string)
-    }
-  }
-
-  const onChange = (date: string | unknown) => {
+  const onChange = (date: any) => {
     if (date && setDate) {
-      setDate(date as string)
+      setDate(dayjs(date).format('YYYY-MM-DD'))
     }
   }
 
   return (
     <ConfigProvider locale={ko_KR}>
       <SelectBox>
-        <StyledDatePicker showTime onChange={onChange} onOk={onOk} />
+        <StyledDatePicker onChange={onChange} />
       </SelectBox>
     </ConfigProvider>
   )

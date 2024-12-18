@@ -1,35 +1,3 @@
-// 메인 대시보드 테이블 컬럼 정의
-export const responseListColumns = [
-  {
-    header: '등록일시',
-    accessorKey: 'regdate',
-  },
-  {
-    header: '대상구분',
-    accessorKey: 'targettype',
-  },
-  {
-    header: '피해기관',
-    accessorKey: 'hackedorganization',
-  },
-  {
-    header: '사고유형',
-    accessorKey: 'incidenttype',
-  },
-  {
-    header: '채널구분',
-    accessorKey: 'channeltype',
-  },
-  {
-    header: '채널명',
-    accessorKey: 'darktelegramname',
-  },
-  {
-    header: '최초인지',
-    accessorKey: 'firstrecogition',
-  },
-]
-
 // 이슈 대응 이력 테이블 컬럼 정의
 export const issueTrackingColumns = [
   {

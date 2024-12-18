@@ -94,9 +94,15 @@ const DarkWebDetailPage = () => {
             </tr>
             <tr>
               <LabelTd>해킹 여부</LabelTd>
-              <Td>{dtDetail.data?.data[0]?.threatflag}</Td>
+              <Td>
+                {dtDetail.data?.data[0]?.threatflag === 'Y' ? '해킹' : '미해킹'}
+              </Td>
               <LabelTd>대응 여부</LabelTd>
-              <Td>{dtDetail.data?.data[0]?.issueresponseflag}</Td>
+              <Td>
+                {dtDetail.data?.data[0]?.issueresponseflag === 'Y'
+                  ? '대응'
+                  : '미대응'}
+              </Td>
               <LabelTd>수집 키워드</LabelTd>
               <Td>{dtDetail.data?.data[0]?.keyword}</Td>
             </tr>

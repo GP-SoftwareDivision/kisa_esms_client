@@ -7,7 +7,6 @@ import Bar from '@/components/charts/Bar.tsx'
 import Pie from '@/components/charts/Pie.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomList from '@/components/charts/List.tsx'
-import { responseListColumns } from '@/constants/tableColumns.ts'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 
@@ -25,14 +24,55 @@ interface HackingListType {
 
 const DashBoardPage = () => {
   // 모니터링 데이터 조회 API
-  const hackingList = useQueries<{ data: HackingListType[] }>({
-    queryKey: `hackingList`,
+  const responseList = useQueries<{ data: HackingListType[] }>({
+    queryKey: `responseList`,
     method: 'POST',
-    url: `/api/main/hacking/status`,
+    url: `/api/issue/history`,
     body: {
+      type: 'M',
       page: 1,
+      startdate: dayjs().subtract(6, 'm').format('YYYY-MM-DD'),
+      enddate: dayjs().format('YYYY-MM-DD'),
+      institution: '',
+      channelName: '',
+      targetType: '',
+      incidentType: '',
+      apiType: '',
+      originType: '',
     },
   })
+
+  // 테이블 컬럼
+  const responseListColumns = [
+    {
+      header: '등록일시',
+      accessorKey: 'registrationDate',
+    },
+    {
+      header: '대상구분',
+      accessorKey: 'targetType',
+    },
+    {
+      header: '피해기관',
+      accessorKey: 'institution',
+    },
+    {
+      header: '사고유형',
+      accessorKey: 'incidentId',
+    },
+    {
+      header: '채널구분',
+      accessorKey: 'domain',
+    },
+    {
+      header: '채널명',
+      accessorKey: 'channelName',
+    },
+    {
+      header: '최초인지',
+      accessorKey: 'originType',
+    },
+  ]
 
   return (
     <>
@@ -93,13 +133,14 @@ const DashBoardPage = () => {
       <Box mt={4}>
         <PageTitle text={'대응 이력 현황'} />
         <ChartBox>
-          {hackingList.isLoading ? (
+          {responseList.isLoading ? (
             <Loading />
           ) : (
             <CustomTable
               loading={false}
-              data={hackingList.data?.data ? hackingList.data?.data : []}
+              data={responseList.data?.data ? responseList.data?.data : []}
               columns={responseListColumns}
+              maxHeight={400}
             />
           )}
         </ChartBox>

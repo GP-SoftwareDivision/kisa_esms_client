@@ -4,8 +4,8 @@ const useOptions = () => {
   const responseOptions = useMemo(
     () => [
       { value: '', label: '전체' },
-      { value: '대응', label: '대응' },
-      { value: '대기', label: '대기' },
+      { value: 'Y', label: '대응' },
+      { value: 'N', label: '대기' },
     ],
     []
   )
@@ -23,18 +23,9 @@ const useOptions = () => {
   const hackingOptions = useMemo(
     () => [
       { value: '', label: '전체' },
-      { value: '해킹', label: '해킹' },
-      { value: '미해킹', label: '미해킹' },
-      { value: '대기', label: '대기' },
-    ],
-    []
-  )
-
-  const regularExpressionOptions = useMemo(
-    () => [
-      { value: 'email', label: '이메일' },
-      { value: 'phone', label: '전화번호' },
-      { value: 'RRN', label: '주민등록번호' },
+      { value: 'Y', label: '해킹' },
+      { value: 'N', label: '미해킹' },
+      { value: 'W', label: '대기' },
     ],
     []
   )
@@ -43,7 +34,6 @@ const useOptions = () => {
     responseOptions,
     fileTypeOptions,
     hackingOptions,
-    regularExpressionOptions,
   }
 }
 

@@ -1,17 +1,29 @@
-import { Editable } from '@chakra-ui/react'
 import styled from '@emotion/styled'
+import { Dispatch, SetStateAction } from 'react'
 
-const CustomTextarea = () => {
+interface TextareaProps {
+  value: string
+  setValue: Dispatch<SetStateAction<string>>
+  disabled?: boolean
+}
+
+const CustomTextarea = (props: TextareaProps) => {
+  const { setValue, value, disabled } = props
   return (
-    <StyledTextarea autoResize={false}>
-      <Editable.Preview minH='100px' alignItems='flex-start' width='full' />
-      <Editable.Textarea />
-    </StyledTextarea>
+    <StyledTextarea
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      disabled={disabled}
+    />
   )
 }
 export default CustomTextarea
 
-const StyledTextarea = styled(Editable.Root)`
+const StyledTextarea = styled.textarea`
+  min-height: 100px;
+  align-items: flex-start;
+  width: 100%;
+  outline: none;
   ${({ theme }) => theme.typography.body3};
 
   & textarea:focus {

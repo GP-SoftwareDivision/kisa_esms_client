@@ -16,6 +16,7 @@ export const useForm = (initialFields: Record<string, string> = {}) => {
   // 체인지 이벤트 핸들러
   const handleOnChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target
+
     setFields((prevFields) => ({
       ...prevFields,
       [id]: value,

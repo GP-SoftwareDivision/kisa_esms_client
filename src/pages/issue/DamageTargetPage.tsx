@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import styled from '@emotion/styled'
 import { Box, Flex } from '@chakra-ui/react'
+import dayjs from 'dayjs'
 
 import {
   ButtonContainer,
@@ -22,6 +23,26 @@ import CustomButton from '@/components/elements/Button.tsx'
 import CustomDatePicker from '@/components/elements/DatePicker.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+  gap: 10px;
+`
+
+const ModalContents = styled.div`
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+const TableButtonWrapper = styled(Box)`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+`
+
 interface DamageTargetListType {
   seqidx: number
   createdAt: string
@@ -39,14 +60,13 @@ const DamageTargetPage = () => {
 
   // 조회기간
   const [date, setDate] = useState({
-    startdate: '2024-12-03',
-    enddate: '2024-12-03',
+    startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
+    enddate: dayjs().format('YYYY-MM-DD'),
   })
 
   // 대상 구분 / 피해 기관 / 신고 여부 /  채널 구분
   const [selectFields, setSelectFields] = useState({
     targetType: '',
-    institution: '',
     reportFlag: '',
     supportFlag: '',
   })
@@ -56,7 +76,7 @@ const DamageTargetPage = () => {
     page: 1,
     ...date,
     ...selectFields,
-    ...fields,
+    institution: fields.institution ?? '',
   })
 
   const damageTargetList = useQueries<{
@@ -80,6 +100,16 @@ const DamageTargetPage = () => {
     handleOnUpdateText,
   } = useRulesetUpdateMutation()
 
+  const targetList = [
+    { value: '', label: '전체' },
+    { value: 'company', label: '기업' },
+    { value: 'pub', label: '공공' },
+    { value: 'edu', label: '교육' },
+    { value: 'fin', label: '금융' },
+    { value: 'med', label: '의료' },
+    { value: 'other', label: '기타(해외)' },
+  ]
+
   // 판단 키워드 관리 테이블 컬럼 정의
   const damageTargetColumns = [
     {
@@ -94,11 +124,16 @@ const DamageTargetPage = () => {
     },
     {
       header: '일시',
-      accessorKey: 'createdAt',
+      accessorKey: 'registrationDate',
     },
     {
       header: '대상구분',
       accessorKey: 'targetType',
+      cell: ({ row }: any) =>
+        targetList.find(
+          (list: { value: string; label: string }) =>
+            list.value === row.original?.targetType
+        )?.label ?? '',
     },
     {
       header: '피해기관',
@@ -107,6 +142,12 @@ const DamageTargetPage = () => {
     {
       header: '신고여부',
       accessorKey: 'reportFlag',
+      cell: ({ row }: any) =>
+        row.original?.reportFlag === 'Y' ? (
+          <span>신고</span>
+        ) : (
+          <span>미신고</span>
+        ),
     },
     {
       header: '사고번호',
@@ -115,23 +156,31 @@ const DamageTargetPage = () => {
     {
       header: '기술지원여부',
       accessorKey: 'supportFlag',
+      cell: ({ row }: any) =>
+        row.original?.supportFlag === 'Y' ? (
+          <span>동의</span>
+        ) : (
+          <span>미동의</span>
+        ),
     },
     {
       header: '거부사유',
-      accessorKey: 'rejectionReason',
+      accessorKey: 'reason',
     },
     {
       header: '대응이력보기',
       accessorKey: '',
       id: 'view',
       cell: ({ row }: any) => (
-        <Button
-          type={'secondary'}
-          text={'수정'}
-          onClick={() => {
-            console.log(row)
-          }}
-        />
+        <TableButtonWrapper>
+          <Button
+            type={'outline'}
+            text={'이동'}
+            onClick={() => {
+              console.log(row)
+            }}
+          />
+        </TableButtonWrapper>
       ),
     },
     {
@@ -139,24 +188,20 @@ const DamageTargetPage = () => {
       accessorKey: '',
       id: 'update',
       cell: ({ row }: any) => (
-        <Button
-          type={'secondary'}
-          text={'수정'}
-          onClick={() => {
-            const { rule, seqidx, type, useflag, hackingflag } = row.original
-            openUpdateRuleset()
-            setUpdateData({ rule, seqidx, type, useflag, hackingflag })
-          }}
-        />
+        <TableButtonWrapper>
+          <Button
+            type={'secondary'}
+            text={'수정'}
+            onClick={() => {
+              const { rule, seqidx, type, useflag, hackingflag } = row.original
+              openUpdateRuleset()
+              setUpdateData({ rule, seqidx, type, useflag, hackingflag })
+            }}
+          />
+        </TableButtonWrapper>
       ),
     },
   ]
-
-  // 판단 키워드 추가 액션
-  // const handleInsertKeywordAction = () => {
-  //   const { rule } = fields
-  //   insertRuleset.mutate({ rule, apitype, hackingflag })
-  // }
 
   // 판단 키워드 추가 취소 액션 이벤트
   const handleOnCancelAction = () => {
@@ -174,7 +219,7 @@ const DamageTargetPage = () => {
       page: 1,
       ...date,
       ...selectFields,
-      ...fields,
+      institution: fields.institution ?? '',
     })
   }
 
@@ -197,17 +242,7 @@ const DamageTargetPage = () => {
         <Box>
           <CustomSelect
             label={'대상구분'}
-            options={[
-              { value: '', label: '전체' },
-              { value: '개인', label: '개인' },
-              { value: '기업', label: '기업' },
-              { value: '협회', label: '협회' },
-              { value: '공공', label: '공공' },
-              { value: '교육', label: '교육' },
-              { value: '금융', label: '금융' },
-              { value: '의료', label: '의료' },
-              { value: '기타', label: '기타' },
-            ]}
+            options={targetList}
             value={selectFields.targetType}
             setState={(value) => handleSelectChange('targetType', value)}
           />
@@ -226,8 +261,8 @@ const DamageTargetPage = () => {
             label={'신고여부'}
             options={[
               { value: '', label: '전체' },
-              { value: '신고', label: '신고' },
-              { value: '미신고', label: '미신고' },
+              { value: 'Y', label: '신고' },
+              { value: 'N', label: '미신고' },
             ]}
             value={selectFields.reportFlag}
             setState={(value) => handleSelectChange('reportFlag', value)}
@@ -238,8 +273,8 @@ const DamageTargetPage = () => {
             label={'기술지원'}
             options={[
               { value: '', label: '전체' },
-              { value: '동의', label: '동의' },
-              { value: '미동의', label: '미동의' },
+              { value: 'Y', label: '동의' },
+              { value: 'N', label: '미동의' },
             ]}
             value={selectFields.supportFlag}
             setState={(value) => handleSelectChange('supportFlag', value)}
@@ -342,17 +377,3 @@ const DamageTargetPage = () => {
   )
 }
 export default DamageTargetPage
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.5rem;
-  gap: 10px;
-`
-
-const ModalContents = styled.div`
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`

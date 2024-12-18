@@ -12,24 +12,27 @@ interface TableProps {
   data: object[]
   loading: boolean
   columns: ColumnDef<any>[]
-  detailURL?: string
+  maxHeight?: number
+  detailIdx?: string
 }
 
 const CustomTable = ({
   loading,
   data = [],
   columns = [],
-  detailURL,
+  maxHeight,
+  detailIdx,
 }: TableProps) => {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   })
+
   const navigate = useNavigate()
+
   const handleOnRowClick = (row: any) => {
-    console.log(row)
-    navigate(detailURL ?? '')
+    if (detailIdx) navigate(`detail?id=${row.original[detailIdx]}`)
   }
 
   return (
@@ -37,38 +40,40 @@ const CustomTable = ({
       {loading ? (
         <CustomSkeleton />
       ) : (
-        <StyledTable>
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHeader key={header.id} colSpan={header.colSpan}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHeader>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                onClick={detailURL ? () => handleOnRowClick(row) : undefined}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </tbody>
-        </StyledTable>
+        <TableContainer $maxHeight={maxHeight ? maxHeight : 'none'}>
+          <StyledTable>
+            <thead style={{ position: 'sticky' }}>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHeader key={header.id} colSpan={header.colSpan}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHeader>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} onClick={() => handleOnRowClick(row)}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </tbody>
+          </StyledTable>
+        </TableContainer>
       )}
     </TableWrapper>
   )
@@ -76,19 +81,31 @@ const CustomTable = ({
 
 export default CustomTable
 
-// ... (스타일 컴포넌트는 그대로 유지)
-
 const TableWrapper = styled.div`
   overflow-x: auto;
   width: 100%;
 `
 
+const TableContainer = styled.div<{ $maxHeight: number | string }>`
+  position: relative;
+  width: 100%;
+  overflow-y: auto;
+  max-height: ${(props) =>
+    props.$maxHeight ? `${props.$maxHeight}px` : 'none'};
+`
+
 const StyledTable = styled.table`
-  table-layout: auto;
+  table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
   ${({ theme }) => theme.typography.body2};
+
+  thead {
+    position: sticky;
+    top: 0;
+    background-color: #fafafa;
+  }
 `
 
 const TableHeader = styled.th`
