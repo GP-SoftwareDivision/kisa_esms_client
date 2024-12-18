@@ -1,12 +1,24 @@
-import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { AxiosError } from 'axios'
+import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import instance from '@/apis/instance.ts'
-import { useState } from 'react'
+
+// 피해 대상 타입
+export interface VictimType {
+  seqidx?: number
+  registrationDate: string
+  targetType: string
+  institution: string
+  reportFlag: string
+  incidentId: string
+  supportFlag: string
+  reason: string
+}
 
 // 이슈 대응 타입
-interface insertResponseType {
+export interface insertResponseType {
   registrationDate: string
   incidentType: string
   incidentTypeDetail: string
@@ -26,18 +38,7 @@ interface insertResponseType {
   hackGroup: string
   leakedInfo: string
   comment: string
-}
-
-// 피해 대상 타입
-interface VictimType {
-  id: number
-  registrationDate: string
-  targetType: string
-  institution: string
-  reportFlag: string
-  incidentId: string
-  supportFlag: string
-  reason: string
+  indFlag: string
 }
 
 interface InsertVictimsRequestType {
@@ -83,10 +84,21 @@ export const useResponseAddMutation = () => {
     },
   })
 
-  // 피해 대상 저장
+  // 대응 이력 저장
   const insertResponseIssue = useMutation({
     mutationKey: ['insertResponseIssue'],
     mutationFn: async (data: insertResponseType) => {
+      if (
+        data.registrationDate === '' ||
+        (data.indFlag === 'N' && victims.length === 0) ||
+        data.incidentType === '' ||
+        data.channelId === 0 ||
+        data.originType === '' ||
+        data.threatFlag === ''
+      ) {
+        notifyError('필수 사항을 모두 입력해주세요')
+        throw new Error()
+      }
       const response = await instance.post('/api/issue/history/insert', data)
       return response.data
     },
@@ -110,8 +122,6 @@ export const useResponseAddMutation = () => {
       }
     },
     onSuccess: (response) => {
-      console.log(response.seqidx)
-      console.log(victims)
       insertVictims.mutate({ issueIdx: response.seqidx, list: victims })
     },
   })

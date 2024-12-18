@@ -131,15 +131,17 @@ const JudgmentKeywordPage = () => {
       accessorKey: '수정',
       id: 'update',
       cell: ({ row }: any) => (
-        <Button
-          type={'secondary'}
-          text={'수정'}
-          onClick={() => {
-            const { rule, seqidx, type, useflag, hackingflag } = row.original
-            openUpdateRuleset()
-            setUpdateData({ rule, seqidx, type, useflag, hackingflag })
-          }}
-        />
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Button
+            type={'secondary'}
+            text={'수정'}
+            onClick={() => {
+              const { rule, seqidx, type, useflag, hackingflag } = row.original
+              openUpdateRuleset()
+              setUpdateData({ rule, seqidx, type, useflag, hackingflag })
+            }}
+          />
+        </div>
       ),
     },
   ]
@@ -252,7 +254,7 @@ const JudgmentKeywordPage = () => {
       {/*판단 키워드 수정 모달*/}
       <CustomModal
         isOpen={updateRulesetOpen}
-        title='그룹 수정'
+        title='판단 키워드 수정'
         onCancel={closeUpdateRuleset}
         content={
           <ModalContents>

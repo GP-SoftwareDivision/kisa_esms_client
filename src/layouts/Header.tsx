@@ -35,7 +35,7 @@ const Header = () => {
 
   const onSubMenuSelect = (subItemKey: string | null) => {
     const darkwebParams = new URLSearchParams({
-      startdate: dayjs().subtract(14, 'd').format('YYYY-MM-DD'),
+      startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
       enddate: dayjs().format('YYYY-MM-DD'),
       threatflag: 'Y',
       category: '',
@@ -50,7 +50,7 @@ const Header = () => {
     }).toString()
 
     const telegramParams = new URLSearchParams({
-      startdate: dayjs().subtract(14, 'd').format('YYYY-MM-DD'),
+      startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
       enddate: dayjs().format('YYYY-MM-DD'),
       threatflag: 'Y',
       username: '',

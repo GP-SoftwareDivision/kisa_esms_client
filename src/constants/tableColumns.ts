@@ -50,15 +50,15 @@ export const DomainColumns = [
   },
   {
     header: '구분',
-    accessorKey: 'type',
+    accessorKey: 'channelType',
   },
   {
     header: '채널명',
-    accessorKey: 'sitename',
+    accessorKey: 'channelName',
   },
   {
     header: '해커그룹(특정시)',
-    accessorKey: 'hacked_organization',
+    accessorKey: 'hackGroup',
   },
   {
     header: '비고',

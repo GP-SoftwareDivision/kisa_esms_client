@@ -1,6 +1,8 @@
+import Dropzone from 'react-dropzone'
 import { useState } from 'react'
-import { Box } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
+import { MdUploadFile } from 'react-icons/md'
 
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
@@ -19,6 +21,13 @@ import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
 import dayjs from 'dayjs'
+import styled from '@emotion/styled'
+import CustomModal from '@/components/elements/Modal.tsx'
+import useUploadMutation from '@/hooks/mutations/useUploadMutation.tsx'
+import { CloseButton } from '@/components/ui/close-button.tsx'
+import instance from '@/apis/instance.ts'
+import useFileDragDrop from '@/hooks/common/useFileDragDrop.tsx'
+import { notifyError } from '@/utils/notify.ts'
 
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
@@ -35,10 +44,21 @@ interface ResponseListType {
 const TrackingPage = () => {
   const navigate = useNavigate()
   const { page, handlePageChange } = usePagination(1)
+  const { openInsertUpload, closeInsertUpload, insertUploadOpen } =
+    useUploadMutation()
+  const {
+    uploadFile,
+    uploadFileName,
+    dragFile,
+    // formData,
+    startUpload,
+    abortUpload,
+  } = useFileDragDrop()
+
   const { fields, handleOnChange } = useForm()
+  const [seqidx, setSeqidx] = useState<number>(0)
 
   const targetList = [
-    // { value: '', label: '전체' },
     { value: 'ind', label: '개인' },
     { value: 'company', label: '기업' },
     { value: 'pub', label: '공공' },
@@ -83,7 +103,7 @@ const TrackingPage = () => {
   }
 
   // 이슈 대응 이력 리스트 API
-  const responseList = useQueries<{ data: ResponseListType[] }>({
+  const responseList = useQueries<{ data: ResponseListType[]; count: number }>({
     queryKey: `responseList`,
     method: 'POST',
     url: `/api/issue/history`,
@@ -93,6 +113,12 @@ const TrackingPage = () => {
   // 셀렉트 박스 옵션 변경 이벤트
   const handleSelectChange = (field: string, value: any) => {
     setSelectFields((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleOnFileUpload = (event: any, id: number) => {
+    event.stopPropagation()
+    openInsertUpload()
+    setSeqidx(id)
   }
 
   // 테이블 컬럼
@@ -125,10 +151,12 @@ const TrackingPage = () => {
       header: '채널구분',
       accessorKey: 'domainType',
       cell: ({ row }: any) =>
-        row.original.domainType === 'dt' ? (
+        row.original?.domainType === 'DT' ? (
           <span>다크웹</span>
-        ) : (
+        ) : row.original?.domainType === 'TT' ? (
           <span>텔레그램</span>
+        ) : (
+          ''
         ),
     },
     {
@@ -143,14 +171,39 @@ const TrackingPage = () => {
       header: '업로드',
       accessorKey: '',
       id: 'actions',
-      cell: () => (
+      cell: ({ row }: any) => (
         <Box display={'flex'} justifyContent={'center'}>
-          <Button type={'outline'} text={'파일선택'} onClick={() => {}} />
+          <StyledButton
+            onClick={(e: any) => handleOnFileUpload(e, row.original.issueIdx)}
+          >
+            파일선택
+          </StyledButton>
         </Box>
       ),
     },
   ]
 
+  // 파일 업로드
+  const accountUpload = async () => {
+    await startUpload()
+    try {
+      // const response = await instance.post('/upload', formData, {
+      //   headers: { 'Content-Type': 'multipart/form-data' },
+      //   withCredentials: true,
+      // })
+      const response = await instance.post(`/api/issue/detection/file/upload`, {
+        seqidx: seqidx,
+        filename: uploadFile?.name,
+        uploader: 'syjin',
+      })
+      return response.data
+      // if (response.status === 200) {
+      // }
+    } catch (error) {
+      console.error('Error uploading file', error)
+      notifyError(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
+    }
+  }
   return (
     <ContentContainer>
       <PageTitle
@@ -256,20 +309,113 @@ const TrackingPage = () => {
           <Button type={'primary'} onClick={handleOnClick} text={'조회'} />
         </ButtonContainer>
       </SelectContainer>
-      <ContentBox mt={4}>
-        <CustomTable
-          loading={false}
-          data={responseList.data?.data ? responseList.data?.data : []}
-          columns={responseListColumns}
-          detailIdx={'issueIdx'}
-        />
-        <CustomPagination
-          total={1}
-          page={page}
-          handlePageChange={(newPage) => handlePageChange(newPage as number)}
-        />
-      </ContentBox>
+      {responseList.isSuccess && (
+        <ContentBox mt={4}>
+          <CustomTable
+            loading={false}
+            data={responseList.data?.data ? responseList.data?.data : []}
+            columns={responseListColumns}
+            detailIdx={'issueIdx'}
+          />
+          <CustomPagination
+            total={responseList.data?.count}
+            page={page}
+            handlePageChange={(newPage) => handlePageChange(newPage as number)}
+          />
+        </ContentBox>
+      )}
+      <CustomModal
+        isOpen={insertUploadOpen}
+        title='업로드'
+        onCancel={closeInsertUpload}
+        content={
+          <ModalContents>
+            <Flex direction='column' gap={4} padding={4}>
+              <UploadContainer>
+                <Dropzone onDrop={dragFile}>
+                  {({ getRootProps, getInputProps }) => (
+                    <StyledFileUpload {...getRootProps()}>
+                      <input
+                        {...getInputProps()}
+                        accept={
+                          '.xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain'
+                        }
+                      />
+                      <StyledFileIcon />
+                      <p>
+                        {uploadFileName
+                          ? uploadFileName
+                          : '업로드할 파일 놓기 또는 파일 선택'}
+                      </p>
+                      {uploadFile && (
+                        <CloseButton
+                          me='-1'
+                          size='xs'
+                          variant='plain'
+                          focusVisibleRing='inside'
+                          focusRingWidth='2px'
+                          pointerEvents='auto'
+                          color='fg.subtle'
+                          height={'auto'}
+                          onClick={abortUpload}
+                        />
+                      )}
+                    </StyledFileUpload>
+                  )}
+                </Dropzone>
+                <Button
+                  text={'파일 업로드'}
+                  type={'primary'}
+                  onClick={accountUpload}
+                />
+              </UploadContainer>
+            </Flex>
+          </ModalContents>
+        }
+      />
     </ContentContainer>
   )
 }
 export default TrackingPage
+
+const StyledButton = styled.button`
+  border: 1px solid #c7c7c7;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold !important;
+  padding: 3px 6px;
+  ${({ theme }) => theme.typography.body3};
+`
+
+const ModalContents = styled.div`
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+const UploadContainer = styled.div`
+  display: flex;
+  margin-top: 0.5rem;
+  gap: 1rem;
+`
+
+const StyledFileUpload = styled.div`
+  width: 100%;
+  display: flex;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 0.25rem;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+
+  p {
+    ${({ theme }) => theme.typography.body2};
+  }
+`
+
+const StyledFileIcon = styled(MdUploadFile)`
+  margin-right: 0.3rem;
+  color: ${({ theme }) => theme.color.gray800};
+`

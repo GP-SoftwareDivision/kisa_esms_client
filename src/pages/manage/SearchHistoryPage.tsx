@@ -10,6 +10,7 @@ import CustomPagination from '@/components/elements/Pagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useSearchHistoryDeleteMutation } from '@/hooks/mutations/useSearchHistoryDeleteMutation.tsx'
+import { Box } from '@chakra-ui/react'
 
 interface SearchHistoryListType {
   seqidx: number
@@ -75,7 +76,7 @@ const SearchHistoryPage = () => {
       header: '수집대상',
       accessorKey: 'type',
       cell: ({ row }: any) =>
-        row.original?.type === 'dt' ? (
+        row.original?.type === 'DT' ? (
           <span>다크웹</span>
         ) : (
           <span>텔레그램</span>
@@ -90,15 +91,17 @@ const SearchHistoryPage = () => {
       accessorKey: '',
       id: 'update',
       cell: ({ row }: any) => (
-        <Button
-          type={'secondary'}
-          text={'이동'}
-          onClick={() =>
-            navigate(
-              `/retrieve/${row.original.type === 'dt' ? 'darkweb' : 'telegram'}?${row.original.searchlog}`
-            )
-          }
-        />
+        <Box display='flex' justifyContent='center'>
+          <Button
+            type={'secondary'}
+            text={'이동'}
+            onClick={() =>
+              navigate(
+                `/retrieve/${row.original.type === 'DT' ? 'darkweb' : 'telegram'}?${row.original.searchlog}`
+              )
+            }
+          />
+        </Box>
       ),
     },
   ]

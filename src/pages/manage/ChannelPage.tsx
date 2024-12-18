@@ -11,7 +11,6 @@ import { Box } from '@chakra-ui/react'
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
-import { DomainColumns } from '@/constants/tableColumns.ts'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import Button from '@/components/elements/Button.tsx'
@@ -43,6 +42,45 @@ const ChannelPage = () => {
   const handleOnClick = () => {
     setRequest({ page, channelName })
   }
+
+  const DomainColumns = [
+    {
+      header: '사이트(도메인)',
+      accessorKey: 'domain',
+    },
+    {
+      header: '최초 수집일',
+      accessorKey: 'firstcrawl',
+    },
+    {
+      header: '최근 수집일',
+      accessorKey: 'lastcrawl',
+    },
+    {
+      header: '구분',
+      accessorKey: 'channelType',
+      cell: ({ row }: any) =>
+        row.original?.channelType === 'DT' ? (
+          <span>다크웹</span>
+        ) : row.original?.channelType === 'TT' ? (
+          <span>텔레그램</span>
+        ) : (
+          ''
+        ),
+    },
+    {
+      header: '채널명',
+      accessorKey: 'channelName',
+    },
+    {
+      header: '해커그룹(특정시)',
+      accessorKey: 'hackGroup',
+    },
+    {
+      header: '비고',
+      accessorKey: 'comment',
+    },
+  ]
 
   return (
     <ContentContainer>

@@ -14,7 +14,7 @@ interface TimePickerProps {
 }
 
 const CustomTimePicker = (props: TimePickerProps) => {
-  const { setDate } = props
+  const { date, setDate } = props
 
   const onChange = (date: any) => {
     if (date && setDate) {
@@ -25,7 +25,10 @@ const CustomTimePicker = (props: TimePickerProps) => {
   return (
     <ConfigProvider locale={ko_KR}>
       <SelectBox>
-        <StyledDatePicker onChange={onChange} />
+        <StyledDatePicker
+          onChange={onChange}
+          value={dayjs(date).isValid() ? dayjs(date) : undefined}
+        />
       </SelectBox>
     </ConfigProvider>
   )

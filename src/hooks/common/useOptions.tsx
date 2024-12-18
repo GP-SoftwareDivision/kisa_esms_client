@@ -5,7 +5,7 @@ const useOptions = () => {
     () => [
       { value: '', label: '전체' },
       { value: 'Y', label: '대응' },
-      { value: 'N', label: '대기' },
+      { value: 'N', label: '미대응' },
     ],
     []
   )

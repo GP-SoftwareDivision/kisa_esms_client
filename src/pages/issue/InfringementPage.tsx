@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Box } from '@chakra-ui/react'
 import styled from '@emotion/styled'
-// import { MdUploadFile } from 'react-icons/md'
 
 import {
   ButtonContainer,
@@ -17,6 +16,7 @@ import PageTitle from '@/components/elements/PageTitle'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
+import { useNavigate } from 'react-router-dom'
 
 interface DetectionListType {
   seqidx: number
@@ -37,14 +37,7 @@ interface DetectionListType {
 
 const InfringementPage = () => {
   const { page, handlePageChange } = usePagination(1)
-  // const {
-  //   uploadFile,
-  //   uploadFileName,
-  //   dragFile,
-  //   formData,
-  //   startUpload,
-  //   abortUpload,
-  // } = useFileDragDrop()
+  const navigate = useNavigate()
 
   // 조회기간
   const [date, setDate] = useState({
@@ -83,25 +76,6 @@ const InfringementPage = () => {
       <span>{`${Number(localString[0]).toLocaleString()}(${Number(localString[1].slice(0, -1)).toLocaleString()})`}</span>
     )
   }
-  // 파일 업로드
-  // const accountUpload = async () => {
-  //   await startUpload()
-  //   try {
-  //     const response = await instance.post('/upload', formData, {
-  //       headers: { 'Content-Type': 'multipart/form-data' },
-  //       withCredentials: true,
-  //     })
-  //     if (response.status === 200) {
-  //       await instance.post(`/api/account/upload`, {
-  //         filename: uploadFile?.name,
-  //         uploader: 'syjin',
-  //       })
-  //     }
-  //   } catch (error) {
-  //     console.error('Error uploading file', error)
-  //     notifyError(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
-  //   }
-  // }
 
   const InfringementColumns = [
     {
@@ -173,7 +147,9 @@ const InfringementPage = () => {
           <Button
             type={'outline'}
             text={'이동'}
-            onClick={() => console.log(row.original)}
+            onClick={() =>
+              navigate(`/issue/tracking/detail?id=${row.original.issueidx}`)
+            }
           />
         </ButtonWrapper>
       ),
@@ -183,49 +159,7 @@ const InfringementPage = () => {
   return (
     <ContentContainer>
       <PageTitle text={'유출 정보 판별'} />
-      {/*<UploadContainer>*/}
-      {/*  <Dropzone onDrop={dragFile}>*/}
-      {/*    {({ getRootProps, getInputProps }) => (*/}
-      {/*      <StyledFileUpload {...getRootProps()}>*/}
-      {/*        <input*/}
-      {/*          {...getInputProps()}*/}
-      {/*          accept={*/}
-      {/*            '.xlsx,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain'*/}
-      {/*          }*/}
-      {/*        />*/}
-      {/*        <StyledFileIcon />*/}
-      {/*        <p>*/}
-      {/*          {uploadFileName*/}
-      {/*            ? uploadFileName*/}
-      {/*            : '업로드할 파일 놓기 또는 파일 선택'}*/}
-      {/*        </p>*/}
-      {/*        {uploadFile && (*/}
-      {/*          <CloseButton*/}
-      {/*            me='-1'*/}
-      {/*            size='xs'*/}
-      {/*            variant='plain'*/}
-      {/*            focusVisibleRing='inside'*/}
-      {/*            focusRingWidth='2px'*/}
-      {/*            pointerEvents='auto'*/}
-      {/*            color='fg.subtle'*/}
-      {/*            height={'auto'}*/}
-      {/*            onClick={abortUpload}*/}
-      {/*          />*/}
-      {/*        )}*/}
-      {/*      </StyledFileUpload>*/}
-      {/*    )}*/}
-      {/*  </Dropzone>*/}
-      {/*  <Button*/}
-      {/*    text={'파일 업로드'}*/}
-      {/*    type={*/}
-      {/*      uploadFileName && detectionList.data?.progress === 'N'*/}
-      {/*        ? 'primary'*/}
-      {/*        : 'ghost'*/}
-      {/*    }*/}
-      {/*    disabled={!uploadFileName && detectionList.data?.progress === 'Y'}*/}
-      {/*    onClick={accountUpload}*/}
-      {/*  />*/}
-      {/*</UploadContainer>*/}
+
       <SelectContainer columns={[1, 2, 3, 4]}>
         <Box>
           <CustomDatePicker label={'조회 기간'} date={date} setDate={setDate} />
@@ -271,32 +205,6 @@ const InfringementPage = () => {
 }
 
 export default InfringementPage
-
-// const UploadContainer = styled.div`
-//   display: flex;
-//   margin-top: 0.5rem;
-//   gap: 1rem;
-// `
-//
-// const StyledFileUpload = styled.div`
-//   width: 100%;
-//   display: flex;
-//   border-width: 1px;
-//   border-style: solid;
-//   border-radius: 0.25rem;
-//   align-items: center;
-//   padding: 0.3rem 0.6rem;
-//   cursor: pointer;
-//
-//   p {
-//     ${({ theme }) => theme.typography.body2};
-//   }
-// `
-//
-// const StyledFileIcon = styled(MdUploadFile)`
-//   margin-right: 0.3rem;
-//   color: ${({ theme }) => theme.color.gray800};
-// `
 
 const ButtonWrapper = styled(Box)`
   display: flex;

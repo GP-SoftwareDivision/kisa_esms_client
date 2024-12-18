@@ -145,7 +145,7 @@ const DarkWebPage = () => {
     method: 'POST',
     url: `/api/manage/search/history/data`,
     body: {
-      type: 'dt',
+      type: 'DT',
     },
   })
 
@@ -338,7 +338,7 @@ const DarkWebPage = () => {
                 type={'secondary'}
                 onClick={() =>
                   SaveSearch.mutate({
-                    type: 'dt',
+                    type: 'DT',
                     searchlog: new URLSearchParams({
                       startdate: date.startdate,
                       enddate: date.enddate,

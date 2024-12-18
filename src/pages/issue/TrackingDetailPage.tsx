@@ -10,10 +10,19 @@ import Button from '@/components/elements/Button.tsx'
 import CustomCheckBoxGroup from '@/components/elements/CheckBoxGroup.tsx'
 import CustomEditable from '@/components/elements/Editable.tsx'
 import CustomTextarea from '@/components/elements/Textarea.tsx'
-import { useEdit } from '@/hooks/common/useEdit.tsx'
 import CustomRadio from '@/components/elements/CustomRadio.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
-import { useResponseAddMutation } from '@/hooks/mutations/useResponseAddMutation.tsx'
+import {
+  insertResponseType,
+  VictimType,
+  useResponseAddMutation,
+} from '@/hooks/mutations/useResponseAddMutation.tsx'
+import { Flex } from '@chakra-ui/react'
+import CustomModal from '@/components/elements/Modal.tsx'
+import CustomInput from '@/components/elements/Input.tsx'
+import CustomButton from '@/components/elements/Button.tsx'
+import { useChannelAddMutation } from '@/hooks/mutations/useChannelAddMutation.tsx'
+import { useForm } from '@/hooks/common/useForm.tsx'
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -40,7 +49,9 @@ const Table = styled.table`
 const Td = styled.td`
   padding: 2px 4px;
   border-bottom: 1px solid #d9d9d9;
-
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
   input {
     height: 25px !important;
   }
@@ -73,6 +84,7 @@ const AddVictimsWrapper = styled.div`
   border-radius: 4px;
   max-width: 120px;
   overflow: hidden;
+  cursor: pointer;
 
   span {
     overflow: hidden;
@@ -90,6 +102,20 @@ const AddVictimsWrapper = styled.div`
   }
 `
 
+const ModalContents = styled.div`
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+  gap: 10px;
+`
+
 // 채널 리스트 타입 정의
 interface ChannelListType {
   channelName: string
@@ -98,9 +124,15 @@ interface ChannelListType {
   type: string
 }
 
+// 유출 이력 상세 정보 타입
+interface responseListType extends insertResponseType {
+  institutions: VictimType[]
+}
+
 const TrackingDetailPage = () => {
-  const { editFields, handleOnFieldsChange, handleOnCleanField } = useEdit()
   const queryParams = new URLSearchParams(location.search)
+  const { fields, handleOnChange, handleOnCleanForm } = useForm()
+
   const {
     insertResponseIssue,
     victims,
@@ -109,8 +141,14 @@ const TrackingDetailPage = () => {
     findTargetTypeText,
   } = useResponseAddMutation()
 
+  const {
+    insertChannel,
+    openInsertChannel,
+    closeInsertChannel,
+    insertChannelOpen,
+  } = useChannelAddMutation()
   // 작성일
-  const [date, setDate] = useState<string>('')
+  const [registrationDate, setRegistrationDate] = useState<string>('')
 
   // 게시일
   const [publishedDate, setPublishedDate] = useState<string>('')
@@ -130,6 +168,9 @@ const TrackingDetailPage = () => {
   // 공유
   const [shareTarget, setShareTarget] = useState<string[]>([])
 
+  // 공유 기타
+  const [shareTargetEtc, setShareTargetEtc] = useState<string>('')
+
   // 수집 정보
   const [colInfo, setColInfo] = useState<string>('')
 
@@ -140,10 +181,10 @@ const TrackingDetailPage = () => {
   const [contents, setContents] = useState<string>('')
 
   // 대상 구분 => 개인 | 개인 외
-  const [targetType, setTargetType] = useState<string[]>([])
+  const [indFlag, setIndFlag] = useState<string[]>([])
 
   // 피해 대상
-  const [target, setTarget] = useState<string>('')
+  const [targetType, setTargetType] = useState<string>('')
 
   // 침해 신고 여부
   const [reportFlag, setReportFlag] = useState<string>('')
@@ -154,7 +195,22 @@ const TrackingDetailPage = () => {
   // 거부 사유
   const [reason, setReason] = useState<string>('')
 
-  const responseDetail = useQueries<{ data: ChannelListType[] }>({
+  const [incidentTypeEtc, setIncidentTypeEtc] = useState<string>('')
+
+  const [incidentTypeDetail, setIncidentTypeDetail] = useState<string>('')
+  const [url, setUrl] = useState<string>('')
+  const [downloadUrl, setDownloadUrl] = useState<string>('')
+  const [title, setTitle] = useState<string>('')
+  const [writer, setWriter] = useState<string>('')
+  const [originTypeDetail, setOriginTypeDetail] = useState<string>('')
+  const [hackGroup, setHackGroup] = useState<string>('')
+  const [leakedInfo, setLeakedInfo] = useState<string>('')
+  const [comment, setComment] = useState<string>('')
+
+  const [institution, setInstitution] = useState<string>('')
+  const [incidentId, setIncidentId] = useState<string>('')
+
+  const responseDetail = useQueries<{ data: responseListType }>({
     queryKey: `responseDetail`,
     method: 'POST',
     url: '/api/issue/history/detail',
@@ -165,7 +221,57 @@ const TrackingDetailPage = () => {
   })
 
   useEffect(() => {
-    console.log(responseDetail.data?.data)
+    if (responseDetail.isSuccess && responseDetail.data?.data) {
+      const institutionsLength =
+        responseDetail.data?.data?.institutions.length || 0
+      const hasIndFlag = responseDetail.data?.data?.indFlag.includes('Y')
+
+      if (hasIndFlag) {
+        setIndFlag(institutionsLength > 0 ? ['개인', '개인 외'] : ['개인'])
+      } else {
+        setIndFlag(institutionsLength > 0 ? ['개인 외'] : [])
+      }
+      setChannelId(responseDetail.data?.data?.channelId?.toString() ?? '')
+      setColInfo(responseDetail.data?.data?.colInfo ?? '')
+      setComment(responseDetail.data?.data?.comment ?? '')
+      setContents(responseDetail.data?.data?.contents ?? '')
+      setDownloadUrl(responseDetail.data?.data?.downloadUrl ?? '')
+      setHackGroup(responseDetail.data?.data?.hackGroup ?? '')
+      setImageFlag(responseDetail.data?.data?.imageFlag ?? '')
+      setIncidentType(responseDetail.data?.data?.incidentType?.split(','))
+      setIncidentTypeDetail(responseDetail.data?.data?.incidentTypeDetail ?? '')
+      setVictims(responseDetail.data?.data?.institutions ?? '')
+
+      if (responseDetail.data?.data?.institutions.length > 0) {
+        setTargetType(
+          responseDetail.data?.data?.institutions[0]?.targetType ?? ''
+        )
+        setInstitution(
+          responseDetail.data?.data?.institutions[0]?.institution ?? ''
+        )
+        setReportFlag(
+          responseDetail.data?.data?.institutions[0]?.reportFlag ?? ' '
+        )
+        setSupportFlag(
+          responseDetail.data?.data?.institutions[0]?.supportFlag ?? ' '
+        )
+        setReason(responseDetail.data?.data?.institutions[0]?.reason ?? '')
+        setIncidentId(
+          responseDetail.data?.data?.institutions[0]?.incidentId ?? ''
+        )
+      }
+
+      setRegistrationDate(responseDetail.data?.data?.registrationDate ?? '')
+      setLeakedInfo(responseDetail.data?.data?.leakedInfo ?? '')
+      setOriginType(responseDetail.data?.data?.originType ?? '')
+      setOriginTypeDetail(responseDetail.data?.data?.originTypeDetail ?? '')
+      setPublishedDate(responseDetail.data?.data?.publishedDate ?? '')
+      setShareTarget(responseDetail.data?.data?.shareTarget?.split(','))
+      setThreatFlag(responseDetail.data?.data?.threatFlag ?? '')
+      setTitle(responseDetail.data?.data?.title ?? '')
+      setUrl(responseDetail.data?.data?.url ?? '')
+      setWriter(responseDetail.data?.data?.writer ?? '')
+    }
   }, [responseDetail.data])
 
   // 채널 선택 조회 API
@@ -175,62 +281,86 @@ const TrackingDetailPage = () => {
     url: '/api/issue/history/channel',
   })
 
-  const issueRequest = {
-    registrationDate: date,
-    incidentType: incidentType.join(','),
-    incidentTypeDetail: editFields.incidentTypeDetail ?? '',
-    threatFlag,
-    channelId: Number(channelId),
-    url: editFields.url ?? '',
-    downloadUrl: editFields.downloadUrl ?? '',
-    title: editFields.title ?? '',
-    writer: editFields.writer ?? '',
-    publishedDate: publishedDate,
-    originType: originType,
-    originTypeDetail: editFields.originTypeDetail ?? '',
-    shareTarget: shareTarget.join(','),
-    colInfo: colInfo,
-    imageFlag,
-    contents,
-    hackGroup: editFields.hackedGroup ?? '',
-    leakedInfo: editFields.leakedInfo ?? '',
-    comment: editFields.comment ?? '',
-  }
-
   // 피해 대상 생성
   const handleCreateVictims = () => {
     const tmpState = {
-      id: victims.length + 1,
-      registrationDate: date,
-      targetType: target,
-      institution: editFields.institution ?? '',
+      registrationDate,
+      targetType,
+      institution,
       reportFlag,
-      incidentId: editFields.incidentId ?? '',
+      incidentId,
       supportFlag,
       reason,
     }
     setVictims((prev) => [...prev, tmpState])
 
-    setTarget('')
+    setTargetType('')
     setReportFlag(' ')
     setSupportFlag(' ')
-    setReason(' ')
-    handleOnCleanField('institution', '')
-    handleOnCleanField('incidentId', '')
+    setReason('')
+    setInstitution('')
+    setIncidentId('')
   }
 
   // 대상 구분 개인일 때 빈 리스트 생성
   useEffect(() => {
-    if (targetType.length === 1 && targetType[0] === '개인')
-      handleCreateVictims()
-  }, [targetType])
+    if (indFlag.length === 1 && indFlag[0] === '개인') handleCreateVictims()
+  }, [indFlag])
 
   // 피해 대상 생성 취소
-  const handleOnCancelVictims = (id: number) => {
+  const handleOnCancelVictims = (event: any, id: number) => {
+    event.stopPropagation()
+
+    console.log(id)
     setVictims((prevVictims) =>
-      prevVictims.filter((victim) => victim.id !== id)
+      prevVictims.filter((victim) => victim.seqidx !== id)
     )
+
+    if (victims.length > 0) {
+      setTargetType(victims[0].targetType ?? '')
+      setInstitution(victims[0].institution ?? '')
+      setReportFlag(victims[0].reportFlag ?? ' ')
+      setSupportFlag(victims[0].supportFlag ?? ' ')
+      setReason(victims[0].reason ?? '')
+      setIncidentId(victims[0].incidentId ?? '')
+    }
+    if (victims.length === 0) {
+      setTargetType('')
+      setInstitution('')
+      setReportFlag(' ')
+      setSupportFlag(' ')
+      setReason('')
+      setIncidentId('')
+    }
   }
+  console.log(victims)
+
+  const handleOnInsertChannelAction = () => {
+    insertChannel.mutate({
+      domainName: fields.domainName,
+      channelType: fields.channelType,
+      channelName: fields.channelName,
+    })
+
+    handleOnCleanForm()
+  }
+
+  const handleOnInsertChannelCancelAction = () => {
+    closeInsertChannel()
+    handleOnCleanForm()
+  }
+
+  // 피해 대상 기관 없을 경우 비우기
+  useEffect(() => {
+    if (victims.length === 0) {
+      setTargetType('')
+      setInstitution('')
+      setReportFlag(' ')
+      setSupportFlag(' ')
+      setReason('')
+      setIncidentId('')
+    }
+  }, [victims])
 
   return (
     <ContentContainer>
@@ -243,7 +373,10 @@ const TrackingDetailPage = () => {
               등록일시
             </LabelTd>
             <Td colSpan={3}>
-              <CustomTimePicker date={date} setDate={setDate} />
+              <CustomTimePicker
+                date={registrationDate}
+                setDate={setRegistrationDate}
+              />
             </Td>
             <LabelTd colSpan={2}>
               <span>*</span>
@@ -252,12 +385,12 @@ const TrackingDetailPage = () => {
             <Td colSpan={10}>
               <CustomCheckBoxGroup
                 items={['개인', '개인 외']}
-                value={targetType}
-                setValue={setTargetType}
+                value={indFlag}
+                setValue={setIndFlag}
               />
             </Td>
           </tr>
-          {targetType.includes('개인 외') && (
+          {indFlag.includes('개인 외') && (
             <>
               <tr>
                 <LabelTd>
@@ -266,16 +399,16 @@ const TrackingDetailPage = () => {
                 <Td colSpan={7}>
                   <CustomRadio
                     items={targetList}
-                    value={target}
-                    setValue={setTarget}
+                    value={targetType}
+                    setValue={setTargetType}
                   />
                 </Td>
                 <LabelTd>피해기관</LabelTd>
                 <Td colSpan={4}>
                   <CustomEditable
                     id={'institution'}
-                    value={editFields.institution}
-                    onChange={handleOnFieldsChange}
+                    value={institution}
+                    setValue={setInstitution}
                   />
                 </Td>
                 <LabelTd>침해신고여부</LabelTd>
@@ -295,8 +428,8 @@ const TrackingDetailPage = () => {
                 <Td colSpan={3}>
                   <CustomEditable
                     id={'incidentId'}
-                    value={editFields.incidentId}
-                    onChange={handleOnFieldsChange}
+                    value={incidentId}
+                    setValue={setIncidentId}
                     disabled={reportFlag === 'N'}
                   />
                 </Td>
@@ -336,12 +469,12 @@ const TrackingDetailPage = () => {
                   />
                 </Td>
                 <Td colSpan={4}>
-                  <CustomEditable
-                    id={'reason'}
-                    value={editFields.reason}
-                    onChange={handleOnFieldsChange}
-                    disabled={reportFlag === 'Y' || reason !== '기타'}
-                  />
+                  {/*<CustomEditable*/}
+                  {/*  id={'reason'}*/}
+                  {/*  value={reason}*/}
+                  {/*  setValue={setReason}*/}
+                  {/*  disabled={reportFlag === 'Y' || reason !== '기타'}*/}
+                  {/*/>*/}
                 </Td>
                 <Td>
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -361,13 +494,23 @@ const TrackingDetailPage = () => {
                         victims.map((victim, index) => (
                           <AddVictimsWrapper
                             key={`${victim.targetType}_${index}`}
+                            onClick={() => {
+                              setTargetType(victim.targetType ?? '')
+                              setInstitution(victim.institution ?? '')
+                              setReportFlag(victim.reportFlag ?? ' ')
+                              setSupportFlag(victim.supportFlag ?? ' ')
+                              setReason(victim.reason ?? '')
+                              setIncidentId(victim.incidentId ?? '')
+                            }}
                           >
                             <span>
                               {findTargetTypeText(victim.targetType)} -
                               {victim.institution}
                             </span>
                             <button
-                              onClick={() => handleOnCancelVictims(victim.id)}
+                              onClick={(event) =>
+                                handleOnCancelVictims(event, victim.seqidx!)
+                              }
                             >
                               <IoMdClose />
                             </button>
@@ -403,9 +546,9 @@ const TrackingDetailPage = () => {
                 children={
                   <CustomEditable
                     id={'incidentType'}
-                    value={editFields.incidentType}
-                    onChange={handleOnFieldsChange}
-                    disabled={!incidentType.includes('기타')}
+                    value={incidentTypeEtc}
+                    setValue={setIncidentTypeEtc}
+                    disabled={!incidentType?.includes('기타')}
                   />
                 }
               />
@@ -416,8 +559,8 @@ const TrackingDetailPage = () => {
             <Td colSpan={11}>
               <CustomEditable
                 id={'incidentTypeDetail'}
-                value={editFields.incidentTypeDetail}
-                onChange={handleOnFieldsChange}
+                value={incidentTypeDetail}
+                setValue={setIncidentTypeDetail}
               />
             </Td>
             <LabelTd>
@@ -441,20 +584,28 @@ const TrackingDetailPage = () => {
                 <span>*</span>
                 채널 선택
               </LabelTd>
-              <Td colSpan={3}>
-                <CustomSelect
-                  options={
-                    channelList.isSuccess && channelList.data?.data
-                      ? channelList.data?.data?.map((item) => ({
-                          label: item.domain,
-                          value: item.seqidx.toString(),
-                        }))
-                      : []
-                  }
-                  setState={setChannelId}
-                />
+              <Td colSpan={6}>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <CustomSelect
+                    options={
+                      channelList.isSuccess && channelList.data?.data
+                        ? channelList.data?.data?.map((item) => ({
+                            label: item.domain,
+                            value: item.seqidx.toString(),
+                          }))
+                        : []
+                    }
+                    value={channelId}
+                    setState={setChannelId}
+                  />
+                  <Button
+                    text={'신규생성'}
+                    type={'primary'}
+                    onClick={openInsertChannel}
+                  />
+                </div>
               </Td>
-              <LabelTd colSpan={2}>
+              <LabelTd>
                 <span>*</span>
                 채널 구분
               </LabelTd>
@@ -462,17 +613,22 @@ const TrackingDetailPage = () => {
                 <CustomEditable
                   id={''}
                   value={
-                    (channelList.isSuccess &&
-                      channelList.data?.data.find(
-                        (item) => item.seqidx === Number(channelId)
-                      )?.type) ||
-                    ''
+                    channelList.isSuccess &&
+                    channelList.data?.data.find(
+                      (item) => item.seqidx === Number(channelId)
+                    )?.type === 'DT'
+                      ? '다크웹'
+                      : channelList.data?.data.find(
+                            (item) => item.seqidx === Number(channelId)
+                          )?.type === 'TT'
+                        ? '텔레그램'
+                        : ''
                   }
-                  onChange={handleOnFieldsChange}
+                  disabled
                 />
               </Td>
               <LabelTd>채널명</LabelTd>
-              <Td colSpan={6}>
+              <Td colSpan={4}>
                 <CustomEditable
                   id={''}
                   value={
@@ -482,7 +638,7 @@ const TrackingDetailPage = () => {
                       )?.channelName) ||
                     ''
                   }
-                  onChange={handleOnFieldsChange}
+                  disabled
                 />
               </Td>
             </tr>
@@ -490,36 +646,28 @@ const TrackingDetailPage = () => {
           <tr>
             <LabelTd colSpan={2}>게시글/텔레그램 URL</LabelTd>
             <Td colSpan={6}>
-              <CustomEditable
-                id={'url'}
-                value={editFields.url}
-                onChange={handleOnFieldsChange}
-              />
+              <CustomEditable id={'url'} value={url} setValue={setUrl} />
             </Td>
             <LabelTd colSpan={2}>다운로드 URL</LabelTd>
             <Td colSpan={6}>
               <CustomEditable
                 id={'downloadUrl'}
-                value={editFields.downloadUrl}
-                onChange={handleOnFieldsChange}
+                value={downloadUrl}
+                setValue={setDownloadUrl}
               />
             </Td>
           </tr>
           <tr>
             <LabelTd>제목</LabelTd>
             <Td colSpan={7}>
-              <CustomEditable
-                id={'title'}
-                value={editFields.title}
-                onChange={handleOnFieldsChange}
-              />
+              <CustomEditable id={'title'} value={title} setValue={setTitle} />
             </Td>
             <LabelTd>작성자</LabelTd>
             <Td colSpan={3}>
               <CustomEditable
                 id={'writer'}
-                value={editFields.writer}
-                onChange={handleOnFieldsChange}
+                value={writer}
+                setValue={setWriter}
               />
             </Td>
             <LabelTd>게시일</LabelTd>
@@ -553,8 +701,8 @@ const TrackingDetailPage = () => {
             <Td colSpan={9}>
               <CustomEditable
                 id={'originTypeDetail'}
-                value={editFields.originTypeDetail}
-                onChange={handleOnFieldsChange}
+                value={originTypeDetail}
+                setValue={setOriginTypeDetail}
               />
             </Td>
           </tr>
@@ -576,9 +724,9 @@ const TrackingDetailPage = () => {
                 children={
                   <CustomEditable
                     id={'shareTarget'}
-                    value={editFields.shareTarget}
-                    onChange={handleOnFieldsChange}
-                    disabled={!shareTarget.includes('기타')}
+                    value={shareTargetEtc}
+                    setValue={setShareTargetEtc}
+                    disabled={!shareTarget?.includes('기타')}
                   />
                 }
               />
@@ -638,17 +786,17 @@ const TrackingDetailPage = () => {
             <LabelTd>해커그룹</LabelTd>
             <Td colSpan={7}>
               <CustomEditable
-                id={'hackedGroup'}
-                value={editFields.hackedGroup}
-                onChange={handleOnFieldsChange}
+                id={'hackGroup'}
+                value={hackGroup}
+                setValue={setHackGroup}
               />
             </Td>
             <LabelTd>비고</LabelTd>
             <Td colSpan={7}>
               <CustomEditable
                 id={'comment'}
-                value={editFields.comment}
-                onChange={handleOnFieldsChange}
+                value={comment}
+                setValue={setComment}
               />
             </Td>
           </tr>
@@ -657,8 +805,8 @@ const TrackingDetailPage = () => {
             <Td colSpan={15}>
               <CustomEditable
                 id={'leakedInfo'}
-                value={editFields.leakedInfo}
-                onChange={handleOnFieldsChange}
+                value={leakedInfo}
+                setValue={setLeakedInfo}
               />
             </Td>
           </tr>
@@ -667,11 +815,81 @@ const TrackingDetailPage = () => {
       <ButtonContainer>
         <Button
           type={'primary'}
-          onClick={() => insertResponseIssue.mutate(issueRequest)}
+          onClick={() =>
+            insertResponseIssue.mutate({
+              registrationDate,
+              incidentType: incidentType.join(','),
+              incidentTypeDetail,
+              threatFlag,
+              channelId: Number(channelId),
+              url,
+              downloadUrl,
+              title,
+              writer,
+              publishedDate,
+              originType,
+              originTypeDetail,
+              shareTarget: shareTarget.join(','),
+              colInfo,
+              imageFlag,
+              contents,
+              hackGroup,
+              leakedInfo,
+              comment,
+              indFlag: indFlag.includes('개인') ? 'Y' : 'N',
+            })
+          }
           text={'저장'}
         />
         <Button type={'tertiary'} onClick={() => {}} text={'닫기'} />
       </ButtonContainer>
+      <CustomModal
+        isOpen={insertChannelOpen}
+        title='채널 추가'
+        onCancel={handleOnInsertChannelCancelAction}
+        content={
+          <ModalContents>
+            <Flex direction='column' gap={4} padding={4}>
+              <CustomInput
+                id='domainName'
+                value={fields.domainName}
+                label='신규 채널'
+                placeholder={'그룹 이름을 입력하세요.'}
+                onChange={handleOnChange}
+                required
+              />
+              <CustomInput
+                id='channelType'
+                value={fields.channelType}
+                label='채널구분'
+                placeholder={'설명을 입력하세요.'}
+                required
+                onChange={handleOnChange}
+              />
+              <CustomInput
+                id='channelName'
+                value={fields.channelName}
+                label='채널명'
+                placeholder={'설명을 입력하세요.'}
+                onChange={handleOnChange}
+                required
+              />
+            </Flex>
+            <ButtonWrapper>
+              <CustomButton
+                type='outline'
+                text='취소'
+                onClick={handleOnInsertChannelCancelAction}
+              />
+              <CustomButton
+                type='primary'
+                text='추가'
+                onClick={handleOnInsertChannelAction}
+              />
+            </ButtonWrapper>
+          </ModalContents>
+        }
+      />
     </ContentContainer>
   )
 }

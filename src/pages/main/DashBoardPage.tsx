@@ -23,19 +23,30 @@ interface HackingListType {
 }
 
 const DashBoardPage = () => {
+  const targetList = [
+    // { value: '', label: '전체' },
+    { value: 'ind', label: '개인' },
+    { value: 'company', label: '기업' },
+    { value: 'pub', label: '공공' },
+    { value: 'edu', label: '교육' },
+    { value: 'fin', label: '금융' },
+    { value: 'med', label: '의료' },
+    { value: 'other', label: '기타(해외)' },
+  ]
+
   // 모니터링 데이터 조회 API
   const responseList = useQueries<{ data: HackingListType[] }>({
     queryKey: `responseList`,
     method: 'POST',
     url: `/api/issue/history`,
     body: {
-      type: 'M',
+      type: 'I',
       page: 1,
-      startdate: dayjs().subtract(6, 'm').format('YYYY-MM-DD'),
+      startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
       enddate: dayjs().format('YYYY-MM-DD'),
       institution: '',
       channelName: '',
-      targetType: '',
+      targetType: 'pub',
       incidentType: '',
       apiType: '',
       originType: '',
@@ -51,6 +62,14 @@ const DashBoardPage = () => {
     {
       header: '대상구분',
       accessorKey: 'targetType',
+      cell: ({ row }: any) => {
+        const matching = targetList
+          .filter((item) =>
+            row.original.targetType.split('/').includes(item.value)
+          )
+          .map((item) => item.label)
+        return matching.join('/')
+      },
     },
     {
       header: '피해기관',
@@ -113,17 +132,17 @@ const DashBoardPage = () => {
                 <CustomList label={'수집 건수'} value={'1'} />
                 <CustomList label={'해킹 판단 건수'} value={'10'} />
                 <CustomList label={'대응 건수'} value={'30'} />
-                <ListSubTitle>Top 10 수집 채널</ListSubTitle>
-                <CustomList label={'t.me/Dark_Telegram1'} value={'1390'} />
-                <CustomList label={'t.me/piarc_new'} value={'998'} />
-                <CustomList label={'t.me/tgkpzq'} value={'464'} />
-                <CustomList label={'t.me/Neverbroke43'} value={'234'} />
-                <CustomList label={'t.me/instaprolikecomment5'} value={'129'} />
-                <CustomList label={'cracked.io'} value={'108'} />
-                <CustomList label={'www.nulled.to'} value={'99'} />
-                <CustomList label={'t.me/bwallagang'} value={'80'} />
-                <CustomList label={'breachforums'} value={'50'} />
-                <CustomList label={'awuohcqkwnaohnc.onion'} value={'45'} />
+                <ListSubTitle>Top 10 채널</ListSubTitle>
+                <CustomList label={'t.me/Dark_Telegram1'} value={'190'} />
+                <CustomList label={'t.me/piarc_new'} value={'98'} />
+                <CustomList label={'t.me/tgkpzq'} value={'46'} />
+                <CustomList label={'t.me/Neverbroke43'} value={'23'} />
+                <CustomList label={'t.me/instaprolikecomment5'} value={'12'} />
+                <CustomList label={'cracked.io'} value={'10'} />
+                <CustomList label={'www.nulled.to'} value={'9'} />
+                <CustomList label={'t.me/bwallagang'} value={'8'} />
+                <CustomList label={'breachforums'} value={'5'} />
+                <CustomList label={'awuohcqkwnaohnc.onion'} value={'4'} />
                 <CustomList label={'t.me/SELLERS_EMPIRE'} value={'30'} />
               </VStack>
             </ListBox>

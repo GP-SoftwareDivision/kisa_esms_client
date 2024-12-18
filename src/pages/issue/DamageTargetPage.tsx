@@ -22,6 +22,7 @@ import CustomSelect from '@/components/elements/Select.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import CustomDatePicker from '@/components/elements/DatePicker.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
+import { useNavigate } from 'react-router-dom'
 
 const ButtonWrapper = styled.div`
   display: flex;
@@ -56,6 +57,7 @@ interface DamageTargetListType {
 
 const DamageTargetPage = () => {
   const { page, handlePageChange } = usePagination(1)
+  const navigate = useNavigate()
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
   // 조회기간
@@ -177,7 +179,7 @@ const DamageTargetPage = () => {
             type={'outline'}
             text={'이동'}
             onClick={() => {
-              console.log(row)
+              navigate(`/issue/tracking/detail?id=${row.original.issueIdx}`)
             }}
           />
         </TableButtonWrapper>
@@ -308,7 +310,7 @@ const DamageTargetPage = () => {
       {/*판단 키워드 수정 모달*/}
       <CustomModal
         isOpen={updateRulesetOpen}
-        title='그룹 수정'
+        title='피해 대상 관리 수정'
         onCancel={closeUpdateRuleset}
         content={
           <ModalContents>

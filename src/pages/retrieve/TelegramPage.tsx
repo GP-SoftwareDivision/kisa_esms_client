@@ -120,7 +120,7 @@ const Telegram = () => {
     method: 'POST',
     url: `/api/manage/search/history/data`,
     body: {
-      type: 'tt',
+      type: 'TT',
     },
   })
 
@@ -334,7 +334,7 @@ const Telegram = () => {
                 type={'secondary'}
                 onClick={() =>
                   SaveSearch.mutate({
-                    type: 'tt',
+                    type: 'TT',
                     searchlog: new URLSearchParams({
                       startdate: date.startdate,
                       enddate: date.enddate,

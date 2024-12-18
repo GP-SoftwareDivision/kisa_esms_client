@@ -179,19 +179,19 @@ const TelegramDetailPage = () => {
               />
             </Td>
           </tr>
-          <tr>
-            <LabelTd>검색</LabelTd>
-            <Td colSpan={5}>
-              {/*<SearchContainer>*/}
-              {/*  <CustomEditable />*/}
-              {/*  <Button*/}
-              {/*    type={'primary'}*/}
-              {/*    onClick={() => console.log('')}*/}
-              {/*    text={'검색'}*/}
-              {/*  />*/}
-              {/*</SearchContainer>*/}
-            </Td>
-          </tr>
+          {/*<tr>*/}
+          {/*  <LabelTd>검색</LabelTd>*/}
+          {/*  <Td colSpan={5}>*/}
+          {/*    <SearchContainer>*/}
+          {/*      <CustomEditable />*/}
+          {/*      <Button*/}
+          {/*        type={'primary'}*/}
+          {/*        onClick={() => console.log('')}*/}
+          {/*        text={'검색'}*/}
+          {/*      />*/}
+          {/*    </SearchContainer>*/}
+          {/*  </Td>*/}
+          {/*</tr>*/}
           <tr>
             <LabelTd>내용</LabelTd>
             <Td colSpan={5}>
