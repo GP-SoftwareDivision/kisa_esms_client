@@ -62,7 +62,7 @@ const DarkWebDetailPage = () => {
 
   // html 새 창으로 열기 이벤트
   const ViewHtml = () => {
-    window.open(dtDetail.data?.data[0]?.htmlpath, '_blank')
+    window.open(`/${dtDetail.data?.data[0]?.htmlpath}`, '_blank')
   }
 
   return (
