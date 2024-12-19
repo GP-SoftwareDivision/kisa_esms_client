@@ -23,6 +23,7 @@ import CustomInput from '@/components/elements/Input.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useChannelAddMutation } from '@/hooks/mutations/useChannelAddMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
+import { useNavigate } from 'react-router-dom'
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -210,6 +211,7 @@ const TrackingDetailPage = () => {
   const [institution, setInstitution] = useState<string>('')
   const [incidentId, setIncidentId] = useState<string>('')
 
+  const navigate = useNavigate()
   const responseDetail = useQueries<{ data: responseListType }>({
     queryKey: `responseDetail`,
     method: 'POST',
@@ -311,7 +313,6 @@ const TrackingDetailPage = () => {
   const handleOnCancelVictims = (event: any, id: number) => {
     event.stopPropagation()
 
-    console.log(id)
     setVictims((prevVictims) =>
       prevVictims.filter((victim) => victim.seqidx !== id)
     )
@@ -361,6 +362,15 @@ const TrackingDetailPage = () => {
       setIncidentId('')
     }
   }, [victims])
+
+  // 닫기 이벤트
+  const handleOnClose = () => {
+    const isConfirm = confirm(
+      '작성 중인 내용이 저장되지 않습니다. 계속하시겠습니까?'
+    )
+
+    if (isConfirm) navigate(-1)
+  }
 
   return (
     <ContentContainer>
@@ -578,71 +588,69 @@ const TrackingDetailPage = () => {
               />
             </Td>
           </tr>
-          {channelList.isSuccess && (
-            <tr>
-              <LabelTd>
-                <span>*</span>
-                채널 선택
-              </LabelTd>
-              <Td colSpan={6}>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <CustomSelect
-                    options={
-                      channelList.isSuccess && channelList.data?.data
-                        ? channelList.data?.data?.map((item) => ({
-                            label: item.domain,
-                            value: item.seqidx.toString(),
-                          }))
-                        : []
-                    }
-                    value={channelId}
-                    setState={setChannelId}
-                  />
-                  <Button
-                    text={'신규생성'}
-                    type={'primary'}
-                    onClick={openInsertChannel}
-                  />
-                </div>
-              </Td>
-              <LabelTd>
-                <span>*</span>
-                채널 구분
-              </LabelTd>
-              <Td colSpan={3}>
-                <CustomEditable
-                  id={''}
-                  value={
-                    channelList.isSuccess &&
+          <tr>
+            <LabelTd>
+              <span>*</span>
+              채널 선택
+            </LabelTd>
+            <Td colSpan={6}>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <CustomSelect
+                  options={
+                    channelList.isSuccess && channelList.data?.data
+                      ? channelList.data?.data?.map((item) => ({
+                          label: item.domain,
+                          value: item.seqidx.toString(),
+                        }))
+                      : []
+                  }
+                  value={channelId}
+                  setState={setChannelId}
+                />
+                <Button
+                  text={'신규생성'}
+                  type={'primary'}
+                  onClick={openInsertChannel}
+                />
+              </div>
+            </Td>
+            <LabelTd>
+              <span>*</span>
+              채널 구분
+            </LabelTd>
+            <Td colSpan={3}>
+              <CustomEditable
+                id={''}
+                value={
+                  channelList.isSuccess &&
+                  channelList.data?.data.find(
+                    (item) => item.seqidx === Number(channelId)
+                  )?.type === 'DT'
+                    ? '다크웹'
+                    : channelList.data?.data.find(
+                          (item) => item.seqidx === Number(channelId)
+                        )?.type === 'TT'
+                      ? '텔레그램'
+                      : ''
+                }
+                disabled
+              />
+            </Td>
+            <LabelTd>채널명</LabelTd>
+            <Td colSpan={4}>
+              <CustomEditable
+                id={''}
+                value={
+                  (channelList.isSuccess &&
                     channelList.data?.data.find(
                       (item) => item.seqidx === Number(channelId)
-                    )?.type === 'DT'
-                      ? '다크웹'
-                      : channelList.data?.data.find(
-                            (item) => item.seqidx === Number(channelId)
-                          )?.type === 'TT'
-                        ? '텔레그램'
-                        : ''
-                  }
-                  disabled
-                />
-              </Td>
-              <LabelTd>채널명</LabelTd>
-              <Td colSpan={4}>
-                <CustomEditable
-                  id={''}
-                  value={
-                    (channelList.isSuccess &&
-                      channelList.data?.data.find(
-                        (item) => item.seqidx === Number(channelId)
-                      )?.channelName) ||
-                    ''
-                  }
-                  disabled
-                />
-              </Td>
-            </tr>
-          )}
+                    )?.channelName) ||
+                  ''
+                }
+                disabled
+              />
+            </Td>
+          </tr>
           <tr>
             <LabelTd colSpan={2}>게시글/텔레그램 URL</LabelTd>
             <Td colSpan={6}>
@@ -841,7 +849,7 @@ const TrackingDetailPage = () => {
           }
           text={'저장'}
         />
-        <Button type={'tertiary'} onClick={() => {}} text={'닫기'} />
+        <Button type={'tertiary'} onClick={handleOnClose} text={'닫기'} />
       </ButtonContainer>
       <CustomModal
         isOpen={insertChannelOpen}

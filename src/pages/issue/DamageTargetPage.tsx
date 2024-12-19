@@ -116,13 +116,7 @@ const DamageTargetPage = () => {
   const damageTargetColumns = [
     {
       header: '순번',
-      accessorKey: 'type',
-      cell: ({ row }: any) =>
-        row.original?.type === 'DT' ? (
-          <span>다크웹</span>
-        ) : (
-          <span>텔레그램</span>
-        ),
+      accessorKey: 'seqidx',
     },
     {
       header: '일시',
@@ -315,48 +309,65 @@ const DamageTargetPage = () => {
         content={
           <ModalContents>
             <Flex direction='column' gap={4} padding={4}>
+              <CustomSelect
+                label={'대상구분'}
+                options={[
+                  { value: 'company', label: '기업' },
+                  { value: 'pub', label: '공공' },
+                  { value: 'edu', label: '교육' },
+                  { value: 'fin', label: '금융' },
+                  { value: 'med', label: '의료' },
+                  { value: 'other', label: '기타(해외)' },
+                ]}
+                value={selectFields.targetType}
+                setState={(value) => handleSelectChange('targetType', value)}
+              />
               <CustomInput
                 id='update_rule'
                 value={updateData.rule || ''}
-                label='키워드'
-                placeholder={'키워드를 입력하세요.'}
+                label='피해기관'
+                placeholder={'피해기관을 입력하세요.'}
                 onChange={handleOnUpdateText}
                 required
               />
               <CustomSelect
-                label={'타입'}
+                label={'신고여부'}
                 value={updateData.type}
                 options={[
-                  { value: 'DT', label: '다크웹' },
-                  { value: 'TT', label: '텔레그램' },
+                  { value: 'Y', label: '신고' },
+                  { value: 'N', label: '미신고' },
                 ]}
                 setState={(value) =>
                   handleUpdateOption('type', value as string)
                 }
                 required
               />
+              <CustomInput
+                id='update_rule'
+                value={updateData.rule || ''}
+                label='사고번호'
+                placeholder={'사고번호를 입력하세요.'}
+                onChange={handleOnUpdateText}
+                required
+              />
               <CustomSelect
-                label={'사용여부'}
+                label={'기술지원'}
                 value={updateData.useflag}
                 options={[
-                  { value: 'Y', label: '사용' },
-                  { value: 'N', label: '미사용' },
+                  { value: 'Y', label: '동의' },
+                  { value: 'N', label: '미동의' },
                 ]}
                 setState={(value) =>
                   handleUpdateOption('useflag', value as string)
                 }
                 required
               />
-              <CustomSelect
-                label={'해킹여부'}
-                value={updateData.hackingflag}
-                options={[
-                  { value: 'Y', label: '해킹' },
-                  { value: 'N', label: '미해킹' },
-                ]}
-                setState={(value) =>
-                  handleUpdateOption('hackingflag', value as string)
-                }
+              <CustomInput
+                id='update_rule'
+                value={updateData.rule || ''}
+                label='거부사유'
+                placeholder={'거부사유를 입력하세요.'}
+                onChange={handleOnUpdateText}
                 required
               />
             </Flex>

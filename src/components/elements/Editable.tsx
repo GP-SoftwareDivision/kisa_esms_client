@@ -1,4 +1,4 @@
-import React, { Dispatch, memo } from 'react'
+import React, { Dispatch, memo, useCallback } from 'react'
 import styled from '@emotion/styled'
 import { Editable } from '@chakra-ui/react'
 
@@ -11,9 +11,12 @@ interface EditableProps {
 const CustomEditable = memo((props: EditableProps) => {
   const { id, value, setValue, disabled } = props
 
-  const handleOnValueChange = (value: string) => {
-    if (setValue) setValue(value)
-  }
+  const handleOnValueChange = useCallback(
+    (value: string) => {
+      if (setValue) setValue(value)
+    },
+    [value]
+  )
 
   return (
     <StyledEditable

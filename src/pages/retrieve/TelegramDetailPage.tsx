@@ -13,6 +13,7 @@ import { Loading } from '@/components/elements/Loading.tsx'
 import Empty from '@/components/elements/Empty.tsx'
 import { useInfiniteQueries } from '@/hooks/queries/useInfiniteQueries.tsx'
 import { highlightText } from '@/utils/highlightText.tsx'
+import CustomEditable from '@/components/elements/Editable.tsx'
 
 interface TelegramDetailType {
   seqidx: number
@@ -47,8 +48,11 @@ const TelegramDetailPage = () => {
 
   // 다음 데이터를 가져오기 위한 분기
   const [type, setType] = useState<'prev' | 'default' | 'next'>('default')
+
   // 번역 여부
   const [isTranslation, setTranslation] = useState<boolean>(false)
+
+  const [keyword, setKeyword] = useState<string>('')
 
   // 텔레그램 현재 id의 메시지로 위치를 이동하기 위한 REF
   const currentMessageRef = useRef<any>(null)
@@ -138,7 +142,7 @@ const TelegramDetailPage = () => {
         block: 'center',
       })
     }
-  }, [ttHistoryData])
+  }, [ttHistoryData.data])
 
   return (
     <ContentContainer>
@@ -179,19 +183,23 @@ const TelegramDetailPage = () => {
               />
             </Td>
           </tr>
-          {/*<tr>*/}
-          {/*  <LabelTd>검색</LabelTd>*/}
-          {/*  <Td colSpan={5}>*/}
-          {/*    <SearchContainer>*/}
-          {/*      <CustomEditable />*/}
-          {/*      <Button*/}
-          {/*        type={'primary'}*/}
-          {/*        onClick={() => console.log('')}*/}
-          {/*        text={'검색'}*/}
-          {/*      />*/}
-          {/*    </SearchContainer>*/}
-          {/*  </Td>*/}
-          {/*</tr>*/}
+          <tr>
+            <LabelTd>검색</LabelTd>
+            <Td colSpan={5}>
+              <SearchContainer>
+                <CustomEditable
+                  id={'keyword'}
+                  value={keyword}
+                  setValue={setKeyword}
+                />
+                <Button
+                  type={'primary'}
+                  onClick={() => console.log('')}
+                  text={'검색'}
+                />
+              </SearchContainer>
+            </Td>
+          </tr>
           <tr>
             <LabelTd>내용</LabelTd>
             <Td colSpan={5}>
@@ -251,18 +259,19 @@ const LabelTd = styled(Td)`
   background-color: #f6f6f6;
 `
 
-// const SearchContainer = styled(Box)`
-//   display: flex;
-//   align-items: center;
-//   gap: 1rem;
-//
-//   span {
-//     min-width: 10rem;
-//   }
-//   button {
-//     min-width: 5rem;
-//   }
-// `
+const SearchContainer = styled(Box)`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  span {
+    min-width: 10rem;
+  }
+  button {
+    min-width: 5rem;
+  }
+`
+
 const StyledContentsContainer = styled(Stack)`
   max-height: 50rem;
   overflow-y: auto;
