@@ -66,7 +66,7 @@ const CustomSelect = memo(
           {createListCollection({
             items: options,
           }).items.map((item, index: number) => (
-            <SelectItem item={item} key={`${item.value}_${index}`}>
+            <SelectItem item={item} key={index}>
               {item.label}
             </SelectItem>
           ))}

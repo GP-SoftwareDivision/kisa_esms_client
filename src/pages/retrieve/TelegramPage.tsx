@@ -24,6 +24,12 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import Empty from '@/components/elements/Empty.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 import { useSearchSaveMutation } from '@/hooks/mutations/useSearchSaveMutation.tsx'
+import { useQuery } from '@tanstack/react-query'
+import instance from '@/apis/instance.ts'
+import CustomModal from '@/components/elements/Modal.tsx'
+import CustomButton from '@/components/elements/Button.tsx'
+import { useForm } from '@/hooks/common/useForm.tsx'
+import { notifyError } from '@/utils/notify.ts'
 
 export interface ttListType {
   channelurl: string
@@ -46,7 +52,16 @@ const Telegram = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const { hackingOptions, responseOptions } = useOptions()
-  const SaveSearch = useSearchSaveMutation()
+  const { fields, handleOnChange, handleOnCleanForm } = useForm()
+
+  // 조회 조건 저장
+  const {
+    SaveSearch,
+    handleOnAddSearch,
+    handleOnAddSearchCancel,
+    insertSearchOpen,
+  } = useSearchSaveMutation()
+
   const { page, setPage, handlePageChange } = usePagination(1)
 
   // 검색 조건 불러오기
@@ -111,20 +126,24 @@ const Telegram = () => {
     url: `/api/monitoring/ttList${location.search}`,
   })
 
-  // 검색 기록 불러오기
-  const searchHistory = useQueries<{
+  // 검색조건 불러오기
+  const searchHistory = useQuery<{
     data: { searchlog: string; title: string }[]
     message: string
   }>({
-    queryKey: `searchHistory`,
-    method: 'POST',
-    url: `/api/manage/search/history/data`,
-    body: {
-      type: 'TT',
+    queryKey: ['searchHistoryList'],
+    queryFn: async () => {
+      try {
+        const response = await instance.post(
+          '/api/manage/search/history/data',
+          { type: 'TT' }
+        )
+        return response.data
+      } catch (error) {
+        console.error(error)
+      }
     },
   })
-
-  // 검색조건 불러오기
 
   useEffect(() => {
     if (savedSearchCondition) {
@@ -171,15 +190,45 @@ const Telegram = () => {
     navigate(`?${params}`)
   }
 
+  // 조회조건 저장
+  const handleOnAddSearchAction = () => {
+    if (!fields.searchName) {
+      notifyError('저장명을 입력해주세요')
+      return
+    }
+
+    SaveSearch.mutate({
+      type: 'DT',
+      searchlog: new URLSearchParams({
+        startdate: date.startdate,
+        enddate: date.enddate,
+        threatflag,
+        username: writer,
+        channel,
+        contents,
+        responseflag,
+        page: '1',
+        regex,
+        re_contents: reContents,
+        re_channel: reChannel,
+        re_username: reUsername,
+      }).toString(),
+      title: fields.searchName,
+    })
+
+    handleOnCleanForm()
+    handleOnAddSearchCancel()
+  }
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderTelegramList = useMemo(() => {
     if (ttList.isLoading) return <Loading />
-    if (ttList.isSuccess && ttList.data.count === 0)
+    if (!ttList.data || ttList.data.count === 0) {
       return (
         <EmptyBox>
           <Empty />
         </EmptyBox>
       )
+    }
     if (ttList.isSuccess && ttList.data.count > 0)
       return (
         <>
@@ -215,7 +264,7 @@ const Telegram = () => {
           </Stack>
         </>
       )
-  }, [page, handlePageChange, navigate, ttList])
+  }, [page, handlePageChange, navigate, ttList.data])
 
   return (
     <ContentContainer>
@@ -332,25 +381,7 @@ const Telegram = () => {
               <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
               <Button
                 type={'secondary'}
-                onClick={() =>
-                  SaveSearch.mutate({
-                    type: 'TT',
-                    searchlog: new URLSearchParams({
-                      startdate: date.startdate,
-                      enddate: date.enddate,
-                      threatflag,
-                      username: writer,
-                      channel,
-                      contents,
-                      responseflag,
-                      page: '1',
-                      regex,
-                      re_contents: reContents,
-                      re_channel: reChannel,
-                      re_username: reUsername,
-                    }).toString(),
-                  })
-                }
+                onClick={handleOnAddSearch}
                 text={'조회 조건 저장'}
               />
             </ButtonContainer>
@@ -411,6 +442,35 @@ const Telegram = () => {
         />
       </Stack>
       {renderTelegramList}
+      <CustomModal
+        isOpen={insertSearchOpen}
+        title='조회 조건 저장'
+        onCancel={handleOnAddSearchCancel}
+        content={
+          <ModalContents>
+            <CustomInput
+              id='searchName'
+              value={fields.searchName}
+              label='저장명'
+              placeholder={'조회 조건 저장명을 입력하세요.'}
+              onChange={handleOnChange}
+              required
+            />
+            <ButtonWrapper>
+              <CustomButton
+                type='outline'
+                text='취소'
+                onClick={handleOnAddSearchCancel}
+              />
+              <CustomButton
+                type='primary'
+                text='저장'
+                onClick={handleOnAddSearchAction}
+              />
+            </ButtonWrapper>
+          </ModalContents>
+        }
+      />
     </ContentContainer>
   )
 }
@@ -468,4 +528,17 @@ const AccordionContainer = styled(SimpleGrid)`
 const EmptyBox = styled(Box)`
   border-radius: 8px;
   border: 1px solid ${({ theme }) => theme.color.gray200};
+`
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+`
+
+const ModalContents = styled.div`
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `

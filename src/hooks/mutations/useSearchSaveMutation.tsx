@@ -3,17 +3,20 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import instance from '@/apis/instance.ts'
+import useModal from '@/hooks/common/useModal.tsx'
 
 interface SearchSaveMutationType {
   type: string
   searchlog: string
+  title: string
 }
 
 export const useSearchSaveMutation = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { openModal, closeModal, isOpen } = useModal()
 
-  return useMutation({
+  const SaveSearch = useMutation({
     mutationKey: ['SaveSearch'],
     mutationFn: async (data: SearchSaveMutationType) => {
       const response = await instance.post(
@@ -49,4 +52,20 @@ export const useSearchSaveMutation = () => {
       queryClient?.invalidateQueries({ queryKey: ['searchHistory'] })
     },
   })
+
+  // 유저 추가 => 모달 열림
+  const handleOnAddSearch = () => {
+    openModal('insert_search')
+  }
+
+  // 유저 추가 취소 => 모달 닫힘
+  const handleOnAddSearchCancel = () => {
+    closeModal('insert_search')
+  }
+  return {
+    SaveSearch,
+    handleOnAddSearch,
+    handleOnAddSearchCancel,
+    insertSearchOpen: isOpen('insert_search'),
+  }
 }

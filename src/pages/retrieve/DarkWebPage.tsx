@@ -23,6 +23,12 @@ import useOptions from '@/hooks/common/useOptions.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 import { useSearchSaveMutation } from '@/hooks/mutations/useSearchSaveMutation.tsx'
+import CustomModal from '@/components/elements/Modal.tsx'
+import CustomButton from '@/components/elements/Button.tsx'
+import { useForm } from '@/hooks/common/useForm.tsx'
+import { notifyError } from '@/utils/notify.ts'
+import { useQuery } from '@tanstack/react-query'
+import instance from '@/apis/instance.ts'
 
 export interface dtListType {
   seqidx: number
@@ -46,8 +52,17 @@ const DarkWebPage = () => {
   const queryParams = new URLSearchParams(location.search)
   const { responseOptions, hackingOptions } = useOptions()
   const { page, setPage, handlePageChange } = usePagination(1)
+  const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
-  // 검색조건 불러오기
+  // 조회 조건 저장
+  const {
+    SaveSearch,
+    handleOnAddSearch,
+    handleOnAddSearchCancel,
+    insertSearchOpen,
+  } = useSearchSaveMutation()
+
+  // 조회 조건 불러오기
   const [savedSearchCondition, setSavedSearchCondition] = useState<string>('')
 
   // 조회기간
@@ -122,9 +137,6 @@ const DarkWebPage = () => {
     }
   }, [savedSearchCondition])
 
-  // 검색조건 저장
-  const SaveSearch = useSearchSaveMutation()
-
   // 다크웹 데이터 조회 API
   const dtList = useQueries<{ data: dtListType[]; count: number }>({
     queryKey: `dtList`,
@@ -132,16 +144,22 @@ const DarkWebPage = () => {
     url: `/api/monitoring/dtList${location.search}`,
   })
 
-  // 검색 기록 불러오기
-  const searchHistory = useQueries<{
+  // 검색조건 불러오기
+  const searchHistory = useQuery<{
     data: { searchlog: string; title: string }[]
     message: string
   }>({
-    queryKey: `searchHistory`,
-    method: 'POST',
-    url: `/api/manage/search/history/data`,
-    body: {
-      type: 'DT',
+    queryKey: ['searchHistoryList'],
+    queryFn: async () => {
+      try {
+        const response = await instance.post(
+          '/api/manage/search/history/data',
+          { type: 'DT' }
+        )
+        return response.data
+      } catch (error) {
+        console.error(error)
+      }
     },
   })
 
@@ -166,16 +184,45 @@ const DarkWebPage = () => {
     navigate(`?${params}`)
   }
 
+  // 조회조건 저장
+  const handleOnAddSearchAction = () => {
+    if (!fields.searchName) {
+      notifyError('저장명을 입력해주세요')
+      return
+    }
+
+    SaveSearch.mutate({
+      type: 'DT',
+      searchlog: new URLSearchParams({
+        startdate: date.startdate,
+        enddate: date.enddate,
+        threatflag,
+        responseflag,
+        category,
+        title,
+        keyword,
+        url,
+        regex,
+        re_title: reTitle,
+        re_keyword: reKeyword,
+        page: '1',
+      }).toString(),
+      title: fields.searchName,
+    })
+    handleOnCleanForm()
+    handleOnAddSearchCancel()
+  }
+
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderDarkwebList = useMemo(() => {
     if (dtList.isLoading) return <Loading />
-    if (dtList.isSuccess && dtList.data.count === 0)
+    if (!dtList.data || dtList.data.count === 0)
       return (
         <EmptyBox>
           <Empty />
         </EmptyBox>
       )
-    if (dtList.isSuccess && dtList.data.count > 0)
+    if (!dtList.data || dtList.data.count > 0)
       return (
         <>
           <Stack margin={'1rem 0'}>
@@ -341,25 +388,7 @@ const DarkWebPage = () => {
               <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
               <Button
                 type={'secondary'}
-                onClick={() =>
-                  SaveSearch.mutate({
-                    type: 'DT',
-                    searchlog: new URLSearchParams({
-                      startdate: date.startdate,
-                      enddate: date.enddate,
-                      threatflag,
-                      responseflag,
-                      category,
-                      title,
-                      keyword,
-                      url,
-                      regex,
-                      re_title: reTitle,
-                      re_keyword: reKeyword,
-                      page: '1',
-                    }).toString(),
-                  })
-                }
+                onClick={handleOnAddSearch}
                 text={'조회 조건 저장'}
               />
             </ButtonContainer>
@@ -411,6 +440,35 @@ const DarkWebPage = () => {
         />
       </Stack>
       {renderDarkwebList}
+      <CustomModal
+        isOpen={insertSearchOpen}
+        title='조회 조건 저장'
+        onCancel={handleOnAddSearchCancel}
+        content={
+          <ModalContents>
+            <CustomInput
+              id='searchName'
+              value={fields.searchName}
+              label='저장명'
+              placeholder={'조회 조건 저장명을 입력하세요.'}
+              onChange={handleOnChange}
+              required
+            />
+            <ButtonWrapper>
+              <CustomButton
+                type='outline'
+                text='취소'
+                onClick={handleOnAddSearchCancel}
+              />
+              <CustomButton
+                type='primary'
+                text='저장'
+                onClick={handleOnAddSearchAction}
+              />
+            </ButtonWrapper>
+          </ModalContents>
+        }
+      />
     </ContentContainer>
   )
 }
@@ -470,4 +528,17 @@ const AccordionContainer = styled(SimpleGrid)`
 const EmptyBox = styled(Box)`
   border-radius: 8px;
   border: 1px solid ${({ theme }) => theme.color.gray200};
+`
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+`
+
+const ModalContents = styled.div`
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `

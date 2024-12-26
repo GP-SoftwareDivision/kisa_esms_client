@@ -63,7 +63,6 @@ export function useQueries<TData>({
               )
           }
         }
-        return undefined // 에러 시 상태 변경 최소화
       }
     },
     enabled: !!queryKey && !!url && !!method && (enabled ?? true), // 기본값 true

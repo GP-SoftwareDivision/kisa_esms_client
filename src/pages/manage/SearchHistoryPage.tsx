@@ -17,6 +17,7 @@ interface SearchHistoryListType {
   regdate: string
   searchlog: string
   type: string
+  title: string
   username: string
 }
 
@@ -69,18 +70,16 @@ const SearchHistoryPage = () => {
       },
     },
     {
+      header: '저장명',
+      accessorKey: 'title',
+    },
+    {
       header: '작성자명',
       accessorKey: 'username',
     },
     {
       header: '수집대상',
       accessorKey: 'type',
-      cell: ({ row }: any) =>
-        row.original?.type === 'DT' ? (
-          <span>다크웹</span>
-        ) : (
-          <span>텔레그램</span>
-        ),
     },
     {
       header: '저장일시',
@@ -97,7 +96,7 @@ const SearchHistoryPage = () => {
             text={'이동'}
             onClick={() =>
               navigate(
-                `/retrieve/${row.original.type === 'DT' ? 'darkweb' : 'telegram'}?${row.original.searchlog}`
+                `/retrieve/${row.original.type === '다크웹' ? 'darkweb' : 'telegram'}?${row.original.searchlog}`
               )
             }
           />
