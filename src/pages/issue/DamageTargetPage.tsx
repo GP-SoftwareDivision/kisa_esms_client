@@ -98,7 +98,6 @@ const DamageTargetPage = () => {
     updateRulesetOpen,
     updateData,
     setUpdateData,
-    handleUpdateOption,
     handleOnUpdateText,
   } = useRulesetUpdateMutation()
 
@@ -240,7 +239,9 @@ const DamageTargetPage = () => {
             label={'대상구분'}
             options={targetList}
             value={selectFields.targetType}
-            setState={(value) => handleSelectChange('targetType', value)}
+            onChange={(item: { items: any; value: string[] }) =>
+              handleSelectChange('targetType', item.value.join(','))
+            }
           />
         </Box>
         <Box>
@@ -261,7 +262,9 @@ const DamageTargetPage = () => {
               { value: 'N', label: '미신고' },
             ]}
             value={selectFields.reportFlag}
-            setState={(value) => handleSelectChange('reportFlag', value)}
+            onChange={(item: { items: any; value: string[] }) =>
+              handleSelectChange('reportFlag', item.value.join(','))
+            }
           />
         </Box>
         <Box>
@@ -273,7 +276,9 @@ const DamageTargetPage = () => {
               { value: 'N', label: '미동의' },
             ]}
             value={selectFields.supportFlag}
-            setState={(value) => handleSelectChange('supportFlag', value)}
+            onChange={(item: { items: any; value: string[] }) =>
+              handleSelectChange('supportFlag', item.value.join(','))
+            }
           />
         </Box>
         <Box></Box>
@@ -320,7 +325,9 @@ const DamageTargetPage = () => {
                   { value: 'other', label: '기타(해외)' },
                 ]}
                 value={selectFields.targetType}
-                setState={(value) => handleSelectChange('targetType', value)}
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleSelectChange('targetType', item.value.join(','))
+                }
               />
               <CustomInput
                 id='update_rule'
@@ -337,8 +344,8 @@ const DamageTargetPage = () => {
                   { value: 'Y', label: '신고' },
                   { value: 'N', label: '미신고' },
                 ]}
-                setState={(value) =>
-                  handleUpdateOption('type', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleSelectChange('type', item.value.join(','))
                 }
                 required
               />
@@ -357,8 +364,8 @@ const DamageTargetPage = () => {
                   { value: 'Y', label: '동의' },
                   { value: 'N', label: '미동의' },
                 ]}
-                setState={(value) =>
-                  handleUpdateOption('useflag', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleSelectChange('useflag', item.value.join(','))
                 }
                 required
               />

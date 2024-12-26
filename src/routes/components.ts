@@ -32,8 +32,8 @@ export const TelegramDetail = lazy(
 
 export const Alert = lazy(() => import('@/pages/setting/AlertPage.tsx'))
 // export const Keyword = lazy(() => import('@/pages/manage/KeywordPage.tsx'))
-export const JudgmentKeyword = lazy(
-  () => import('@/pages/manage/JudgmentKeywordPage.tsx')
+export const RuleSetKeyword = lazy(
+  () => import('@/pages/manage/RuleSetKeywordPage.tsx')
 )
 export const Group = lazy(() => import('@/pages/setting/GroupPage.tsx'))
 export const Server = lazy(() => import('@/pages/setting/ServerPage.tsx'))

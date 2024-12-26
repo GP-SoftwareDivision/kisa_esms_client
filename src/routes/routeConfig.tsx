@@ -17,7 +17,7 @@ export const routeConfig: RouteObject[] = [
   { path: '/retrieve/darkweb/detail', element: <Components.DarkWebDetail /> },
   { path: '/retrieve/telegram', element: <Components.Telegram /> },
   { path: '/retrieve/telegram/detail', element: <Components.TelegramDetail /> },
-  { path: '/manage/judgmentkeyword', element: <Components.JudgmentKeyword /> },
+  { path: '/manage/rulesetkeyword', element: <Components.RuleSetKeyword /> },
   { path: '/manage/channel', element: <Components.Channel /> },
   { path: '/manage/searchhistory', element: <Components.SearchHistory /> },
   { path: '/setting/user', element: <Components.User /> },

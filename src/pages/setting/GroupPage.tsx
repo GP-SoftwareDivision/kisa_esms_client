@@ -170,7 +170,9 @@ const GroupPage = () => {
                   { value: 'Y', label: '사용' },
                   { value: 'N', label: '미사용' },
                 ]}
-                setState={setUseFlag}
+                onChange={(item: { items: any; value: string[] }) =>
+                  setUseFlag(item.value.join(','))
+                }
                 required
               />
               <CustomSelect
@@ -179,7 +181,9 @@ const GroupPage = () => {
                   { value: 'Y', label: '발송' },
                   { value: 'N', label: '미발송' },
                 ]}
-                setState={setKakaoFlag}
+                onChange={(item: { items: any; value: string[] }) =>
+                  setKakaoFlag(item.value.join(','))
+                }
                 required
               />
               <CustomSelect
@@ -188,7 +192,9 @@ const GroupPage = () => {
                   { value: 'Y', label: '발송' },
                   { value: 'N', label: '미발송' },
                 ]}
-                setState={setEmailFlag}
+                onChange={(item: { items: any; value: string[] }) =>
+                  setEmailFlag(item.value.join(','))
+                }
                 required
               />
             </Flex>
@@ -238,8 +244,8 @@ const GroupPage = () => {
                   { value: 'Y', label: '사용' },
                   { value: 'N', label: '미사용' },
                 ]}
-                setState={(value) =>
-                  handleUpdateOption('useflag', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleUpdateOption('useflag', item.value.join(','))
                 }
                 required
               />
@@ -250,8 +256,8 @@ const GroupPage = () => {
                   { value: 'Y', label: '발송' },
                   { value: 'N', label: '미발송' },
                 ]}
-                setState={(value) =>
-                  handleUpdateOption('kakaoflag', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleUpdateOption('kakaoflag', item.value.join(','))
                 }
                 required
               />
@@ -262,8 +268,8 @@ const GroupPage = () => {
                   { value: 'Y', label: '발송' },
                   { value: 'N', label: '미발송' },
                 ]}
-                setState={(value) =>
-                  handleUpdateOption('emailflag', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleUpdateOption('emailflag', item.value.join(','))
                 }
                 required
               />

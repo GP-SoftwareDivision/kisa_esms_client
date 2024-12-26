@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { AxiosError } from 'axios'
-import { useEffect, useReducer, useState } from 'react'
+import { useReducer, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import instance from '@/apis/instance.ts'
@@ -324,10 +324,6 @@ export const useTrackingDetailMutation = () => {
 
     if (isConfirm) navigate(-1)
   }
-
-  useEffect(() => {
-    console.log(state.indFlag)
-  }, [state.indFlag])
 
   return {
     state,

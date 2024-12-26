@@ -189,7 +189,7 @@ const TelegramDetailPage = () => {
                 <CustomEditable
                   id={'keyword'}
                   value={keyword}
-                  setValue={setKeyword}
+                  onChange={(item: { value: string }) => setKeyword(item.value)}
                 />
                 <Button
                   type={'primary'}

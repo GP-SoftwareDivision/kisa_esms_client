@@ -26,7 +26,7 @@ interface JudgmentListType {
   regdate: string
 }
 
-const JudgmentKeywordPage = () => {
+const RuleSetKeywordPage = () => {
   // 삭제 목록
   const [deleteItems, setDeleteItems] = useState<number[]>([])
 
@@ -222,7 +222,9 @@ const JudgmentKeywordPage = () => {
                   { value: 'DT', label: '다크웹' },
                   { value: 'TT', label: '텔레그램' },
                 ]}
-                setState={setApitype}
+                onChange={(item: { items: any; value: string[] }) =>
+                  setApitype(item.value.join(','))
+                }
                 required
               />
               <CustomSelect
@@ -231,7 +233,9 @@ const JudgmentKeywordPage = () => {
                   { value: 'Y', label: '해킹' },
                   { value: 'N', label: '미해킹' },
                 ]}
-                setState={setHackingflag}
+                onChange={(item: { items: any; value: string[] }) =>
+                  setHackingflag(item.value.join(','))
+                }
                 required
               />
             </Flex>
@@ -274,8 +278,8 @@ const JudgmentKeywordPage = () => {
                   { value: 'DT', label: '다크웹' },
                   { value: 'TT', label: '텔레그램' },
                 ]}
-                setState={(value) =>
-                  handleUpdateOption('type', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleUpdateOption('type', item.value.join(','))
                 }
                 required
               />
@@ -286,8 +290,8 @@ const JudgmentKeywordPage = () => {
                   { value: 'Y', label: '사용' },
                   { value: 'N', label: '미사용' },
                 ]}
-                setState={(value) =>
-                  handleUpdateOption('useflag', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleUpdateOption('useflag', item.value.join(','))
                 }
                 required
               />
@@ -298,8 +302,8 @@ const JudgmentKeywordPage = () => {
                   { value: 'Y', label: '해킹' },
                   { value: 'N', label: '미해킹' },
                 ]}
-                setState={(value) =>
-                  handleUpdateOption('hackingflag', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleUpdateOption('hackingflag', item.value.join(','))
                 }
                 required
               />
@@ -322,7 +326,7 @@ const JudgmentKeywordPage = () => {
     </ContentContainer>
   )
 }
-export default JudgmentKeywordPage
+export default RuleSetKeywordPage
 
 const TitleButtonWrapper = styled.div`
   display: flex;

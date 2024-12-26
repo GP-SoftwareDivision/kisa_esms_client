@@ -232,7 +232,9 @@ const TrackingPage = () => {
             label={'대상구분'}
             options={targetList}
             value={selectFields.targetType}
-            setState={(value) => handleSelectChange('targetType', value)}
+            onChange={(item: { items: any; value: string[] }) =>
+              handleSelectChange('targetType', item.value.join(','))
+            }
           />
         </Box>
         <Box>
@@ -261,7 +263,9 @@ const TrackingPage = () => {
               { value: '기타', label: '기타' },
             ]}
             value={selectFields.incidentType}
-            setState={(value) => handleSelectChange('incidentType', value)}
+            onChange={(item: { items: any; value: string[] }) =>
+              handleSelectChange('incidentType', item.value.join(','))
+            }
           />
         </Box>
         <Box>
@@ -277,7 +281,9 @@ const TrackingPage = () => {
               { value: '기타', label: '기타' },
             ]}
             value={fields.apiType}
-            setState={(value) => handleSelectChange('apiType', value)}
+            onChange={(item: { items: any; value: string[] }) =>
+              handleSelectChange('apiType', item.value.join(','))
+            }
           />
         </Box>
         <Box>
@@ -302,7 +308,9 @@ const TrackingPage = () => {
               { value: '기타', label: '기타' },
             ]}
             value={selectFields.originType}
-            setState={(value) => handleSelectChange('originType', value)}
+            onChange={(item: { items: any; value: string[] }) =>
+              handleSelectChange('originType', item.value.join(','))
+            }
           />
         </Box>
         <ButtonContainer>

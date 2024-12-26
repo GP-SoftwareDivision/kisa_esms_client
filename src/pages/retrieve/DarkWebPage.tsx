@@ -237,7 +237,9 @@ const DarkWebPage = () => {
                   }))
                 : []
             }
-            setState={setSavedSearchCondition}
+            onChange={(item: { items: any; value: string[] }) =>
+              setSavedSearchCondition(item.value.join(','))
+            }
           />
           <Button
             type={'primary'}
@@ -263,7 +265,9 @@ const DarkWebPage = () => {
                 { value: 'url-deepweb', label: 'url-deepweb' },
               ]}
               value={category}
-              setState={setCategory}
+              onChange={(item: { items: any; value: string[] }) =>
+                setCategory(item.value.join(','))
+              }
               disabled={isReSearch}
             />
           </Box>
@@ -272,7 +276,9 @@ const DarkWebPage = () => {
               label={'해킹 여부'}
               options={hackingOptions}
               value={threatflag}
-              setState={setThreatFlag}
+              onChange={(item: { items: any; value: string[] }) =>
+                setThreatFlag(item.value.join(','))
+              }
               disabled={isReSearch}
             />
           </Box>
@@ -281,7 +287,9 @@ const DarkWebPage = () => {
               label={'대응 여부'}
               options={responseOptions}
               value={responseflag}
-              setState={setResponseFlag}
+              onChange={(item: { items: any; value: string[] }) =>
+                setResponseFlag(item.value.join(','))
+              }
               disabled={isReSearch}
             />
           </Box>

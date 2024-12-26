@@ -242,7 +242,9 @@ const Telegram = () => {
                   }))
                 : []
             }
-            setState={setSavedSearchCondition}
+            onChange={(item: { items: any; value: string[] }) =>
+              setSavedSearchCondition(item.value.join(','))
+            }
           />
           <Button
             type={'primary'}
@@ -264,7 +266,9 @@ const Telegram = () => {
               label={'해킹 여부'}
               options={hackingOptions}
               value={threatflag}
-              setState={setThreatFlag}
+              onChange={(item: { items: any; value: string[] }) =>
+                setThreatFlag(item.value.join(','))
+              }
               disabled={isReSearch}
             />
           </Box>
@@ -273,7 +277,9 @@ const Telegram = () => {
               label={'대응 여부'}
               options={responseOptions}
               value={responseflag}
-              setState={setResponseFlag}
+              onChange={(item: { items: any; value: string[] }) =>
+                setResponseFlag(item.value.join(','))
+              }
               disabled={isReSearch}
             />
           </Box>

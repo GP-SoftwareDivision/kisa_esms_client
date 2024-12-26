@@ -308,7 +308,9 @@ const UserPage = () => {
                   { label: '사용자', value: 'user' },
                   { label: '관리자', value: 'administrator' },
                 ]}
-                setState={setUserType}
+                onChange={(item: { items: any; value: string[] }) =>
+                  setUserType(item.value.join(','))
+                }
                 required
               />
               <CustomSelect
@@ -317,7 +319,9 @@ const UserPage = () => {
                   userGroupList.isSuccess ? userGroupList.data?.data : []
                 }
                 multiple
-                setState={setGroupCode}
+                onChange={(item: { items: any; value: string[] }) =>
+                  setGroupCode(item.value.join(','))
+                }
                 required
               />
             </Flex>
@@ -378,8 +382,8 @@ const UserPage = () => {
                   { label: '사용자', value: 'user' },
                   { label: '관리자', value: 'administrator' },
                 ]}
-                setState={(value) =>
-                  handleUpdateOption('usertype', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleUpdateOption('usertype', item.value.join(','))
                 }
                 required
               />
@@ -390,8 +394,8 @@ const UserPage = () => {
                   userGroupList.isSuccess ? userGroupList.data?.data : []
                 }
                 multiple
-                setState={(value) =>
-                  handleUpdateOption('groupcode', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleUpdateOption('groupcode', item.value.join(','))
                 }
                 required
               />
@@ -402,8 +406,8 @@ const UserPage = () => {
                   { label: '사용', value: 'Y' },
                   { label: '미사용', value: 'N' },
                 ]}
-                setState={(value) =>
-                  handleUpdateOption('useflag', value as string)
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleUpdateOption('useflag', item.value.join(','))
                 }
                 required
               />
