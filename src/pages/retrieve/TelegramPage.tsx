@@ -23,7 +23,7 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Empty from '@/components/elements/Empty.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
-import { useSearchSave } from '@/hooks/mutations/useSearchSave.tsx'
+import { useSearchSaveMutation } from '@/hooks/mutations/useSearchSaveMutation.tsx'
 
 export interface ttListType {
   channelurl: string
@@ -45,12 +45,12 @@ const Telegram = () => {
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const { page, setPage, handlePageChange } = usePagination(
-    Number(queryParams.get('page')) || 1
-  )
-
   const { hackingOptions, responseOptions } = useOptions()
+  const SaveSearch = useSearchSaveMutation()
+  const { page, setPage, handlePageChange } = usePagination(1)
 
+  // 검색 조건 불러오기
+  const [savedSearchCondition, setSavedSearchCondition] = useState<string>('')
   // 조회기간
   const [date, setDate] = useState({
     startdate: queryParams.get('startdate') || '',
@@ -125,7 +125,6 @@ const Telegram = () => {
   })
 
   // 검색조건 불러오기
-  const [savedSearchCondition, setSavedSearchCondition] = useState<string>('')
 
   useEffect(() => {
     if (savedSearchCondition) {
@@ -149,11 +148,8 @@ const Telegram = () => {
           queryParams.get('re_channel') !== '' ||
           queryParams.get('re_username') !== ''
       )
-      navigate(`?${savedSearchCondition}`)
     }
   }, [savedSearchCondition])
-
-  const SaveSearch = useSearchSave()
 
   // 검색 조건 적용 후 파라미터 변경
   const handleOnSearch = () => {
@@ -221,8 +217,6 @@ const Telegram = () => {
       )
   }, [page, handlePageChange, navigate, ttList])
 
-  const handleOnSelectChange = () => {}
-
   return (
     <ContentContainer>
       <PageTitle
@@ -230,7 +224,7 @@ const Telegram = () => {
         children={
           <Button
             type={'secondary'}
-            onClick={handleOnSelectChange}
+            onClick={() => {}}
             text={'엑셀 다운로드'}
           />
         }
@@ -252,7 +246,7 @@ const Telegram = () => {
           />
           <Button
             type={'primary'}
-            onClick={handleOnSelectChange}
+            onClick={() => navigate(`?${savedSearchCondition}`)}
             text={'적용'}
           />
         </StyledLoad>

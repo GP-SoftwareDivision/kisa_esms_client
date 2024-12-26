@@ -26,7 +26,7 @@
     "key": "issue",
     "subMenu": {
       "title": "이력 관리",
-      "items": [{ "label": "이슈 대응 이력", "key": "tracking" },{ "label": "피해 대상 관리", "key": "damagetarget" }, { "label": "유출 정보 판별", "key": "infringement" }]
+      "items": [{ "label": "대응 이력", "key": "tracking" },{ "label": "피해 대상 관리", "key": "damagetarget" }, { "label": "유출 정보 판별", "key": "infringement" }]
     }
   },
   {

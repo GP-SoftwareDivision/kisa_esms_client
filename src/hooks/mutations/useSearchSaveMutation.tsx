@@ -9,7 +9,7 @@ interface SearchSaveMutationType {
   searchlog: string
 }
 
-export const useSearchSave = () => {
+export const useSearchSaveMutation = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 

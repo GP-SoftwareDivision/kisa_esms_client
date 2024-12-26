@@ -22,7 +22,7 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import useOptions from '@/hooks/common/useOptions.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
-import { useSearchSave } from '@/hooks/mutations/useSearchSave.tsx'
+import { useSearchSaveMutation } from '@/hooks/mutations/useSearchSaveMutation.tsx'
 
 export interface dtListType {
   seqidx: number
@@ -44,11 +44,11 @@ const DarkWebPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-
-  const { page, setPage, handlePageChange } = usePagination(
-    Number(queryParams.get('page')) || 1
-  )
   const { responseOptions, hackingOptions } = useOptions()
+  const { page, setPage, handlePageChange } = usePagination(1)
+
+  // 검색조건 불러오기
+  const [savedSearchCondition, setSavedSearchCondition] = useState<string>('')
 
   // 조회기간
   const [date, setDate] = useState({
@@ -100,9 +100,6 @@ const DarkWebPage = () => {
     queryParams.get('re_title') !== '' || queryParams.get('re_keyword') !== ''
   )
 
-  // 검색조건 불러오기
-  const [savedSearchCondition, setSavedSearchCondition] = useState<string>('')
-
   useEffect(() => {
     if (savedSearchCondition) {
       const params = new URLSearchParams(savedSearchCondition)
@@ -122,12 +119,11 @@ const DarkWebPage = () => {
       setIsReSearch(
         params.get('re_title') !== '' || params.get('re_keyword') !== ''
       )
-      navigate(`?${savedSearchCondition}`)
     }
   }, [savedSearchCondition])
 
   // 검색조건 저장
-  const SaveSearch = useSearchSave()
+  const SaveSearch = useSearchSaveMutation()
 
   // 다크웹 데이터 조회 API
   const dtList = useQueries<{ data: dtListType[]; count: number }>({
@@ -169,6 +165,7 @@ const DarkWebPage = () => {
     setPage(1)
     navigate(`?${params}`)
   }
+
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderDarkwebList = useMemo(() => {
     if (dtList.isLoading) return <Loading />
@@ -244,7 +241,7 @@ const DarkWebPage = () => {
           />
           <Button
             type={'primary'}
-            onClick={() => console.log('')}
+            onClick={() => navigate(`?${savedSearchCondition}`)}
             text={'적용'}
           />
         </StyledLoad>

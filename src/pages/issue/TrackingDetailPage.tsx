@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
+import Creatable from 'react-select'
+import { FixedSizeList as List } from 'react-window'
 import styled from '@emotion/styled'
 import { IoMdClose } from 'react-icons/io'
 
@@ -15,15 +17,15 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import {
   insertResponseType,
   VictimType,
-  useResponseAddMutation,
-} from '@/hooks/mutations/useResponseAddMutation.tsx'
+  useTrackingDetailMutation,
+} from '@/hooks/mutations/useTrackingDetailMutation.tsx'
 import { Flex } from '@chakra-ui/react'
 import CustomModal from '@/components/elements/Modal.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useChannelAddMutation } from '@/hooks/mutations/useChannelAddMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
-import { useNavigate } from 'react-router-dom'
+import { notifyError } from '@/utils/notify.ts'
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -117,6 +119,66 @@ const ButtonWrapper = styled.div`
   gap: 10px;
 `
 
+const StyledMenuList = styled.div`
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  gap: 0.5rem;
+  align-items: center;
+
+  button {
+    height: 30px !important;
+  }
+`
+
+// react-window를 사용한 selectbox 스타일
+const selectStyles = {
+  container: (base: any) => ({
+    ...base,
+    width: '100%',
+  }),
+  control: (base: any) => ({
+    ...base,
+    outline: 'none',
+    boxShadow: 'none',
+    border: '1px solid #d9d9d9',
+    height: '30px',
+    '&:hover': {
+      border: '1px solid #d9d9d9',
+    },
+  }),
+  input: (base: any) => ({
+    ...base,
+    outline: 'none',
+    boxShadow: 'none',
+  }),
+  menu: (base: any) => ({
+    ...base,
+    boxShadow: 'none',
+  }),
+  option: (base: any, state: any) => ({
+    ...base,
+    fontSize: '0.785rem',
+    cursor: 'pointer',
+    backgroundColor: state.isSelected
+      ? '#f6f6f6'
+      : state.isActive
+        ? '#FFFFFF'
+        : '#FFFFFF',
+    color: '#000000',
+  }),
+  indicatorSeparator: (base: any) => ({
+    ...base,
+    display: 'none',
+  }),
+  indicatorContainer: (base: any) => ({
+    ...base,
+    display: 'none',
+    padding: '4px',
+  }),
+}
+
 // 채널 리스트 타입 정의
 interface ChannelListType {
   channelName: string
@@ -136,11 +198,14 @@ const TrackingDetailPage = () => {
 
   const {
     insertResponseIssue,
+    state,
+    updateState,
     victims,
     setVictims,
     targetList,
     findTargetTypeText,
-  } = useResponseAddMutation()
+    handleOnExitPage,
+  } = useTrackingDetailMutation()
 
   const {
     insertChannel,
@@ -148,70 +213,7 @@ const TrackingDetailPage = () => {
     closeInsertChannel,
     insertChannelOpen,
   } = useChannelAddMutation()
-  // 작성일
-  const [registrationDate, setRegistrationDate] = useState<string>('')
 
-  // 게시일
-  const [publishedDate, setPublishedDate] = useState<string>('')
-
-  // 사고 유형
-  const [incidentType, setIncidentType] = useState<string[]>([])
-
-  // 협박 유무
-  const [threatFlag, setThreatFlag] = useState<string>('')
-
-  // 선택된 채널
-  const [channelId, setChannelId] = useState<string>('')
-
-  // 최초 인지
-  const [originType, setOriginType] = useState<string>('')
-
-  // 공유
-  const [shareTarget, setShareTarget] = useState<string[]>([])
-
-  // 공유 기타
-  const [shareTargetEtc, setShareTargetEtc] = useState<string>('')
-
-  // 수집 정보
-  const [colInfo, setColInfo] = useState<string>('')
-
-  // 이미지 유무
-  const [imageFlag, setImageFlag] = useState<string>('')
-
-  // 보고 문구
-  const [contents, setContents] = useState<string>('')
-
-  // 대상 구분 => 개인 | 개인 외
-  const [indFlag, setIndFlag] = useState<string[]>([])
-
-  // 피해 대상
-  const [targetType, setTargetType] = useState<string>('')
-
-  // 침해 신고 여부
-  const [reportFlag, setReportFlag] = useState<string>('')
-
-  // 기술 지원 여부
-  const [supportFlag, setSupportFlag] = useState<string>('')
-
-  // 거부 사유
-  const [reason, setReason] = useState<string>('')
-
-  const [incidentTypeEtc, setIncidentTypeEtc] = useState<string>('')
-
-  const [incidentTypeDetail, setIncidentTypeDetail] = useState<string>('')
-  const [url, setUrl] = useState<string>('')
-  const [downloadUrl, setDownloadUrl] = useState<string>('')
-  const [title, setTitle] = useState<string>('')
-  const [writer, setWriter] = useState<string>('')
-  const [originTypeDetail, setOriginTypeDetail] = useState<string>('')
-  const [hackGroup, setHackGroup] = useState<string>('')
-  const [leakedInfo, setLeakedInfo] = useState<string>('')
-  const [comment, setComment] = useState<string>('')
-
-  const [institution, setInstitution] = useState<string>('')
-  const [incidentId, setIncidentId] = useState<string>('')
-
-  const navigate = useNavigate()
   const responseDetail = useQueries<{ data: responseListType }>({
     queryKey: `responseDetail`,
     method: 'POST',
@@ -222,60 +224,6 @@ const TrackingDetailPage = () => {
     enabled: !!queryParams.get('id'),
   })
 
-  useEffect(() => {
-    if (responseDetail.isSuccess && responseDetail.data?.data) {
-      const institutionsLength =
-        responseDetail.data?.data?.institutions.length || 0
-      const hasIndFlag = responseDetail.data?.data?.indFlag.includes('Y')
-
-      if (hasIndFlag) {
-        setIndFlag(institutionsLength > 0 ? ['개인', '개인 외'] : ['개인'])
-      } else {
-        setIndFlag(institutionsLength > 0 ? ['개인 외'] : [])
-      }
-      setChannelId(responseDetail.data?.data?.channelId?.toString() ?? '')
-      setColInfo(responseDetail.data?.data?.colInfo ?? '')
-      setComment(responseDetail.data?.data?.comment ?? '')
-      setContents(responseDetail.data?.data?.contents ?? '')
-      setDownloadUrl(responseDetail.data?.data?.downloadUrl ?? '')
-      setHackGroup(responseDetail.data?.data?.hackGroup ?? '')
-      setImageFlag(responseDetail.data?.data?.imageFlag ?? '')
-      setIncidentType(responseDetail.data?.data?.incidentType?.split(','))
-      setIncidentTypeDetail(responseDetail.data?.data?.incidentTypeDetail ?? '')
-      setVictims(responseDetail.data?.data?.institutions ?? '')
-
-      if (responseDetail.data?.data?.institutions.length > 0) {
-        setTargetType(
-          responseDetail.data?.data?.institutions[0]?.targetType ?? ''
-        )
-        setInstitution(
-          responseDetail.data?.data?.institutions[0]?.institution ?? ''
-        )
-        setReportFlag(
-          responseDetail.data?.data?.institutions[0]?.reportFlag ?? ' '
-        )
-        setSupportFlag(
-          responseDetail.data?.data?.institutions[0]?.supportFlag ?? ' '
-        )
-        setReason(responseDetail.data?.data?.institutions[0]?.reason ?? '')
-        setIncidentId(
-          responseDetail.data?.data?.institutions[0]?.incidentId ?? ''
-        )
-      }
-
-      setRegistrationDate(responseDetail.data?.data?.registrationDate ?? '')
-      setLeakedInfo(responseDetail.data?.data?.leakedInfo ?? '')
-      setOriginType(responseDetail.data?.data?.originType ?? '')
-      setOriginTypeDetail(responseDetail.data?.data?.originTypeDetail ?? '')
-      setPublishedDate(responseDetail.data?.data?.publishedDate ?? '')
-      setShareTarget(responseDetail.data?.data?.shareTarget?.split(','))
-      setThreatFlag(responseDetail.data?.data?.threatFlag ?? '')
-      setTitle(responseDetail.data?.data?.title ?? '')
-      setUrl(responseDetail.data?.data?.url ?? '')
-      setWriter(responseDetail.data?.data?.writer ?? '')
-    }
-  }, [responseDetail.data])
-
   // 채널 선택 조회 API
   const channelList = useQueries<{ data: ChannelListType[] }>({
     queryKey: `channelList`,
@@ -283,31 +231,113 @@ const TrackingDetailPage = () => {
     url: '/api/issue/history/channel',
   })
 
+  // 처음 데이터 받아왔을 때
+  useEffect(() => {
+    if (responseDetail.isSuccess && responseDetail.data?.data) {
+      const institutionsLength =
+        responseDetail.data?.data?.institutions.length || 0
+      const hasIndFlag = responseDetail.data?.data?.indFlag.includes('Y')
+      if (hasIndFlag) {
+        updateState(
+          'SET_IND_FLAG',
+          institutionsLength > 0 ? ['개인', '개인 외'] : ['개인']
+        )
+      } else {
+        updateState('SET_IND_FLAG', institutionsLength > 0 ? ['개인 외'] : [])
+      }
+
+      updateState(
+        'SET_CHANNEL_ID',
+        responseDetail.data?.data?.channelId?.toString() ?? ''
+      )
+      updateState('SET_COL_INFO', responseDetail.data?.data?.colInfo ?? '')
+      updateState('SET_COMMENT', responseDetail.data?.data?.comment ?? '')
+      updateState('SET_CONTENTS', responseDetail.data?.data?.contents ?? '')
+      updateState(
+        'SET_DOWNLOAD_URL',
+        responseDetail.data?.data?.downloadUrl ?? ''
+      )
+      updateState('SET_HACK_GROUP', responseDetail.data?.data?.hackGroup ?? '')
+      updateState('SET_IMAGE_FLAG', responseDetail.data?.data?.imageFlag ?? '')
+      updateState(
+        'SET_INCIDENT_TYPE',
+        responseDetail.data?.data?.incidentType?.split(',') ?? []
+      )
+
+      if (responseDetail.data?.data?.institutions.length > 0) {
+        const firstInstitution = responseDetail.data?.data?.institutions[0]
+        updateState('SET_TARGET_TYPE', firstInstitution?.targetType ?? '')
+        updateState('SET_INSTITUTION', firstInstitution?.institution ?? '')
+        updateState('SET_REPORT_FLAG', firstInstitution?.reportFlag ?? ' ')
+        updateState('SET_SUPPORT_FLAG', firstInstitution?.supportFlag ?? ' ')
+        updateState('SET_REASON', firstInstitution?.reason ?? '')
+        updateState('SET_INCIDENT_ID', firstInstitution?.incidentId ?? '')
+      }
+
+      updateState(
+        'SET_REGISTRATION_DATE',
+        responseDetail.data?.data?.registrationDate ?? ''
+      )
+      updateState(
+        'SET_LEAKED_INFO',
+        responseDetail.data?.data?.leakedInfo ?? ''
+      )
+      updateState(
+        'SET_ORIGIN_TYPE',
+        responseDetail.data?.data?.originType ?? ''
+      )
+      updateState(
+        'SET_ORIGIN_TYPE_DETAIL',
+        responseDetail.data?.data?.originTypeDetail ?? ''
+      )
+      updateState(
+        'SET_PUBLISHED_DATE',
+        responseDetail.data?.data?.publishedDate ?? ''
+      )
+      updateState(
+        'SET_SHARE_TARGET',
+        responseDetail.data?.data?.shareTarget?.split(',') ?? []
+      )
+      updateState(
+        'SET_THREAT_FLAG',
+        responseDetail.data?.data?.threatFlag ?? ''
+      )
+      updateState('SET_TITLE', responseDetail.data?.data?.title ?? '')
+      updateState('SET_URL', responseDetail.data?.data?.url ?? '')
+      updateState('SET_WRITER', responseDetail.data?.data?.writer ?? '')
+    }
+  }, [responseDetail.isSuccess, responseDetail.data])
+
   // 피해 대상 생성
   const handleCreateVictims = () => {
-    const tmpState = {
-      registrationDate,
-      targetType,
-      institution,
-      reportFlag,
-      incidentId,
-      supportFlag,
-      reason,
+    if (!state.targetType || !state.institution) {
+      notifyError('모든 필수 항목을 입력해주세요.')
+      return
     }
-    setVictims((prev) => [...prev, tmpState])
+    const request = {
+      seqidx: victims.length + 1,
+      registrationDate: state.registrationDate,
+      targetType: state.targetType,
+      institution: state.institution,
+      reportFlag: state.reportFlag,
+      incidentId: state.incidentId,
+      supportFlag: state.supportFlag,
+      reason:
+        state.reason === '기타'
+          ? `${state.reason}:${state.reasonEtc}`
+          : state.reason,
+    }
 
-    setTargetType('')
-    setReportFlag(' ')
-    setSupportFlag(' ')
-    setReason('')
-    setInstitution('')
-    setIncidentId('')
+    setVictims((prev) => [...prev, request])
+
+    updateState('SET_TARGET_TYPE', '')
+    updateState('SET_INSTITUTION', '')
+    updateState('SET_REPORT_FLAG', ' ')
+    updateState('SET_INCIDENT_ID', '')
+    updateState('SET_SUPPORT_FLAG', ' ')
+    updateState('SET_REASON', ' ')
+    updateState('SET_REASON_ETC', '')
   }
-
-  // 대상 구분 개인일 때 빈 리스트 생성
-  useEffect(() => {
-    if (indFlag.length === 1 && indFlag[0] === '개인') handleCreateVictims()
-  }, [indFlag])
 
   // 피해 대상 생성 취소
   const handleOnCancelVictims = (event: any, id: number) => {
@@ -316,26 +346,9 @@ const TrackingDetailPage = () => {
     setVictims((prevVictims) =>
       prevVictims.filter((victim) => victim.seqidx !== id)
     )
-
-    if (victims.length > 0) {
-      setTargetType(victims[0].targetType ?? '')
-      setInstitution(victims[0].institution ?? '')
-      setReportFlag(victims[0].reportFlag ?? ' ')
-      setSupportFlag(victims[0].supportFlag ?? ' ')
-      setReason(victims[0].reason ?? '')
-      setIncidentId(victims[0].incidentId ?? '')
-    }
-    if (victims.length === 0) {
-      setTargetType('')
-      setInstitution('')
-      setReportFlag(' ')
-      setSupportFlag(' ')
-      setReason('')
-      setIncidentId('')
-    }
   }
-  console.log(victims)
 
+  // 채널 신규 생성
   const handleOnInsertChannelAction = () => {
     insertChannel.mutate({
       domainName: fields.domainName,
@@ -346,30 +359,43 @@ const TrackingDetailPage = () => {
     handleOnCleanForm()
   }
 
+  // 채널 생성 취소 액션
   const handleOnInsertChannelCancelAction = () => {
     closeInsertChannel()
     handleOnCleanForm()
   }
 
-  // 피해 대상 기관 없을 경우 비우기
-  useEffect(() => {
-    if (victims.length === 0) {
-      setTargetType('')
-      setInstitution('')
-      setReportFlag(' ')
-      setSupportFlag(' ')
-      setReason('')
-      setIncidentId('')
+  // 채널 선택에 들어가는 옵션
+  const channelListMemoization = useMemo(() => {
+    if (channelList.isSuccess && channelList.data?.data) {
+      return channelList.data.data.map((item) => ({
+        label: item.domain,
+        value: item.seqidx.toString(),
+      }))
     }
-  }, [victims])
+    return []
+  }, [channelList])
 
-  // 닫기 이벤트
-  const handleOnClose = () => {
-    const isConfirm = confirm(
-      '작성 중인 내용이 저장되지 않습니다. 계속하시겠습니까?'
+  // 채널 선택의 대량 데이터를 처리하기 위함
+  const MenuList = (props: any) => {
+    const { options, children, getValue, height = 35 } = props // 기본 height 값 설정
+    const [value] = getValue()
+    const initialOffset =
+      options.findIndex((option: any) => option.value === value?.value) * height
+
+    return (
+      <List
+        width={'100%'}
+        height={200}
+        itemCount={children.length}
+        itemSize={height}
+        initialScrollOffset={initialOffset}
+      >
+        {({ index, style }: { index: any; style: any }) => (
+          <div style={{ ...style, overflow: 'hidden' }}>{children[index]}</div>
+        )}
+      </List>
     )
-
-    if (isConfirm) navigate(-1)
   }
 
   return (
@@ -384,8 +410,10 @@ const TrackingDetailPage = () => {
             </LabelTd>
             <Td colSpan={3}>
               <CustomTimePicker
-                date={registrationDate}
-                setDate={setRegistrationDate}
+                date={state.registrationDate}
+                onChange={(_date: unknown, dateString: string | string[]) =>
+                  updateState('SET_REGISTRATION_DATE', dateString as string)
+                }
               />
             </Td>
             <LabelTd colSpan={2}>
@@ -395,12 +423,12 @@ const TrackingDetailPage = () => {
             <Td colSpan={10}>
               <CustomCheckBoxGroup
                 items={['개인', '개인 외']}
-                value={indFlag}
-                setValue={setIndFlag}
+                value={state.indFlag}
+                onChange={(value) => updateState('SET_IND_FLAG', value)}
               />
             </Td>
           </tr>
-          {indFlag.includes('개인 외') && (
+          {state.indFlag.includes('개인 외') && (
             <>
               <tr>
                 <LabelTd>
@@ -409,16 +437,22 @@ const TrackingDetailPage = () => {
                 <Td colSpan={7}>
                   <CustomRadio
                     items={targetList}
-                    value={targetType}
-                    setValue={setTargetType}
+                    value={state.targetType}
+                    onChange={(item: { value: string }) =>
+                      updateState('SET_TARGET_TYPE', item.value)
+                    }
                   />
                 </Td>
-                <LabelTd>피해기관</LabelTd>
+                <LabelTd>
+                  <span>*</span>피해기관
+                </LabelTd>
                 <Td colSpan={4}>
                   <CustomEditable
                     id={'institution'}
-                    value={institution}
-                    setValue={setInstitution}
+                    value={state.institution}
+                    onChange={(item: { value: string }) =>
+                      updateState('SET_INSTITUTION', item.value)
+                    }
                   />
                 </Td>
                 <LabelTd>침해신고여부</LabelTd>
@@ -428,8 +462,10 @@ const TrackingDetailPage = () => {
                       { value: 'Y', label: '신고' },
                       { value: 'N', label: '미신고' },
                     ]}
-                    value={reportFlag}
-                    setState={setReportFlag}
+                    value={state.reportFlag}
+                    onChange={(item: { items: any; value: string[] }) =>
+                      updateState('SET_REPORT_FLAG', item.value.join(','))
+                    }
                   />
                 </Td>
               </tr>
@@ -438,9 +474,11 @@ const TrackingDetailPage = () => {
                 <Td colSpan={3}>
                   <CustomEditable
                     id={'incidentId'}
-                    value={incidentId}
-                    setValue={setIncidentId}
-                    disabled={reportFlag === 'N'}
+                    value={state.incidentId}
+                    onChange={(item: { value: string }) =>
+                      updateState('SET_INCIDENT_ID', item.value)
+                    }
+                    disabled={state.reportFlag === 'N'}
                   />
                 </Td>
                 <LabelTd colSpan={2}>기술지원여부</LabelTd>
@@ -450,9 +488,11 @@ const TrackingDetailPage = () => {
                       { value: 'Y', label: '동의' },
                       { value: 'N', label: '미동의' },
                     ]}
-                    value={supportFlag}
-                    setState={setSupportFlag}
-                    disabled={reportFlag === 'N'}
+                    value={state.supportFlag}
+                    onChange={(item: { items: any; value: string[] }) =>
+                      updateState('SET_SUPPORT_FLAG', item.value.join(','))
+                    }
+                    disabled={state.reportFlag === 'N'}
                   />
                 </Td>
                 <LabelTd>거부사유</LabelTd>
@@ -473,18 +513,24 @@ const TrackingDetailPage = () => {
                       { value: '이관', label: '이관' },
                       { value: '기타', label: '기타' },
                     ]}
-                    value={reason}
-                    setState={setReason}
-                    disabled={reportFlag === 'Y'}
+                    value={state.reason}
+                    onChange={(item: { items: any; value: string[] }) =>
+                      updateState('SET_REASON', item.value.join(','))
+                    }
+                    disabled={state.reportFlag === 'Y'}
                   />
                 </Td>
                 <Td colSpan={4}>
-                  {/*<CustomEditable*/}
-                  {/*  id={'reason'}*/}
-                  {/*  value={reason}*/}
-                  {/*  setValue={setReason}*/}
-                  {/*  disabled={reportFlag === 'Y' || reason !== '기타'}*/}
-                  {/*/>*/}
+                  <CustomEditable
+                    id={'reason'}
+                    value={state.reasonEtc}
+                    onChange={(item: { value: string }) =>
+                      updateState('SET_REASON_ETC', item.value)
+                    }
+                    disabled={
+                      state.reportFlag === 'Y' || state.reason !== '기타'
+                    }
+                  />
                 </Td>
                 <Td>
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -500,32 +546,44 @@ const TrackingDetailPage = () => {
                 <tr>
                   <Td colSpan={16}>
                     <VictimsListContainer>
-                      {victims.length > 0 &&
-                        victims.map((victim, index) => (
-                          <AddVictimsWrapper
-                            key={`${victim.targetType}_${index}`}
-                            onClick={() => {
-                              setTargetType(victim.targetType ?? '')
-                              setInstitution(victim.institution ?? '')
-                              setReportFlag(victim.reportFlag ?? ' ')
-                              setSupportFlag(victim.supportFlag ?? ' ')
-                              setReason(victim.reason ?? '')
-                              setIncidentId(victim.incidentId ?? '')
-                            }}
+                      {victims.map((victim) => (
+                        <AddVictimsWrapper
+                          key={victim.seqidx}
+                          onClick={() => {
+                            updateState('SET_TARGET_TYPE', victim.targetType)
+                            updateState('SET_INSTITUTION', victim.institution)
+                            updateState(
+                              'SET_REPORT_FLAG',
+                              victim.reportFlag ?? ' '
+                            )
+                            updateState('SET_INCIDENT_ID', victim.incidentId)
+                            updateState(
+                              'SET_SUPPORT_FLAG',
+                              victim.supportFlag ?? ' '
+                            )
+                            updateState(
+                              'SET_REASON',
+                              victim.reason ? victim.reason.split(':')[0] : ' '
+                            )
+                            updateState(
+                              'SET_REASON_ETC',
+                              victim.reason ? victim.reason.split(':')[1] : ' '
+                            )
+                          }}
+                        >
+                          <span>
+                            {findTargetTypeText(victim.targetType)} -
+                            {victim.institution}
+                          </span>
+                          <button
+                            onClick={(e) =>
+                              handleOnCancelVictims(e, victim.seqidx!)
+                            }
                           >
-                            <span>
-                              {findTargetTypeText(victim.targetType)} -
-                              {victim.institution}
-                            </span>
-                            <button
-                              onClick={(event) =>
-                                handleOnCancelVictims(event, victim.seqidx!)
-                              }
-                            >
-                              <IoMdClose />
-                            </button>
-                          </AddVictimsWrapper>
-                        ))}
+                            <IoMdClose />
+                          </button>
+                        </AddVictimsWrapper>
+                      ))}
                     </VictimsListContainer>
                   </Td>
                 </tr>
@@ -551,14 +609,16 @@ const TrackingDetailPage = () => {
                   '확인불가',
                   '기타',
                 ]}
-                value={incidentType}
-                setValue={setIncidentType}
+                value={state.incidentType}
+                onChange={(value) => updateState('SET_INCIDENT_TYPE', value)}
                 children={
                   <CustomEditable
                     id={'incidentType'}
-                    value={incidentTypeEtc}
-                    setValue={setIncidentTypeEtc}
-                    disabled={!incidentType?.includes('기타')}
+                    value={state.incidentTypeEtc}
+                    disabled={!state.incidentType?.includes('기타')}
+                    onChange={(item: { value: string }) =>
+                      updateState('SET_INCIDENT_TYPE_ETC', item.value)
+                    }
                   />
                 }
               />
@@ -569,8 +629,10 @@ const TrackingDetailPage = () => {
             <Td colSpan={11}>
               <CustomEditable
                 id={'incidentTypeDetail'}
-                value={incidentTypeDetail}
-                setValue={setIncidentTypeDetail}
+                value={state.incidentTypeDetail}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_INCIDENT_DETAIL', item.value)
+                }
               />
             </Td>
             <LabelTd>
@@ -583,8 +645,10 @@ const TrackingDetailPage = () => {
                   { label: '있음', value: 'Y' },
                   { label: '없음', value: 'N' },
                 ]}
-                value={threatFlag}
-                setValue={setThreatFlag}
+                value={state.threatFlag}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_THREAT_FLAG', item.value)
+                }
               />
             </Td>
           </tr>
@@ -593,96 +657,99 @@ const TrackingDetailPage = () => {
               <span>*</span>
               채널 선택
             </LabelTd>
-            <Td colSpan={6}>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <CustomSelect
-                  options={
-                    channelList.isSuccess && channelList.data?.data
-                      ? channelList.data?.data?.map((item) => ({
-                          label: item.domain,
-                          value: item.seqidx.toString(),
-                        }))
-                      : []
-                  }
-                  value={channelId}
-                  setState={setChannelId}
+            <Td colSpan={8}>
+              <StyledMenuList>
+                <Creatable
+                  // menuIsOpen
+                  options={channelListMemoization}
+                  styles={selectStyles}
+                  components={{ MenuList }}
+                  placeholder='옵션을 선택해 주세요'
+                  noOptionsMessage={() => '일치하는 채널이 없습니다.'}
+                  menuPortalTarget={document.body}
+                  menuPlacement='bottom'
                 />
                 <Button
-                  text={'신규생성'}
-                  type={'primary'}
+                  text='신규생성'
+                  type='primary'
                   onClick={openInsertChannel}
                 />
-              </div>
+              </StyledMenuList>
             </Td>
             <LabelTd>
               <span>*</span>
               채널 구분
             </LabelTd>
-            <Td colSpan={3}>
-              <CustomEditable
-                id={''}
-                value={
-                  channelList.isSuccess &&
-                  channelList.data?.data.find(
-                    (item) => item.seqidx === Number(channelId)
-                  )?.type === 'DT'
-                    ? '다크웹'
-                    : channelList.data?.data.find(
-                          (item) => item.seqidx === Number(channelId)
-                        )?.type === 'TT'
-                      ? '텔레그램'
-                      : ''
-                }
-                disabled
-              />
+            <Td colSpan={2}>
+              <span>
+                {(channelList.isSuccess &&
+                  channelList.data?.data?.find(
+                    (item) => item.seqidx === Number(state.channelId)
+                  )?.type) ||
+                  ''}
+              </span>
             </Td>
             <LabelTd>채널명</LabelTd>
-            <Td colSpan={4}>
-              <CustomEditable
-                id={''}
-                value={
-                  (channelList.isSuccess &&
-                    channelList.data?.data.find(
-                      (item) => item.seqidx === Number(channelId)
-                    )?.channelName) ||
-                  ''
-                }
-                disabled
-              />
+            <Td colSpan={3}>
+              <span>
+                {(channelList.isSuccess &&
+                  channelList.data?.data?.find(
+                    (item) => item.seqidx === Number(state.channelId)
+                  )?.channelName) ||
+                  ''}
+              </span>
             </Td>
           </tr>
           <tr>
             <LabelTd colSpan={2}>게시글/텔레그램 URL</LabelTd>
             <Td colSpan={6}>
-              <CustomEditable id={'url'} value={url} setValue={setUrl} />
+              <CustomEditable
+                id={'url'}
+                value={state.url}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_URL', item.value)
+                }
+              />
             </Td>
             <LabelTd colSpan={2}>다운로드 URL</LabelTd>
             <Td colSpan={6}>
               <CustomEditable
                 id={'downloadUrl'}
-                value={downloadUrl}
-                setValue={setDownloadUrl}
+                value={state.downloadUrl}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_DOWNLOAD_URL', item.value)
+                }
               />
             </Td>
           </tr>
           <tr>
             <LabelTd>제목</LabelTd>
             <Td colSpan={7}>
-              <CustomEditable id={'title'} value={title} setValue={setTitle} />
+              <CustomEditable
+                id={'title'}
+                value={state.title}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_TITLE', item.value)
+                }
+              />
             </Td>
             <LabelTd>작성자</LabelTd>
             <Td colSpan={3}>
               <CustomEditable
                 id={'writer'}
-                value={writer}
-                setValue={setWriter}
+                value={state.writer}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_WRITER', item.value)
+                }
               />
             </Td>
             <LabelTd>게시일</LabelTd>
             <Td colSpan={3}>
               <CustomTimePicker
-                date={publishedDate}
-                setDate={setPublishedDate}
+                date={state.publishedDate}
+                onChange={(_date: unknown, dateString: string | string[]) =>
+                  updateState('SET_PUBLISHED_DATE', dateString as string)
+                }
               />
             </Td>
           </tr>
@@ -701,16 +768,20 @@ const TrackingDetailPage = () => {
                   { value: '언론보도', label: '언론보도' },
                   { value: '기타', label: '기타' },
                 ]}
-                value={originType}
-                setState={setOriginType}
+                value={state.originType}
+                onChange={(item: { items: any; value: string[] }) =>
+                  updateState('SET_ORIGIN_TYPE', item.value.join(','))
+                }
               />
             </Td>
             <LabelTd colSpan={2}>최초인지 상세</LabelTd>
             <Td colSpan={9}>
               <CustomEditable
                 id={'originTypeDetail'}
-                value={originTypeDetail}
-                setValue={setOriginTypeDetail}
+                value={state.originTypeDetail}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_ORIGIN_TYPE_DETAIL', item.value)
+                }
               />
             </Td>
           </tr>
@@ -727,14 +798,16 @@ const TrackingDetailPage = () => {
                   '개보위',
                   '기타',
                 ]}
-                value={shareTarget}
-                setValue={setShareTarget}
+                value={state.shareTarget}
+                onChange={(value) => updateState('SET_SHARE_TARGET', value)}
                 children={
                   <CustomEditable
                     id={'shareTarget'}
-                    value={shareTargetEtc}
-                    setValue={setShareTargetEtc}
-                    disabled={!shareTarget?.includes('기타')}
+                    value={state.shareTargetEtc}
+                    onChange={(item: { value: string }) =>
+                      updateState('SET_SHARE_TARGET_ETC', item.value)
+                    }
+                    disabled={!state.shareTarget?.includes('기타')}
                   />
                 }
               />
@@ -768,8 +841,10 @@ const TrackingDetailPage = () => {
                     label: '시스템 정보(DB정보 API정보)',
                   },
                 ]}
-                value={colInfo}
-                setState={setColInfo}
+                value={state.colInfo}
+                onChange={(item: { items: any; value: string[] }) =>
+                  updateState('SET_COL_INFO', item.value.join(','))
+                }
               />
             </Td>
             <LabelTd>이미지 유무</LabelTd>
@@ -779,15 +854,22 @@ const TrackingDetailPage = () => {
                   { label: '있음', value: 'Y' },
                   { label: '없음', value: 'N' },
                 ]}
-                value={imageFlag}
-                setValue={setImageFlag}
+                value={state.imageFlag}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_IMAGE_FLAG', item.value)
+                }
               />
             </Td>
           </tr>
           <tr>
             <LabelTd>보고문구</LabelTd>
             <Td colSpan={15}>
-              <CustomTextarea value={contents} setValue={setContents} />
+              <CustomTextarea
+                value={state.contents}
+                onChange={(e: any) =>
+                  updateState('SET_CONTENTS', e.target.value)
+                }
+              />
             </Td>
           </tr>
           <tr>
@@ -795,26 +877,32 @@ const TrackingDetailPage = () => {
             <Td colSpan={7}>
               <CustomEditable
                 id={'hackGroup'}
-                value={hackGroup}
-                setValue={setHackGroup}
+                value={state.hackGroup}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_HACK_GROUP', item.value)
+                }
               />
             </Td>
             <LabelTd>비고</LabelTd>
             <Td colSpan={7}>
               <CustomEditable
                 id={'comment'}
-                value={comment}
-                setValue={setComment}
+                value={state.comment}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_COMMENT', item.value)
+                }
               />
             </Td>
           </tr>
           <tr>
-            <LabelTd>유출정보</LabelTd>
+            <LabelTd>키워드</LabelTd>
             <Td colSpan={15}>
               <CustomEditable
                 id={'leakedInfo'}
-                value={leakedInfo}
-                setValue={setLeakedInfo}
+                value={state.leakedInfo}
+                onChange={(item: { value: string }) =>
+                  updateState('SET_LEAKED_INFO', item.value)
+                }
               />
             </Td>
           </tr>
@@ -823,33 +911,33 @@ const TrackingDetailPage = () => {
       <ButtonContainer>
         <Button
           type={'primary'}
-          onClick={() =>
+          onClick={() => {
             insertResponseIssue.mutate({
-              registrationDate,
-              incidentType: incidentType.join(','),
-              incidentTypeDetail,
-              threatFlag,
-              channelId: Number(channelId),
-              url,
-              downloadUrl,
-              title,
-              writer,
-              publishedDate,
-              originType,
-              originTypeDetail,
-              shareTarget: shareTarget.join(','),
-              colInfo,
-              imageFlag,
-              contents,
-              hackGroup,
-              leakedInfo,
-              comment,
-              indFlag: indFlag.includes('개인') ? 'Y' : 'N',
+              registrationDate: state.registrationDate,
+              incidentType: state.incidentType.join(','),
+              incidentTypeDetail: state.incidentTypeDetail,
+              threatFlag: state.threatFlag,
+              channelId: Number(state.channelId),
+              url: state.url,
+              downloadUrl: state.downloadUrl,
+              title: state.title,
+              writer: state.writer,
+              publishedDate: state.publishedDate,
+              originType: state.originType,
+              originTypeDetail: state.originTypeDetail,
+              shareTarget: state.shareTarget.join(','),
+              colInfo: state.colInfo,
+              imageFlag: state.imageFlag,
+              contents: state.contents,
+              hackGroup: state.hackGroup,
+              leakedInfo: state.leakedInfo,
+              comment: state.comment,
+              indFlag: state.indFlag.includes('개인') ? 'Y' : 'N',
             })
-          }
+          }}
           text={'저장'}
         />
-        <Button type={'tertiary'} onClick={handleOnClose} text={'닫기'} />
+        <Button type={'tertiary'} onClick={handleOnExitPage} text={'닫기'} />
       </ButtonContainer>
       <CustomModal
         isOpen={insertChannelOpen}

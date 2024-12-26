@@ -1,28 +1,21 @@
-import React, { Dispatch, memo, useCallback } from 'react'
+import { memo } from 'react'
 import styled from '@emotion/styled'
 import { Editable } from '@chakra-ui/react'
 
 interface EditableProps {
   id: string
   value: string
-  setValue?: Dispatch<React.SetStateAction<string>>
+  onChange: (e: { value: string }) => void
   disabled?: boolean
 }
 const CustomEditable = memo((props: EditableProps) => {
-  const { id, value, setValue, disabled } = props
-
-  const handleOnValueChange = useCallback(
-    (value: string) => {
-      if (setValue) setValue(value)
-    },
-    [value]
-  )
+  const { id, value, onChange, disabled } = props
 
   return (
     <StyledEditable
       id={id}
       value={value}
-      onValueChange={(e) => handleOnValueChange(e.value)}
+      onValueChange={onChange}
       placeholder='내용을 입력하세요'
       disabled={disabled}
     >

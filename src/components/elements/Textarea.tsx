@@ -1,20 +1,15 @@
 import styled from '@emotion/styled'
-import { Dispatch, SetStateAction } from 'react'
 
 interface TextareaProps {
   value: string
-  setValue: Dispatch<SetStateAction<string>>
+  onChange: (e: any) => void
   disabled?: boolean
 }
 
 const CustomTextarea = (props: TextareaProps) => {
-  const { setValue, value, disabled } = props
+  const { onChange, value, disabled } = props
   return (
-    <StyledTextarea
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      disabled={disabled}
-    />
+    <StyledTextarea value={value} onChange={onChange} disabled={disabled} />
   )
 }
 export default CustomTextarea
@@ -24,6 +19,7 @@ const StyledTextarea = styled.textarea`
   align-items: flex-start;
   width: 100%;
   outline: none;
+  padding: 4px;
   ${({ theme }) => theme.typography.body3};
 
   & textarea:focus {

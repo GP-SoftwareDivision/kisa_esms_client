@@ -1,4 +1,4 @@
-import React, { Dispatch, memo } from 'react'
+import { memo, useCallback } from 'react'
 import { createListCollection } from '@chakra-ui/react'
 import {
   SelectContent,
@@ -15,8 +15,8 @@ interface SelectProps {
     value: string
     label: string
   }[]
-  value?: string
-  setState?: Dispatch<React.SetStateAction<string>>
+  value?: string | null
+  onChange: (item: { items: any; value: string[] }) => void
   multiple?: boolean
   required?: boolean
   disabled?: boolean
@@ -27,20 +27,16 @@ const CustomSelect = memo(
     options,
     value,
     label,
-    setState,
+    onChange,
     multiple,
     required,
     disabled,
   }: SelectProps) => {
-    const handleOnChange = (selected: string[]) => {
-      if (setState) setState(selected.join())
-    }
-
-    const isMultipleVal = (val: string): string[] => {
+    const isMultipleVal = useCallback((val: string): string[] => {
       if (val.split(',').length > 1) {
         return val.split(',').map((v) => v)
       } else return [val]
-    }
+    }, [])
 
     return (
       <SelectRoot
@@ -55,7 +51,7 @@ const CustomSelect = memo(
         flexDirection={'row'}
         alignItems={'center'}
         value={value ? isMultipleVal(value) : undefined}
-        onValueChange={({ value }) => handleOnChange(value)}
+        onValueChange={onChange}
       >
         {label && (
           <StyledLabel>
@@ -69,8 +65,8 @@ const CustomSelect = memo(
         <SelectContent>
           {createListCollection({
             items: options,
-          }).items.map((item) => (
-            <SelectItem item={item} key={item.label}>
+          }).items.map((item, index: number) => (
+            <SelectItem item={item} key={`${item.value}_${index}`}>
               {item.label}
             </SelectItem>
           ))}

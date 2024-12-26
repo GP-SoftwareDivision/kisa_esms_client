@@ -27,6 +27,7 @@ interface ServerType {
 const ChannelPage = () => {
   const { page, handlePageChange } = usePagination(1)
   const [channelName, setChannelName] = useState<string>('')
+
   const [request, setRequest] = useState<{
     page: number
     channelName: string

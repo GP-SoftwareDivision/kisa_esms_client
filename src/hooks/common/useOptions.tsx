@@ -30,10 +30,24 @@ const useOptions = () => {
     []
   )
 
+  const targetOptions = useMemo(
+    () => [
+      { value: '', label: '전체' },
+      { value: 'company', label: '기업' },
+      { value: 'assn', label: '협회' },
+      { value: 'pub', label: '공공' },
+      { value: 'edu', label: '교육' },
+      { value: 'fin', label: '금융' },
+      { value: 'med', label: '의료' },
+      { value: 'other', label: '기타(해외)' },
+    ],
+    []
+  )
   return {
     responseOptions,
     fileTypeOptions,
     hackingOptions,
+    targetOptions,
   }
 }
 

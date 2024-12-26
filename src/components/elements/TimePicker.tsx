@@ -5,22 +5,22 @@ import ConfigProvider from 'antd/es/config-provider'
 import 'dayjs/locale/ko'
 
 import { SelectBox } from '@/assets/styles/global.ts'
-import React, { Dispatch } from 'react'
 import dayjs from 'dayjs'
 
 interface TimePickerProps {
   date: string
-  setDate: Dispatch<React.SetStateAction<string>>
+  onChange: (date: unknown, dateString: string | string[]) => void
 }
 
 const CustomTimePicker = (props: TimePickerProps) => {
-  const { date, setDate } = props
+  const { date, onChange } = props
 
-  const onChange = (date: any) => {
-    if (date && setDate) {
-      setDate(dayjs(date).format('YYYY-MM-DD'))
-    }
-  }
+  // const onChange = (date: any) => {
+  //   if (date && setDate) {
+  //     setDate(dayjs(date).format('YYYY-MM-DD'))
+  //     onChange()
+  //   }
+  // }
 
   return (
     <ConfigProvider locale={ko_KR}>
