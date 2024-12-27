@@ -10,6 +10,10 @@ export const routeConfig: RouteObject[] = [
     path: '/issue/tracking/detail',
     element: <Components.TrackingDetailPage />,
   },
+  {
+    path: '/issue/tracking/detail/form',
+    element: <Components.TrackingFormPage />,
+  },
   { path: '/issue/infringement', element: <Components.Infringement /> },
   { path: '/issue/damagetarget', element: <Components.DamageTarget /> },
 

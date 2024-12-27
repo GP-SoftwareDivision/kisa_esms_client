@@ -5,7 +5,7 @@ import { useMutation } from '@tanstack/react-query'
 import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import instance from '@/apis/instance.ts'
 
-// 피해 대상 타입
+// 피해 대상 타입 선언
 export interface VictimType {
   seqidx?: number
   registrationDate: string
@@ -15,15 +15,17 @@ export interface VictimType {
   incidentId: string
   supportFlag: string | null
   reason: string | null
+  reasonEtc?: string
 }
 
-// 이슈 대응 타입
+// 이슈 대응 타입 선언
 export interface insertResponseType {
   registrationDate: string
-  incidentType: string
+  incidentType: string[]
+  incidentTypeEtc?: string
   incidentTypeDetail: string
   threatFlag: string
-  channelId: number
+  channelId: string
   url: string
   downloadUrl: string
   title: string
@@ -31,20 +33,19 @@ export interface insertResponseType {
   publishedDate: string
   originType: string
   originTypeDetail: string
-  shareTarget: string
+  shareTarget: string[]
+  shareTargetEtc?: string
   colInfo: string
   imageFlag: string
   contents: string
   hackGroup: string
   leakedInfo: string
   comment: string
-  indFlag: string
+  indFlag: string[]
 }
 
-interface InsertVictimsRequestType {
-  issueIdx: number
-  list: VictimType[]
-}
+// 피해 대상 + 이슈 대응 전체 타입 선언
+export type VictimAndResponseType = VictimType & insertResponseType
 
 type Action =
   | { type: 'SET_REGISTRATION_DATE'; payload: string } // 작성일 업데이트
@@ -77,42 +78,10 @@ type Action =
   | { type: 'SET_LEAKED_INFO'; payload: string } // 유출 정보 업데이트
   | { type: 'SET_COMMENT'; payload: string } // 코멘트 업데이트
 
-interface TargetDetailState {
-  registrationDate: string
-  publishedDate: string
-  incidentType: string[]
-  incidentTypeEtc: string
-  incidentTypeDetail: string
-  threatFlag: string
-  channelId: string
-  originType: string
-  shareTarget: string[]
-  shareTargetEtc: string
-  colInfo: string
-  imageFlag: string
-  contents: string
-  indFlag: string[]
-  targetType: string
-  reportFlag: string | null
-  supportFlag: string | null
-  reason: string | null
-  reasonEtc: string
-  url: string
-  downloadUrl: string
-  incidentId: string // 사고 ID
-  title: string // 제목
-  writer: string // 작성자
-  originTypeDetail: string // 최초 인지 정보 상세
-  hackGroup: string // 해킹 그룹
-  leakedInfo: string // 유출 정보
-  comment: string // 코멘트
-  institution: string // 기관
-}
-
 const reducer = (
-  state: TargetDetailState,
+  state: VictimAndResponseType,
   action: Action
-): TargetDetailState => {
+): VictimAndResponseType => {
   switch (action.type) {
     case 'SET_REGISTRATION_DATE':
       return { ...state, registrationDate: action.payload }
@@ -180,7 +149,7 @@ const reducer = (
 export const useTrackingDetailMutation = () => {
   const navigate = useNavigate()
 
-  const initialState: TargetDetailState = {
+  const initialState: VictimAndResponseType = {
     registrationDate: '', // 등록일시
     publishedDate: '', // 게시일
     incidentType: [], // 사고유형
@@ -250,7 +219,7 @@ export const useTrackingDetailMutation = () => {
   // 피해대상 관리 저장
   const insertVictims = useMutation({
     mutationKey: ['insertVictims'],
-    mutationFn: async (data: InsertVictimsRequestType) => {
+    mutationFn: async (data: { issueIdx: number; list: VictimType[] }) => {
       const response = await instance.post('/api/issue/victims/insert', data)
       return response.data
     },
@@ -263,18 +232,23 @@ export const useTrackingDetailMutation = () => {
   const insertResponseIssue = useMutation({
     mutationKey: ['insertResponseIssue'],
     mutationFn: async (data: insertResponseType) => {
+      const request = {
+        ...data,
+        incidentType: data.incidentType.join(','),
+        shareTarget: data.shareTarget.join(','),
+        indFlag: data.indFlag.includes('개인') ? 'Y' : 'N',
+      }
       if (
         data.registrationDate === '' ||
-        (data.indFlag === 'N' && victims.length === 0) ||
-        data.incidentType === '' ||
-        data.channelId === 0 ||
+        data.incidentType.length === 0 ||
+        data.channelId === '' ||
         data.originType === '' ||
         data.threatFlag === ''
       ) {
         notifyError('필수 사항을 모두 입력해주세요')
         throw new Error()
       }
-      const response = await instance.post('/api/issue/history/upsert', data)
+      const response = await instance.post('/api/issue/history/upsert', request)
       return response.data
     },
     onError: (error) => {

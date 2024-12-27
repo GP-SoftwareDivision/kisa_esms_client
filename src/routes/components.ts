@@ -13,7 +13,9 @@ export const Tracking = lazy(() => import('@/pages/issue/TrackingPage.tsx'))
 export const TrackingDetailPage = lazy(
   () => import('@/pages/issue/TrackingDetailPage.tsx')
 )
-
+export const TrackingFormPage = lazy(
+  () => import('@/pages/issue/TrackingFormPage.tsx')
+)
 export const Infringement = lazy(
   () => import('@/pages/issue/InfringementPage.tsx')
 )

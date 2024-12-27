@@ -212,7 +212,7 @@ const TrackingPage = () => {
           <ButtonContainer>
             <Button
               type={'tertiary'}
-              onClick={() => navigate('detail')}
+              onClick={() => navigate('detail/form')}
               text={'추가'}
             />
             <Button
