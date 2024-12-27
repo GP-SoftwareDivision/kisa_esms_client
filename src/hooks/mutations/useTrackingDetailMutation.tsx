@@ -263,7 +263,6 @@ export const useTrackingDetailMutation = () => {
   const insertResponseIssue = useMutation({
     mutationKey: ['insertResponseIssue'],
     mutationFn: async (data: insertResponseType) => {
-      console.log(victims)
       if (
         data.registrationDate === '' ||
         (data.indFlag === 'N' && victims.length === 0) ||
@@ -275,7 +274,7 @@ export const useTrackingDetailMutation = () => {
         notifyError('필수 사항을 모두 입력해주세요')
         throw new Error()
       }
-      const response = await instance.post('/api/issue/history/insert', data)
+      const response = await instance.post('/api/issue/history/upsert', data)
       return response.data
     },
     onError: (error) => {

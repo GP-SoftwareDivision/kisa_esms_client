@@ -72,7 +72,7 @@ const DarkWebDetailPage = () => {
         children={
           <Button
             type={'primary'}
-            onClick={() => navigate('/issue/tracking/detail')}
+            onClick={() => navigate(`/issue/tracking/detail?id=${id}`)}
             text={'이슈 대응'}
           />
         }
@@ -88,9 +88,11 @@ const DarkWebDetailPage = () => {
             </tr>
             <tr>
               <LabelTd>작성자</LabelTd>
-              <Td colSpan={3}>{dtDetail.data?.data[0]?.writer}</Td>
+              <Td>{dtDetail.data?.data[0]?.writer}</Td>
               <LabelTd>작성시간</LabelTd>
               <Td>{dtDetail.data?.data[0]?.writetime}</Td>
+              <LabelTd>수집시간</LabelTd>
+              <Td>{dtDetail.data?.data[0]?.regdate}</Td>
             </tr>
             <tr>
               <LabelTd>해킹 여부</LabelTd>

@@ -223,11 +223,7 @@ const Telegram = () => {
   const renderTelegramList = useMemo(() => {
     if (ttList.isLoading) return <Loading />
     if (!ttList.data || ttList.data.count === 0) {
-      return (
-        <EmptyBox>
-          <Empty />
-        </EmptyBox>
-      )
+      return <Empty />
     }
     if (ttList.isSuccess && ttList.data.count > 0)
       return (
@@ -524,10 +520,6 @@ const AccordionContainer = styled(SimpleGrid)`
     width: 120px;
     height: 30px;
   }
-`
-const EmptyBox = styled(Box)`
-  border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.color.gray200};
 `
 
 const ButtonWrapper = styled.div`

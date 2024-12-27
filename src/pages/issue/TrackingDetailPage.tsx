@@ -214,6 +214,7 @@ const TrackingDetailPage = () => {
     insertChannelOpen,
   } = useChannelAddMutation()
 
+  // 이력 대응 상세 조회 API
   const responseDetail = useQueries<{ data: responseListType }>({
     queryKey: `responseDetail`,
     method: 'POST',

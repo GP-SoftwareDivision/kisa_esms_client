@@ -21,6 +21,7 @@ const CustomPagination = ({
     <PaginationRoot
       count={total || 0}
       pageSize={15}
+      siblingCount={2}
       page={page}
       onPageChange={(e) => handlePageChange(e.page)}
       display={'flex'}

@@ -63,8 +63,10 @@ export function useQueries<TData>({
               )
           }
         }
+        throw new AxiosError()
       }
     },
+    retry: 0,
     enabled: !!queryKey && !!url && !!method && (enabled ?? true), // 기본값 true
   })
 }

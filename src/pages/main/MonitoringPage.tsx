@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import styled from '@emotion/styled'
-import { Box, Stack } from '@chakra-ui/react'
+import { Stack } from '@chakra-ui/react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { ContentContainer } from '@/assets/styles/global.ts'
@@ -13,6 +13,14 @@ import DarkwebCard from '@/components/templates/DarkwebCard.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { ttListType } from '@/pages/retrieve/TelegramPage.tsx'
 import { dtListType } from '@/pages/retrieve/DarkWebPage.tsx'
+
+const TabContainer = styled.div`
+  display: flex;
+
+  button {
+    min-width: 70px !important;
+  }
+`
 
 interface MonitoringType {
   type: string
@@ -49,11 +57,7 @@ const DashBoardPage = () => {
     }
 
     if (issueMonitoring.isSuccess && issueMonitoring.data.data.length === 0) {
-      return (
-        <EmptyBox>
-          <Empty />
-        </EmptyBox>
-      )
+      return <Empty />
     }
 
     if (issueMonitoring.isSuccess && issueMonitoring.data.data.length > 0) {
@@ -127,16 +131,3 @@ const DashBoardPage = () => {
   )
 }
 export default React.memo(DashBoardPage)
-
-const EmptyBox = styled(Box)`
-  border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.color.gray200};
-`
-
-const TabContainer = styled.div`
-  display: flex;
-
-  button {
-    min-width: 70px !important;
-  }
-`

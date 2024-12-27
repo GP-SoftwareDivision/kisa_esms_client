@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Box } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 
@@ -17,6 +17,7 @@ import CustomPagination from '@/components/elements/Pagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useNavigate } from 'react-router-dom'
+import Empty from '@/components/elements/Empty.tsx'
 
 interface DetectionListType {
   seqidx: number
@@ -156,6 +157,25 @@ const InfringementPage = () => {
     },
   ]
 
+  const renderTable = useMemo(() => {
+    if (!detectionList.data) return <Empty />
+    if (detectionList.isSuccess)
+      return (
+        <>
+          <CustomTable
+            loading={detectionList.isLoading}
+            data={flattenData(detectionList.data?.data)}
+            columns={InfringementColumns}
+          />
+          <CustomPagination
+            total={detectionList.data?.count}
+            page={page}
+            handlePageChange={(newPage) => handlePageChange(newPage as number)}
+          />
+        </>
+      )
+  }, [detectionList.data])
+
   return (
     <ContentContainer>
       <PageTitle text={'유출 정보 판별'} />
@@ -182,24 +202,7 @@ const InfringementPage = () => {
           </ButtonContainer>
         </Box>
       </SelectContainer>
-      <ContentBox>
-        {detectionList.isSuccess && (
-          <>
-            <CustomTable
-              loading={detectionList.isLoading}
-              data={flattenData(detectionList.data.data)}
-              columns={InfringementColumns}
-            />
-            <CustomPagination
-              total={detectionList.data.count}
-              page={page}
-              handlePageChange={(newPage) =>
-                handlePageChange(newPage as number)
-              }
-            />
-          </>
-        )}
-      </ContentBox>
+      <ContentBox>{renderTable}</ContentBox>
     </ContentContainer>
   )
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import styled from '@emotion/styled'
 import { Box, Flex } from '@chakra-ui/react'
 import dayjs from 'dayjs'
@@ -23,6 +23,7 @@ import CustomButton from '@/components/elements/Button.tsx'
 import CustomDatePicker from '@/components/elements/DatePicker.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { useNavigate } from 'react-router-dom'
+import Empty from '@/components/elements/Empty.tsx'
 
 const ButtonWrapper = styled.div`
   display: flex;
@@ -218,6 +219,25 @@ const DamageTargetPage = () => {
     })
   }
 
+  const renderTable = useMemo(() => {
+    if (!damageTargetList.data) return <Empty />
+    if (damageTargetList.isSuccess)
+      return (
+        <>
+          <CustomTable
+            loading={false}
+            data={damageTargetList.data?.data || []}
+            columns={damageTargetColumns}
+          />
+          <CustomPagination
+            total={damageTargetList.data.count}
+            page={page}
+            handlePageChange={(newPage) => handlePageChange(newPage as number)}
+          />
+        </>
+      )
+  }, [damageTargetList.data])
+
   return (
     <ContentContainer>
       <PageTitle
@@ -287,24 +307,7 @@ const DamageTargetPage = () => {
           <Button type={'primary'} onClick={handleOnClick} text={'조회'} />
         </ButtonContainer>
       </SelectContainer>
-      <ContentBox>
-        {damageTargetList.isSuccess && (
-          <>
-            <CustomTable
-              loading={false}
-              data={damageTargetList.data?.data || []}
-              columns={damageTargetColumns}
-            />
-            <CustomPagination
-              total={damageTargetList.data.count}
-              page={page}
-              handlePageChange={(newPage) =>
-                handlePageChange(newPage as number)
-              }
-            />
-          </>
-        )}
-      </ContentBox>
+      <ContentBox>{renderTable}</ContentBox>
 
       {/*판단 키워드 수정 모달*/}
       <CustomModal

@@ -42,6 +42,7 @@ const Header = () => {
       keyword: '',
       re_keyword: '',
       title: '',
+      wrtier: '',
       re_title: '',
       url: '',
       responseflag: '',

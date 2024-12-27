@@ -89,6 +89,9 @@ const DarkWebPage = () => {
   // 제목
   const [title, setTitle] = useState<string>(queryParams.get('title') || '')
 
+  // 작성자
+  const [writer, setWriter] = useState<string>(queryParams.get('writer') || '')
+
   // 재검색 제목
   const [reTitle, setRetitle] = useState<string>(
     queryParams.get('re_title') || ''
@@ -126,6 +129,7 @@ const DarkWebPage = () => {
       setThreatFlag(params.get('threatflag') || '')
       setResponseFlag(params.get('responseflag') || '')
       setTitle(params.get('title') || '')
+      setWriter(params.get('writer') || '')
       setRetitle(params.get('re_title') || '')
       setKeyword(params.get('keyword') || '')
       setReKeyword(params.get('re_keyword') || '')
@@ -172,6 +176,7 @@ const DarkWebPage = () => {
       responseflag,
       category,
       title,
+      writer,
       keyword,
       url,
       regex,
@@ -200,6 +205,7 @@ const DarkWebPage = () => {
         responseflag,
         category,
         title,
+        writer,
         keyword,
         url,
         regex,
@@ -216,12 +222,7 @@ const DarkWebPage = () => {
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderDarkwebList = useMemo(() => {
     if (dtList.isLoading) return <Loading />
-    if (!dtList.data || dtList.data.count === 0)
-      return (
-        <EmptyBox>
-          <Empty />
-        </EmptyBox>
-      )
+    if (!dtList.data || dtList.data.count === 0) return <Empty />
     if (!dtList.data || dtList.data.count > 0)
       return (
         <>
@@ -352,6 +353,16 @@ const DarkWebPage = () => {
           </Box>
           <Box>
             <CustomInput
+              id={'writer'}
+              label={'작성자'}
+              placeholder={'내용을 입력하세요.'}
+              value={writer}
+              onChange={(e) => setWriter(e.target.value)}
+              disabled={isReSearch}
+            />
+          </Box>
+          <Box>
+            <CustomInput
               id={'keyword'}
               label={'키워드'}
               placeholder={'내용을 입력하세요.'}
@@ -370,7 +381,6 @@ const DarkWebPage = () => {
               disabled={isReSearch}
             />
           </Box>
-          <Box></Box>
           <Box>
             <CustomInput
               id={'regex'}
@@ -523,11 +533,6 @@ const AccordionContainer = styled(SimpleGrid)`
     width: 120px;
     height: 30px;
   }
-`
-
-const EmptyBox = styled(Box)`
-  border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.color.gray200};
 `
 
 const ButtonWrapper = styled.div`
