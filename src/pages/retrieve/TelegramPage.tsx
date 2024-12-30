@@ -18,7 +18,7 @@ import { usePagination } from '@/hooks/common/usePagination.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import TelegramCard from '@/components/templates/TelegramCard.tsx'
 import CustomAccordion from '@/components/elements/Accordion.tsx'
-import useOptions from '@/hooks/common/useOptions.tsx'
+import { hackingOptions, responseOptions } from '@/data/selectOptions.ts'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Empty from '@/components/elements/Empty.tsx'
@@ -51,7 +51,6 @@ const Telegram = () => {
 
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const { hackingOptions, responseOptions } = useOptions()
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
   // 조회 조건 저장

@@ -1,5 +1,9 @@
 import { SkeletonText } from '@/components/ui/skeleton'
 
-export const CustomSkeleton = () => {
-  return <SkeletonText noOfLines={3} gap='4' />
+interface SkeletonType {
+  lines: number
+}
+export const CustomSkeleton = (props: SkeletonType) => {
+  const { lines } = props
+  return <SkeletonText noOfLines={lines} gap='6' maxWidth={'100% !important'} />
 }

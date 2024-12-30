@@ -30,9 +30,9 @@ const TrackingDetailPage = () => {
     method: 'POST',
     url: '/api/issue/history/detail',
     body: {
-      seqidx: queryParams.get('id'),
+      seqidx: Number(queryParams.get('seqidx')),
+      sourceIdx: Number(queryParams.get('sourceidx')),
     },
-    enabled: !!queryParams.get('id'),
   })
 
   const getIndividualType = useMemo(() => {

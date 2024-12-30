@@ -42,7 +42,7 @@ const DarkWebDetailPage = () => {
   const [logHighLight, setLogHighLight] = useState<string[]>([])
 
   // 다크웹 데이터 상세 조회 API
-  const dtDetail = useQueries<{ data: DarkWebDetailType[] }>({
+  const dtDetail = useQueries<{ data: DarkWebDetailType }>({
     queryKey: `dtDetail`,
     method: 'POST',
     url: `/api/monitoring/dtDetail`,
@@ -53,16 +53,16 @@ const DarkWebDetailPage = () => {
 
   useEffect(() => {
     if (dtDetail.isSuccess) {
-      setKeywordHighLight(dtDetail.data?.data[0]?.keyword)
+      setKeywordHighLight(dtDetail.data?.data?.keyword)
 
-      if (dtDetail.data?.data[0]?.threatlog)
-        setLogHighLight(dtDetail.data?.data[0]?.threatlog.split('/'))
+      if (dtDetail.data?.data?.threatlog)
+        setLogHighLight(dtDetail.data?.data?.threatlog.split('/'))
     }
   }, [dtDetail.isSuccess])
 
   // html 새 창으로 열기 이벤트
   const ViewHtml = () => {
-    window.open(`/${dtDetail.data?.data[0]?.htmlpath}`, '_blank')
+    window.open(`/${dtDetail.data?.data?.htmlpath}`, '_blank')
   }
 
   return (
@@ -72,7 +72,9 @@ const DarkWebDetailPage = () => {
         children={
           <Button
             type={'primary'}
-            onClick={() => navigate(`/issue/tracking/detail?id=${id}`)}
+            onClick={() =>
+              navigate(`/issue/tracking/detail?seqidx=0&sourceidx=${id}`)
+            }
             text={'이슈 대응'}
           />
         }
@@ -82,37 +84,37 @@ const DarkWebDetailPage = () => {
           <tbody>
             <tr>
               <LabelTd>제목</LabelTd>
-              <Td colSpan={3}>{dtDetail.data?.data[0]?.title}</Td>
+              <Td colSpan={3}>{dtDetail.data?.data?.title}</Td>
               <LabelTd>카테고리</LabelTd>
-              <Td>{dtDetail.data?.data[0]?.target}</Td>
+              <Td>{dtDetail.data?.data?.target}</Td>
             </tr>
             <tr>
               <LabelTd>작성자</LabelTd>
-              <Td>{dtDetail.data?.data[0]?.writer}</Td>
+              <Td>{dtDetail.data?.data?.writer}</Td>
               <LabelTd>작성시간</LabelTd>
-              <Td>{dtDetail.data?.data[0]?.writetime}</Td>
+              <Td>{dtDetail.data?.data?.writetime}</Td>
               <LabelTd>수집시간</LabelTd>
-              <Td>{dtDetail.data?.data[0]?.regdate}</Td>
+              <Td>{dtDetail.data?.data?.regdate}</Td>
             </tr>
             <tr>
               <LabelTd>해킹 여부</LabelTd>
               <Td>
-                {dtDetail.data?.data[0]?.threatflag === 'Y' ? '해킹' : '미해킹'}
+                {dtDetail.data?.data?.threatflag === 'Y' ? '해킹' : '미해킹'}
               </Td>
               <LabelTd>대응 여부</LabelTd>
               <Td>
-                {dtDetail.data?.data[0]?.issueresponseflag === 'Y'
+                {dtDetail.data?.data?.issueresponseflag === 'Y'
                   ? '대응'
                   : '미대응'}
               </Td>
               <LabelTd>수집 키워드</LabelTd>
-              <Td>{dtDetail.data?.data[0]?.keyword}</Td>
+              <Td>{dtDetail.data?.data?.keyword}</Td>
             </tr>
             <tr>
               <LabelTd>URL</LabelTd>
-              <Td colSpan={3}>{dtDetail.data?.data[0]?.url}</Td>
+              <Td colSpan={3}>{dtDetail.data?.data?.url}</Td>
               <LabelTd>판단 키워드</LabelTd>
-              <Td>{dtDetail.data?.data[0].threatlog}</Td>
+              <Td>{dtDetail.data?.data?.threatlog}</Td>
             </tr>
             <tr>
               <LabelTd>번역 보기</LabelTd>
@@ -132,9 +134,9 @@ const DarkWebDetailPage = () => {
               <LabelTd>내용</LabelTd>
               <Td colSpan={5}>
                 {isTranslation
-                  ? `${dtDetail.data?.data[0]?.trancontents}${dtDetail.data?.data[0]?.trancontents2}`
+                  ? `${dtDetail.data?.data?.trancontents}${dtDetail.data?.data?.trancontents2}`
                   : highlightText(
-                      `${dtDetail.data?.data[0]?.contents}${dtDetail.data?.data[0]?.contents2}`,
+                      `${dtDetail.data?.data?.contents}${dtDetail.data?.data?.contents2}`,
                       keywordHighLight,
                       logHighLight
                     )}

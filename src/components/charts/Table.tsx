@@ -32,13 +32,15 @@ const CustomTable = ({
   const navigate = useNavigate()
 
   const handleOnRowClick = (row: any) => {
-    if (detailIdx) navigate(`detail?id=${row.original[detailIdx]}`)
+    if (detailIdx)
+      navigate(
+        `/issue/tracking/detail?seqidx=${row.original[detailIdx]}&sourceidx=0`
+      )
   }
-
   return (
     <TableWrapper>
       {loading ? (
-        <CustomSkeleton />
+        <CustomSkeleton lines={3} />
       ) : (
         <TableContainer $maxHeight={maxHeight ? maxHeight : 'none'}>
           <StyledTable>

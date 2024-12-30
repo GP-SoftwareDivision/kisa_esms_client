@@ -19,7 +19,6 @@ import CustomAccordion from '@/components/elements/Accordion.tsx'
 import DarkwebCard from '@/components/templates/DarkwebCard.tsx'
 import Empty from '@/components/elements/Empty.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
-import useOptions from '@/hooks/common/useOptions.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 import { useSearchSaveMutation } from '@/hooks/mutations/useSearchSaveMutation.tsx'
@@ -29,6 +28,7 @@ import { useForm } from '@/hooks/common/useForm.tsx'
 import { notifyError } from '@/utils/notify.ts'
 import { useQuery } from '@tanstack/react-query'
 import instance from '@/apis/instance.ts'
+import { responseOptions, hackingOptions } from '@/data/selectOptions.ts'
 
 export interface dtListType {
   seqidx: number
@@ -50,7 +50,6 @@ const DarkWebPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const { responseOptions, hackingOptions } = useOptions()
   const { page, setPage, handlePageChange } = usePagination(1)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 

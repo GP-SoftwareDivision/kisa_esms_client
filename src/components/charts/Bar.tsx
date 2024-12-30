@@ -1,7 +1,14 @@
 import ReactApexChart from 'react-apexcharts'
 import { ApexOptions } from 'apexcharts'
 
-const Bar = () => {
+interface BarProps {
+  series: number[]
+  categories: string[]
+}
+
+const Bar = (props: BarProps) => {
+  const { series, categories } = props
+
   const options: ApexOptions = {
     chart: {
       type: 'bar',
@@ -17,23 +24,8 @@ const Bar = () => {
         distributed: true,
       },
     },
-    // title: {
-    //   text: '유출 사고 유형',
-    // },
     xaxis: {
-      categories: [
-        '정보유출',
-        '정보유출(협박)',
-        '공격예고(협박)',
-        'DDos',
-        '랜섬웨어',
-        '웹변조',
-        '취약점',
-        '정보노출',
-        '확인불가',
-        '기타해킹',
-        '기타',
-      ],
+      categories: categories,
     },
     dataLabels: {
       enabled: false,
@@ -88,16 +80,16 @@ const Bar = () => {
       },
     },
   }
-  const series = [
-    {
-      name: '건수',
-      data: [50, 40, 35, 30, 27, 23, 20, 26, 23, 10, 8],
-    },
-  ]
+
   return (
     <ReactApexChart
       options={options}
-      series={series}
+      series={[
+        {
+          name: '건수',
+          data: series,
+        },
+      ]}
       type='bar'
       // height={350}
       width={420}

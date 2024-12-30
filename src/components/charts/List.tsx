@@ -1,7 +1,8 @@
 import styled from '@emotion/styled'
 interface ListType {
   label: string
-  value: string
+  value: number
+  loading?: boolean
 }
 const CustomList = (props: ListType) => {
   const { label, value } = props
@@ -10,7 +11,7 @@ const CustomList = (props: ListType) => {
     <StyledList>
       <StyledLabel>{label}</StyledLabel>
       <StyledValue>
-        <span>{value} </span>건
+        <span>{value.toLocaleString()}</span>건
       </StyledValue>
     </StyledList>
   )
@@ -23,11 +24,11 @@ const StyledList = styled.div`
 `
 const StyledLabel = styled.div`
   display: flex;
-  ${({ theme }) => theme.typography.body2};
+  ${({ theme }) => theme.typography.body3};
 `
 const StyledValue = styled.div`
   display: flex;
-  ${({ theme }) => theme.typography.body2};
+  ${({ theme }) => theme.typography.body3};
 
   span {
     color: dodgerblue;

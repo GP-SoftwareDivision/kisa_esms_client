@@ -1,8 +1,9 @@
 import Dropzone from 'react-dropzone'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Box, Flex } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { MdUploadFile } from 'react-icons/md'
+import styled from '@emotion/styled'
 
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
@@ -20,14 +21,15 @@ import CustomPagination from '@/components/elements/Pagination.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
-import dayjs from 'dayjs'
-import styled from '@emotion/styled'
+import instance from '@/apis/instance.ts'
 import CustomModal from '@/components/elements/Modal.tsx'
 import useUploadMutation from '@/hooks/mutations/useUploadMutation.tsx'
 import { CloseButton } from '@/components/ui/close-button.tsx'
-import instance from '@/apis/instance.ts'
 import useFileDragDrop from '@/hooks/common/useFileDragDrop.tsx'
 import { notifyError } from '@/utils/notify.ts'
+import { targetOptions } from '@/data/selectOptions.ts'
+import Empty from '@/components/elements/Empty.tsx'
+import { Loading } from '@/components/elements/Loading.tsx'
 
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
@@ -44,50 +46,35 @@ interface ResponseListType {
 const TrackingPage = () => {
   const navigate = useNavigate()
   const { page, handlePageChange } = usePagination(1)
+  const queryParams = new URLSearchParams(location.search)
   const { openInsertUpload, closeInsertUpload, insertUploadOpen } =
     useUploadMutation()
-  const {
-    uploadFile,
-    uploadFileName,
-    dragFile,
-    // formData,
-    startUpload,
-    abortUpload,
-  } = useFileDragDrop()
+  const { uploadFile, uploadFileName, dragFile, startUpload, abortUpload } =
+    useFileDragDrop()
 
   const { fields, handleOnChange } = useForm()
   const [seqidx, setSeqidx] = useState<number>(0)
 
-  const targetList = [
-    { value: 'ind', label: '개인' },
-    { value: 'company', label: '기업' },
-    { value: 'pub', label: '공공' },
-    { value: 'edu', label: '교육' },
-    { value: 'fin', label: '금융' },
-    { value: 'med', label: '의료' },
-    { value: 'other', label: '기타(해외)' },
-  ]
-
   // 조회기간
   const [date, setDate] = useState({
-    startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
-    enddate: dayjs().format('YYYY-MM-DD'),
+    startdate: queryParams.get('startdate') || '',
+    enddate: queryParams.get('enddate') || '',
   })
 
   // 대상 구분 / 사고 유형 / 채널 구분 / 최초 인지
   const [selectFields, setSelectFields] = useState({
-    targetType: '',
-    incidentType: '',
-    apiType: '',
-    originType: '',
+    targetType: queryParams.get('targettype') || '',
+    incidentType: queryParams.get('incidenttype') || '',
+    apiType: queryParams.get('apitype'),
+    originType: queryParams.get('origintype'),
   })
 
   // 요청 파라미터
   const [request, setRequest] = useState({
     startdate: date.startdate,
     enddate: date.enddate,
-    institution: '',
-    channelName: '',
+    institution: queryParams.get('institution'),
+    channelName: queryParams.get('channelname'),
     ...selectFields,
   })
 
@@ -131,7 +118,7 @@ const TrackingPage = () => {
       header: '대상구분',
       accessorKey: 'targetType',
       cell: ({ row }: any) => {
-        const matching = targetList
+        const matching = targetOptions
           .filter((item) =>
             row.original.targetType.split('/').includes(item.value)
           )
@@ -150,14 +137,6 @@ const TrackingPage = () => {
     {
       header: '채널구분',
       accessorKey: 'domainType',
-      cell: ({ row }: any) =>
-        row.original?.domainType === 'DT' ? (
-          <span>다크웹</span>
-        ) : row.original?.domainType === 'TT' ? (
-          <span>텔레그램</span>
-        ) : (
-          ''
-        ),
     },
     {
       header: '채널명',
@@ -192,7 +171,7 @@ const TrackingPage = () => {
       //   withCredentials: true,
       // })
       const response = await instance.post(`/api/issue/detection/file/upload`, {
-        seqidx: seqidx,
+        seqidx,
         filename: uploadFile?.name,
         uploader: 'syjin',
       })
@@ -204,6 +183,28 @@ const TrackingPage = () => {
       notifyError(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
     }
   }
+
+  const renderTable = useMemo(() => {
+    if (responseList.isLoading) return <Loading />
+    if (!responseList.data) return <Empty />
+    if (responseList.isSuccess)
+      return (
+        <ContentBox mt={4}>
+          <CustomTable
+            loading={false}
+            data={responseList.data?.data ? responseList.data?.data : []}
+            columns={responseListColumns}
+            detailIdx={'issueIdx'}
+          />
+          <CustomPagination
+            total={responseList.data?.count}
+            page={page}
+            handlePageChange={(newPage) => handlePageChange(newPage as number)}
+          />
+        </ContentBox>
+      )
+  }, [responseList.data, responseList.isLoading, responseList.isSuccess])
+
   return (
     <ContentContainer>
       <PageTitle
@@ -230,7 +231,7 @@ const TrackingPage = () => {
         <Box>
           <CustomSelect
             label={'대상구분'}
-            options={targetList}
+            options={targetOptions}
             value={selectFields.targetType}
             onChange={(item: { items: any; value: string[] }) =>
               handleSelectChange('targetType', item.value.join(','))
@@ -313,25 +314,23 @@ const TrackingPage = () => {
             }
           />
         </Box>
+        <Box>
+          <CustomInput
+            id={'keyword'}
+            label={'키워드'}
+            placeholder={'내용을 입력하세요.'}
+            value={fields.keyword}
+            onChange={handleOnChange}
+          />
+        </Box>
+        <Box></Box>
+        <Box></Box>
+        <Box></Box>
         <ButtonContainer>
           <Button type={'primary'} onClick={handleOnClick} text={'조회'} />
         </ButtonContainer>
       </SelectContainer>
-      {responseList.isSuccess && (
-        <ContentBox mt={4}>
-          <CustomTable
-            loading={false}
-            data={responseList.data?.data ? responseList.data?.data : []}
-            columns={responseListColumns}
-            detailIdx={'issueIdx'}
-          />
-          <CustomPagination
-            total={responseList.data?.count}
-            page={page}
-            handlePageChange={(newPage) => handlePageChange(newPage as number)}
-          />
-        </ContentBox>
-      )}
+      {renderTable}
       <CustomModal
         isOpen={insertUploadOpen}
         title='업로드'

@@ -3,10 +3,10 @@ export const highlightText = (
   keywords: string,
   log: string[]
 ) => {
-  if (!text) return null // 내용이 비어있을 경우 반환
+  if (!text || !keywords) return null // 내용이 비어있을 경우 반환
 
   // keywords 문자열을 쉼표나 공백 기준으로 분리 (추가적인 기준이 있다면 정규식 수정 가능)
-  const keywordList = keywords.split(/\s*,\s*|\s+/).filter(Boolean)
+  const keywordList = keywords?.split(/\s*,\s*|\s+/).filter(Boolean)
 
   // 키워드와 로그를 하나의 정규식 패턴으로 병합 (중복 제거)
   const combinedRegex = new RegExp(

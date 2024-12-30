@@ -1,15 +1,19 @@
 import ReactApexChart from 'react-apexcharts'
 import { ApexOptions } from 'apexcharts'
 
-const Pie = () => {
+interface PieProps {
+  series: number[]
+  categories: string[]
+}
+
+const Pie = (props: PieProps) => {
+  const { series, categories } = props
+
   const options: ApexOptions = {
     chart: {
       type: 'pie',
     },
-    // title: {
-    //   text: '대응 현황',
-    // },
-    labels: ['개인', '기업', '공공', '교육', '금융', '의료', '기타'],
+    labels: categories,
     colors: [
       '#142956',
       '#1f3d80',
@@ -17,6 +21,7 @@ const Pie = () => {
       '#3366d6',
       '#4285f4',
       '#71a3f6',
+      '#d0dffc',
       '#d0dffc',
     ],
     dataLabels: {
@@ -32,15 +37,7 @@ const Pie = () => {
       show: true,
       showForSingleSeries: true,
       position: 'right',
-      customLegendItems: [
-        '개인',
-        '기업',
-        '공공',
-        '교육',
-        '금융',
-        '의료',
-        '기타(해외)',
-      ],
+      customLegendItems: categories,
       markers: {
         fillColors: [
           '#142956',
@@ -50,6 +47,7 @@ const Pie = () => {
           '#4285f4',
           '#71a3f6',
           '#d0dffc',
+          '#d0dffc',
         ],
       },
       formatter: function (legendName: string, opts: any) {
@@ -57,7 +55,6 @@ const Pie = () => {
       },
     },
   }
-  const series = [48, 30, 28, 20, 15, 9, 7]
 
   return (
     <ReactApexChart

@@ -31,18 +31,20 @@ const Header = () => {
         )
       }
     },
+    staleTime: 10 * 60 * 1000, // 10분 동안 캐시 유지
   })
 
   const onSubMenuSelect = (subItemKey: string | null) => {
+    // 다크웹 파라미터
     const darkwebParams = new URLSearchParams({
-      startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
+      startdate: dayjs().subtract(14, 'd').format('YYYY-MM-DD'),
       enddate: dayjs().format('YYYY-MM-DD'),
       threatflag: 'Y',
       category: '',
       keyword: '',
+      writer: '',
       re_keyword: '',
       title: '',
-      wrtier: '',
       re_title: '',
       url: '',
       responseflag: '',
@@ -50,8 +52,9 @@ const Header = () => {
       page: '1',
     }).toString()
 
+    // 텔레그램 파라미터
     const telegramParams = new URLSearchParams({
-      startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
+      startdate: dayjs().subtract(14, 'd').format('YYYY-MM-DD'),
       enddate: dayjs().format('YYYY-MM-DD'),
       threatflag: 'Y',
       username: '',
@@ -65,13 +68,33 @@ const Header = () => {
       re_username: '',
     }).toString()
 
+    // 대응 이력 파라미터
+    const trackingParams = new URLSearchParams({
+      type: 'I',
+      page: '1',
+      startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
+      enddate: dayjs().format('YYYY-MM-DD'),
+      institution: '',
+      channelname: '',
+      targettype: '',
+      incidenttype: '',
+      apitype: '',
+      origintype: '',
+    }).toString()
+
     if (subItemKey) {
       const pathName = subItemKey.split('/')[1]
+      // 다크웹
       if (pathName === 'darkweb') navigate(`/${subItemKey}?${darkwebParams}`)
+      // 텔레그램
       else if (pathName === 'telegram')
         navigate(`/${subItemKey}?${telegramParams}`)
+      // 메인 - 모니터링
       else if (pathName === 'monitoring')
         navigate(`/${subItemKey}?type=darkweb`)
+      // 이력관리 - 대응이력
+      else if (pathName === 'tracking')
+        navigate(`/${subItemKey}?${trackingParams}`)
       else navigate(`/${subItemKey}`)
     }
   }
