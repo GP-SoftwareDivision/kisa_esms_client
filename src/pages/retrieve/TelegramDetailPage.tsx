@@ -53,6 +53,7 @@ const TelegramDetailPage = () => {
   // 번역 여부
   const [isTranslation, setTranslation] = useState<boolean>(false)
 
+  // 검색
   const [keyword, setKeyword] = useState<string>('')
 
   // 텔레그램 현재 id의 메시지로 위치를 이동하기 위한 REF
@@ -82,7 +83,6 @@ const TelegramDetailPage = () => {
     if (ttHistoryData.isSuccess && infiniteData?.length === 0) {
       return <Empty />
     }
-
     return infiniteData?.map((v: TelegramDetailHistory, index: number) => (
       <StyledContentsBox
         $current={v.seqidx === Number(id)}
@@ -117,7 +117,7 @@ const TelegramDetailPage = () => {
         </StyledInfoBox>
       </StyledContentsBox>
     ))
-  }, [ttHistoryData, isTranslation])
+  }, [infiniteData, isTranslation])
 
   // 더보기 버튼 이벤트
   const moreHistoryData = useCallback(
@@ -144,6 +144,16 @@ const TelegramDetailPage = () => {
       })
     }
   }, [ttHistoryData.data])
+
+  const handleOnSearch = () => {
+    setTranslation(true)
+    // console.log(infiniteData)
+    // console.log(
+    //   infiniteData.filter((v: TelegramDetailHistory, index: number) => {
+    //     v.trancontents.includes(keyword.trim().toLowerCase())
+    //   })
+    // )
+  }
 
   return (
     <ContentContainer>
@@ -177,9 +187,15 @@ const TelegramDetailPage = () => {
           </tr>
           <tr>
             <LabelTd>해킹 여부</LabelTd>
-            <Td colSpan={2}>{ttDetail.data?.data.threatflag}</Td>
+            <Td colSpan={2}>
+              {ttDetail.data?.data.threatflag === 'Y' ? '해킹' : '미해킹'}
+            </Td>
             <LabelTd>대응 여부</LabelTd>
-            <Td colSpan={2}>{ttDetail.data?.data.issueresponseflag}</Td>
+            <Td colSpan={2}>
+              {ttDetail.data?.data.issueresponseflag === 'Y'
+                ? '대응'
+                : '미대응'}
+            </Td>
           </tr>
           <tr>
             <LabelTd>수집 키워드</LabelTd>
@@ -208,7 +224,7 @@ const TelegramDetailPage = () => {
                 />
                 <Button
                   type={'primary'}
-                  onClick={() => console.log('')}
+                  onClick={handleOnSearch}
                   text={'검색'}
                 />
               </SearchContainer>

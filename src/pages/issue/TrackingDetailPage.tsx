@@ -9,6 +9,7 @@ import { responseListType } from '@/pages/issue/TrackingFormPage.tsx'
 import { useMemo } from 'react'
 import { VictimType } from '@/hooks/mutations/useTrackingDetailMutation.tsx'
 import { targetOptions } from '@/data/selectOptions.ts'
+import { CustomSkeleton } from '@/components/elements/Skeleton.tsx'
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -93,139 +94,231 @@ const TrackingDetailPage = () => {
       <TableContainer>
         <Row>
           <Label>등록일시</Label>
-          <Value>{responseDetail.data?.data?.registrationDate}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.registrationDate}</Value>
+          )}
         </Row>
         <Row>
           <Label>대상구분</Label>
           <Value>{getIndividualType}</Value>
         </Row>
-        <div style={{ padding: '0.5rem' }}>
-          {responseDetail.data?.data?.institutions.map(
-            (v: VictimType, index: number) => (
-              <InnerTableContainer key={v.seqidx}>
-                <InnerTableIndexText>
-                  <span>{index + 1}</span>
-                </InnerTableIndexText>
-                <div>
-                  <Row>
-                    <Label>피해대상</Label>
-                    <Value>
-                      {
-                        targetOptions?.find(
-                          ({ value }: { value: string; label: string }) =>
-                            value === v.targetType
-                        )?.label
-                      }
-                    </Value>
-                  </Row>
-                  <Row>
-                    <Label>피해기관</Label>
-                    <Value>{v.institution}</Value>
-                  </Row>
-                  <Row>
-                    <Label>침해신고여부</Label>
-                    <Value>{v.reportFlag === 'Y' ? '신고' : '미신고'}</Value>
-                  </Row>
-                  <Row>
-                    <Label>사고번호</Label>
-                    <Value>{v.incidentId}</Value>
-                  </Row>
-                  <Row>
-                    <Label>기술지원여부</Label>
-                    <Value>{v.supportFlag === 'Y' ? '동의' : '미동의'}</Value>
-                  </Row>
-                  <Row>
-                    <Label>거부사유</Label>
-                    <Value>{v.reason}</Value>
-                  </Row>
-                </div>
-              </InnerTableContainer>
-            )
+        {responseDetail.isSuccess &&
+          responseDetail.data?.data?.institutions?.length > 0 && (
+            <div style={{ padding: '0.5rem' }}>
+              {responseDetail.data?.data?.institutions.map(
+                (v: VictimType, index: number) => (
+                  <InnerTableContainer key={v.seqidx}>
+                    <InnerTableIndexText>
+                      <span>{index + 1}</span>
+                    </InnerTableIndexText>
+                    <div>
+                      <Row>
+                        <Label>피해대상</Label>
+                        <Value>
+                          {
+                            targetOptions?.find(
+                              ({ value }: { value: string; label: string }) =>
+                                value === v.targetType
+                            )?.label
+                          }
+                        </Value>
+                      </Row>
+                      <Row>
+                        <Label>피해기관</Label>
+                        <Value>{v.institution}</Value>
+                      </Row>
+                      <Row>
+                        <Label>침해신고여부</Label>
+                        <Value>
+                          {v.reportFlag === 'Y' ? '신고' : '미신고'}
+                        </Value>
+                      </Row>
+                      <Row>
+                        <Label>사고번호</Label>
+                        <Value>{v.incidentId}</Value>
+                      </Row>
+                      <Row>
+                        <Label>기술지원여부</Label>
+                        <Value>
+                          {v.supportFlag === 'Y' ? '동의' : '미동의'}
+                        </Value>
+                      </Row>
+                      <Row>
+                        <Label>거부사유</Label>
+                        <Value>{v.reason}</Value>
+                      </Row>
+                    </div>
+                  </InnerTableContainer>
+                )
+              )}
+            </div>
           )}
-        </div>
+
         <Row>
           <Label>사고유형</Label>
-          <Value>{responseDetail.data?.data?.incidentType}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.incidentType}</Value>
+          )}
         </Row>
         <Row>
           <Label>사고유형 상세</Label>
-          <Value>{responseDetail.data?.data?.incidentTypeDetail}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.incidentTypeDetail}</Value>
+          )}
         </Row>
         <Row>
           <Label>협박유무</Label>
-          <Value>
-            {responseDetail.data?.data?.threatFlag === 'Y' ? '있음' : '없음'}
-          </Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>
+              {responseDetail.data?.data?.threatFlag === 'Y' ? '있음' : '없음'}
+            </Value>
+          )}
         </Row>
         <Row>
           <Label>사이트(도메인)</Label>
-          <Value>{responseDetail.data?.data?.domain}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.domain}</Value>
+          )}
         </Row>
         <Row>
           <Label>채널구분</Label>
-          <Value>{responseDetail.data?.data?.domainType}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.domainType}</Value>
+          )}
         </Row>
         <Row>
           <Label>채널명</Label>
-          <Value>{responseDetail.data?.data?.channelName}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.channelName}</Value>
+          )}
         </Row>
         <Row>
           <Label>게시글/텔레그램 URL</Label>
-          <Value>{responseDetail.data?.data?.url}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.url}</Value>
+          )}
         </Row>
         <Row>
           <Label>다운로드 URL</Label>
-          <Value>{responseDetail.data?.data?.downloadUrl}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.downloadUrl}</Value>
+          )}
         </Row>
         <Row>
           <Label>제목</Label>
-          <Value>{responseDetail.data?.data?.title}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.title}</Value>
+          )}
         </Row>
         <Row>
           <Label>작성자</Label>
-          <Value>{responseDetail.data?.data?.writer}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.writer}</Value>
+          )}
         </Row>
         <Row>
           <Label>게시일</Label>
-          <Value>{responseDetail.data?.data?.publishedDate}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.publishedDate}</Value>
+          )}
         </Row>
         <Row>
           <Label>최초인지</Label>
-          <Value>{responseDetail.data?.data?.originType}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.originType}</Value>
+          )}
         </Row>
         <Row>
           <Label>최초인지 상세</Label>
-          <Value>{responseDetail.data?.data?.originTypeDetail}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.originTypeDetail}</Value>
+          )}
         </Row>
         <Row>
           <Label>공유</Label>
-          <Value>{responseDetail.data?.data?.shareTarget}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.shareTarget}</Value>
+          )}
         </Row>
         <Row>
           <Label>수집정보</Label>
-          <Value>{responseDetail.data?.data?.colInfo}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.colInfo}</Value>
+          )}
         </Row>
         <Row>
           <Label>이미지 유무</Label>
-          <Value>
-            {responseDetail.data?.data?.imageFlag === 'Y' ? '있음' : '없음'}
-          </Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>
+              {responseDetail.data?.data?.imageFlag === 'Y' ? '있음' : '없음'}
+            </Value>
+          )}
         </Row>
         <Row>
           <Label>보고문구</Label>
-          <Value>{responseDetail.data?.data?.contents}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.contents}</Value>
+          )}
         </Row>
         <Row>
           <Label>해커그룹</Label>
-          <Value>{responseDetail.data?.data?.hackGroup}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.hackGroup}</Value>
+          )}
         </Row>
         <Row>
           <Label>비고</Label>
-          <Value>{responseDetail.data?.data?.comment}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.comment}</Value>
+          )}
         </Row>
         <Row>
           <Label>키워드</Label>
-          <Value>{responseDetail.data?.data?.keyword}</Value>
+          {responseDetail.isLoading ? (
+            <CustomSkeleton lines={1} />
+          ) : (
+            <Value>{responseDetail.data?.data?.keyword}</Value>
+          )}
         </Row>
       </TableContainer>
       <ButtonContainer>

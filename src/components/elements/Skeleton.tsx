@@ -5,5 +5,5 @@ interface SkeletonType {
 }
 export const CustomSkeleton = (props: SkeletonType) => {
   const { lines } = props
-  return <SkeletonText noOfLines={lines} gap='6' maxWidth={'100% !important'} />
+  return <SkeletonText noOfLines={lines} gap='6' />
 }

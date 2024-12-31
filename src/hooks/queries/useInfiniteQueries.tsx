@@ -66,9 +66,10 @@ export const useInfiniteQueries = (props: IUseInfiniteQuery) => {
               )
           }
         }
+        throw new AxiosError()
       }
-      console.error()
     },
+    retry: 0,
     initialPageParam: 1,
     getNextPageParam: (_lastPage, allPages) => {
       return allPages.length + 1
@@ -99,5 +100,5 @@ export const useInfiniteQueries = (props: IUseInfiniteQuery) => {
     }
   }, [ttHistoryData.data, type])
 
-  return { ttHistoryData, infiniteData, isPrevEnd, isNextEnd }
+  return { ttHistoryData, infiniteData, setInfiniteData, isPrevEnd, isNextEnd }
 }

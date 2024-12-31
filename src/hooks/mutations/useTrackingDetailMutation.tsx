@@ -284,7 +284,7 @@ export const useTrackingDetailMutation = () => {
         {
           id: 0,
           seqidx: 0,
-          registrationDate: '',
+          registrationDate: state.registrationDate,
           targetType: 'ind',
           institution: '',
           reportFlag: '',
