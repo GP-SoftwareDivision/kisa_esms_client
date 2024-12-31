@@ -310,7 +310,6 @@ const DamageTargetPage = () => {
                 onChange={(item: { items: any; value: string[] }) =>
                   handleUpdateOption('targetType', item.value.join(','))
                 }
-                multiple
               />
               <CustomInput
                 id='update_institution'

@@ -44,6 +44,7 @@ export interface dtListType {
   threatlog: string
   issueresponseflag: string
   htmlpath: string
+  regdate: string
 }
 
 const DarkWebPage = () => {
@@ -242,6 +243,7 @@ const DarkWebPage = () => {
                 writer={v.writer}
                 writetime={v.writetime}
                 target={v.target}
+                regdate={v.regdate}
                 htmlpath={v.htmlpath}
               />
             ))}

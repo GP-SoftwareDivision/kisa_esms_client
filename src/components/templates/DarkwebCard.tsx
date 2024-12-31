@@ -20,6 +20,7 @@ interface dtListType {
   url: string
   writer: string
   writetime: string
+  regdate: string
   onClick?: () => void
 }
 
@@ -36,6 +37,7 @@ const DarkwebCard = (props: dtListType) => {
     threatlog,
     title,
     url,
+    regdate,
     writer,
     writetime,
     onClick,
@@ -124,11 +126,15 @@ const DarkwebCard = (props: dtListType) => {
               />
             </StyledCaptionBox>
           </StyledNavContainer>
-          <HtmlIcon
-            onClick={(e: React.MouseEvent<SVGElement, MouseEvent>) =>
-              ViewHtml(e)
-            }
-          />
+          <StyledCaptionBox>
+            <StyledLabel>수집일시</StyledLabel>
+            <Caption text={regdate} type={'black'} />
+            <HtmlIcon
+              onClick={(e: React.MouseEvent<SVGElement, MouseEvent>) =>
+                ViewHtml(e)
+              }
+            />
+          </StyledCaptionBox>
         </NavLayout>
       </Card.Body>
     </Card.Root>

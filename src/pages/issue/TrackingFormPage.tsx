@@ -25,7 +25,6 @@ import CustomInput from '@/components/elements/Input.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useChannelAddMutation } from '@/hooks/mutations/useChannelAddMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
-import { notifyError } from '@/utils/notify.ts'
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -208,6 +207,7 @@ const TrackingFormPage = () => {
     targetOptions,
     findTargetTypeText,
     handleOnExitPage,
+    handleCreateVictims,
   } = useTrackingDetailMutation()
 
   const {
@@ -234,7 +234,7 @@ const TrackingFormPage = () => {
     url: '/api/issue/history/channel',
   })
 
-  // 처음 데이터 받아왔을 때
+  // 페이지 조회
   useEffect(() => {
     if (responseDetail.isSuccess && responseDetail.data?.data) {
       const detail = responseDetail.data?.data
@@ -309,42 +309,16 @@ const TrackingFormPage = () => {
       updateState('SET_URL', detail?.url ?? '')
       updateState('SET_WRITER', detail?.writer ?? '')
 
-      setVictims(detail?.institutions ?? [])
+      setVictims(
+        detail?.institutions.map((item, index) => ({
+          ...item,
+          id: index + 1,
+        })) ?? []
+      )
     }
   }, [responseDetail.isSuccess, responseDetail.data])
 
-  // 피해 대상 생성
-  const handleCreateVictims = () => {
-    if (!state.targetType || !state.institution) {
-      notifyError('모든 필수 항목을 입력해주세요.')
-      return
-    }
-    const request = {
-      id: victims.length + 1,
-      seqidx: 0,
-      registrationDate: state.registrationDate,
-      targetType: state.targetType,
-      institution: state.institution,
-      reportFlag: state.reportFlag,
-      incidentId: state.incidentId,
-      supportFlag: state.supportFlag,
-      reason:
-        state.reason === '기타'
-          ? `${state.reason}:${state.reasonEtc}`
-          : state.reason,
-    }
-
-    setVictims((prev) => [...prev, request])
-
-    updateState('SET_TARGET_TYPE', '')
-    updateState('SET_INSTITUTION', '')
-    updateState('SET_REPORT_FLAG', ' ')
-    updateState('SET_INCIDENT_ID', '')
-    updateState('SET_SUPPORT_FLAG', ' ')
-    updateState('SET_REASON', ' ')
-    updateState('SET_REASON_ETC', '')
-  }
-
+  console.log(victims)
   // 피해 대상 생성 취소
   const handleOnCancelVictims = (event: any, id: number) => {
     event.stopPropagation()
@@ -403,7 +377,6 @@ const TrackingFormPage = () => {
       </List>
     )
   }
-
   return (
     <ContentContainer>
       <PageTitle text={'국내 정보 유출 이력 대응'} />
@@ -552,9 +525,9 @@ const TrackingFormPage = () => {
                 <tr>
                   <Td colSpan={16}>
                     <VictimsListContainer>
-                      {victims.map((victim) => (
+                      {victims.map((victim: VictimType) => (
                         <AddVictimsWrapper
-                          key={victim.seqidx}
+                          key={victim.id}
                           onClick={() => {
                             updateState('SET_TARGET_TYPE', victim.targetType)
                             updateState('SET_INSTITUTION', victim.institution)
@@ -918,7 +891,7 @@ const TrackingFormPage = () => {
               />
             </Td>
           </tr>
-        </tbody>{' '}
+        </tbody>
       </Table>
       <ButtonContainer>
         <Button

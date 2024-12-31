@@ -217,7 +217,7 @@ export const useTrackingDetailMutation = () => {
   const insertVictims = useMutation({
     mutationKey: ['insertVictims'],
     mutationFn: async (data: { issueIdx: number; list: VictimType[] }) => {
-      const response = await instance.post('/api/issue/victims/insert', data)
+      const response = await instance.post('/api/issue/victims/upsert', data)
       return response.data
     },
     onSuccess: (_response: any, variables) => {
@@ -271,11 +271,44 @@ export const useTrackingDetailMutation = () => {
     },
   })
 
+  // 페이지 이탈
   const handleOnExitPage = () => {
     const isConfirm = confirm(
       '작성 중인 내용이 저장되지 않습니다. 계속하시겠습니까?'
     )
     if (isConfirm) navigate(-1)
+  }
+
+  // 피해 대상 생성
+  const handleCreateVictims = () => {
+    if (!state.targetType || !state.institution) {
+      notifyError('모든 필수 항목을 입력해주세요.')
+      return
+    }
+    const request = {
+      id: victims.length + 1,
+      seqidx: 0,
+      registrationDate: state.registrationDate,
+      targetType: state.targetType,
+      institution: state.institution,
+      reportFlag: state.reportFlag,
+      incidentId: state.incidentId,
+      supportFlag: state.supportFlag,
+      reason:
+        state.reason === '기타'
+          ? `${state.reason}:${state.reasonEtc}`
+          : state.reason,
+    }
+
+    setVictims((prev) => [...prev, request])
+
+    updateState('SET_TARGET_TYPE', '')
+    updateState('SET_INSTITUTION', '')
+    updateState('SET_REPORT_FLAG', ' ')
+    updateState('SET_INCIDENT_ID', '')
+    updateState('SET_SUPPORT_FLAG', ' ')
+    updateState('SET_REASON', ' ')
+    updateState('SET_REASON_ETC', '')
   }
 
   useEffect(() => {
@@ -305,5 +338,6 @@ export const useTrackingDetailMutation = () => {
     targetOptions,
     findTargetTypeText,
     handleOnExitPage,
+    handleCreateVictims,
   }
 }

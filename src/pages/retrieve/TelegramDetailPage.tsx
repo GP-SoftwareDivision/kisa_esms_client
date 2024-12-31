@@ -21,6 +21,7 @@ interface TelegramDetailType {
   writetime: string
   channelurl: string
   username: string
+  regdate: string
   channel: string
   contents: string
   trancontents: string
@@ -70,19 +71,30 @@ const TelegramDetailPage = () => {
   })
 
   // 텔레그램 메시지 API
-  const { ttHistoryData, infiniteData, isNextEnd, isPrevEnd } =
+  const { ttHistoryData, infiniteData, setInfiniteData, isNextEnd, isPrevEnd } =
     useInfiniteQueries({
       queryKey: 'ttHistoryData',
       seqidx: seqidx,
       type: type,
     })
 
-  // 메시지 쌓임
+  // 검색 초기화를 위한 오리지날 데이터
+  const originalDataRef = useRef<TelegramDetailHistory[] | null>(null)
+
+  // infiniteData가 초기화될 때만 originalDataRef에 복사
+  useEffect(() => {
+    if (infiniteData) {
+      originalDataRef.current = [...infiniteData]
+    }
+  }, [ttHistoryData])
+
+  // 메시지 쌓이는 함수
   const renderHistories = useMemo(() => {
     if (ttDetail.isLoading) return <Loading />
     if (ttHistoryData.isSuccess && infiniteData?.length === 0) {
       return <Empty />
     }
+
     return infiniteData?.map((v: TelegramDetailHistory, index: number) => (
       <StyledContentsBox
         $current={v.seqidx === Number(id)}
@@ -145,14 +157,18 @@ const TelegramDetailPage = () => {
     }
   }, [ttHistoryData.data])
 
+  // 키워드 검색
   const handleOnSearch = () => {
+    if (!keyword) {
+      // setInfiniteData([...originalDataRef.current ])
+    }
+
     setTranslation(true)
-    // console.log(infiniteData)
-    // console.log(
-    //   infiniteData.filter((v: TelegramDetailHistory, index: number) => {
-    //     v.trancontents.includes(keyword.trim().toLowerCase())
-    //   })
-    // )
+    setInfiniteData(
+      infiniteData.filter((v: TelegramDetailHistory) =>
+        v.trancontents.includes(keyword)
+      )
+    )
   }
 
   return (
@@ -205,13 +221,16 @@ const TelegramDetailPage = () => {
           </tr>
           <tr>
             <LabelTd>번역 보기</LabelTd>
-            <Td colSpan={5}>
+            <Td colSpan={2}>
               <CustomSwitch
                 label={''}
                 checked={isTranslation}
                 setChecked={setTranslation}
               />
             </Td>
+
+            <LabelTd>수집시간</LabelTd>
+            <Td colSpan={2}>{ttDetail.data?.data.regdate}</Td>
           </tr>
           <tr>
             <LabelTd>검색</LabelTd>
