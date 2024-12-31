@@ -75,7 +75,7 @@ const DarkWebDetailPage = () => {
             type={'primary'}
             onClick={() =>
               navigate(
-                `/issue/tracking/detail?seqidx=${dtDetail.data?T.data.issueidx}`
+                `/issue/tracking/detail?seqidx=${dtDetail.data?.data.issueidx}`
               )
             }
             text={'이슈 대응'}
