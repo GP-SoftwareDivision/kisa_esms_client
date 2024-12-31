@@ -210,7 +210,7 @@ const DashBoardPage = () => {
                 data={responseList.data?.data ? responseList.data?.data : []}
                 columns={responseListColumns}
                 maxHeight={400}
-                detailIdx={'issueIdx'}
+                detailIdx={'seqidx'}
               />
             </ChartBox>
           </Box>

@@ -33,9 +33,7 @@ const CustomTable = ({
 
   const handleOnRowClick = (row: any) => {
     if (detailIdx)
-      navigate(
-        `/issue/tracking/detail?seqidx=${row.original[detailIdx]}&sourceidx=0`
-      )
+      navigate(`/issue/tracking/detail?seqidx=${row.original[detailIdx]}`)
   }
   return (
     <TableWrapper>

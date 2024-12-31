@@ -17,6 +17,7 @@ interface ttListType {
   threatlog: string
   username: string
   writetime: string
+  regdate: string
   onClick: () => void
 }
 
@@ -33,6 +34,7 @@ const TelegramCard = (props: ttListType) => {
     threatlog,
     username,
     writetime,
+    regdate,
     onClick,
   } = props
 
@@ -50,10 +52,7 @@ const TelegramCard = (props: ttListType) => {
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>작성자</StyledLabel>
-              <Caption
-                text={username === 'None' ? '-' : username}
-                type={'blue'}
-              />
+              <Caption text={username} type={'blue'} />
             </StyledCaptionBox>
           </StyledNavContainer>
           <StyledCaptionBox>
@@ -88,22 +87,28 @@ const TelegramCard = (props: ttListType) => {
             </StyledCaptionBox>
           </StyledNavContainer>
         </NavLayout>
-        <StyledNavContainer>
+        <NavLayout>
+          <StyledNavContainer>
+            <StyledCaptionBox>
+              <StyledLabel>해킹 여부</StyledLabel>
+              <Caption
+                text={threatflag === 'Y' ? '해킹' : '미해킹'}
+                type={threatflag === 'Y' ? 'red' : 'blue'}
+              />
+            </StyledCaptionBox>
+            <StyledCaptionBox>
+              <StyledLabel>대응 여부</StyledLabel>
+              <Caption
+                text={issueresponseflag === 'Y' ? '대응' : '미대응'}
+                type={issueresponseflag === 'Y' ? 'blue' : 'black'}
+              />
+            </StyledCaptionBox>
+          </StyledNavContainer>
           <StyledCaptionBox>
-            <StyledLabel>해킹 여부</StyledLabel>
-            <Caption
-              text={threatflag === 'Y' ? '해킹' : '미해킹'}
-              type={threatflag === 'Y' ? 'red' : 'blue'}
-            />
+            <StyledLabel>수집일시</StyledLabel>
+            <Caption text={regdate} type={'black'} />
           </StyledCaptionBox>
-          <StyledCaptionBox>
-            <StyledLabel>대응 여부</StyledLabel>
-            <Caption
-              text={issueresponseflag === 'Y' ? '대응' : '미대응'}
-              type={issueresponseflag === 'Y' ? 'blue' : 'black'}
-            />
-          </StyledCaptionBox>
-        </StyledNavContainer>
+        </NavLayout>
       </Card.Body>
     </Card.Root>
   )
@@ -146,6 +151,7 @@ const StyledCaptionBox = styled(Box)`
   align-items: baseline;
   gap: 0.5rem;
 `
+
 const BodyLayout = styled.div`
   display: flex;
   flex-direction: column;

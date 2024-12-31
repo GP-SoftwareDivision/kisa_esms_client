@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
 
 import { ContentContainer } from '@/assets/styles/global.ts'
@@ -8,21 +8,61 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { responseListType } from '@/pages/issue/TrackingFormPage.tsx'
 import { useMemo } from 'react'
 import { VictimType } from '@/hooks/mutations/useTrackingDetailMutation.tsx'
+import { targetOptions } from '@/data/selectOptions.ts'
 
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
   margin: 1rem 0;
   gap: 0.5rem;
+`
 
-  button {
-    min-width: 60px !important;
-  }
+const TableContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  ${({ theme }) => theme.typography.body2};
+`
+
+const Row = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  border-bottom: 1px solid #d9d9d9;
+  gap: 0.5rem;
+`
+
+const Label = styled.div`
+  background-color: #f6f6f6;
+  text-align: center;
+  padding: 8px;
+  font-weight: bold;
+`
+
+const Value = styled.div`
+  padding: 8px 12px;
+`
+
+const InnerTableContainer = styled.div`
+  display: grid;
+  align-items: center;
+  grid-template-columns: 0.5fr 9.5fr;
+  padding: 0.5rem;
+`
+
+const InnerTableIndexText = styled.div`
+  background-color: #f6f6f6;
+  border-right: 1px solid #d9d9d9;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const TrackingDetailPage = () => {
   const queryParams = new URLSearchParams(location.search)
   const navigate = useNavigate()
+  const navigateFormIdx = useLocation()
 
   // 이력 대응 상세 조회 API
   const responseDetail = useQueries<{ data: responseListType }>({
@@ -31,7 +71,6 @@ const TrackingDetailPage = () => {
     url: '/api/issue/history/detail',
     body: {
       seqidx: Number(queryParams.get('seqidx')),
-      sourceIdx: Number(queryParams.get('sourceidx')),
     },
   })
 
@@ -51,162 +90,148 @@ const TrackingDetailPage = () => {
   return (
     <ContentContainer>
       <PageTitle text={'대응 이력 상세 조회'} />
-      <Table>
-        <tbody>
-          <tr>
-            <LabelTd>등록일시</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.registrationDate}</Td>
-          </tr>
-          <tr>
-            <LabelTd>대상구분</LabelTd>
-            <Td colSpan={5}>{getIndividualType}</Td>
-          </tr>
+      <TableContainer>
+        <Row>
+          <Label>등록일시</Label>
+          <Value>{responseDetail.data?.data?.registrationDate}</Value>
+        </Row>
+        <Row>
+          <Label>대상구분</Label>
+          <Value>{getIndividualType}</Value>
+        </Row>
+        <div style={{ padding: '0.5rem' }}>
           {responseDetail.data?.data?.institutions.map(
             (v: VictimType, index: number) => (
-              <>
-                <tr>
-                  <LabelTd rowSpan={6}>{index + 1}</LabelTd>
-                  <LabelTd>피해대상</LabelTd>
-                  <Td colSpan={4}>{v.targetType}</Td>
-                </tr>
-                <tr>
-                  <LabelTd>피해기관</LabelTd>
-                  <Td colSpan={4}>{v.institution}</Td>
-                </tr>
-                <tr>
-                  <LabelTd>침해신고여부</LabelTd>
-                  <Td colSpan={4}>{v.reportFlag}</Td>
-                </tr>
-                <tr>
-                  <LabelTd>사고번호</LabelTd>
-                  <Td colSpan={4}>{v.supportFlag}</Td>
-                </tr>
-                <tr>
-                  <LabelTd>기술지원여부</LabelTd>
-                  <Td colSpan={4}>{v.incidentId}</Td>
-                </tr>
-                <tr>
-                  <LabelTd>거부사유</LabelTd>
-                  <Td colSpan={4}>{v.reason}</Td>
-                </tr>
-                <tr>
-                  <LabelTd rowSpan={6}>{index + 2}</LabelTd>
-                  <LabelTd>피해대상</LabelTd>
-                  <Td colSpan={4}>{v.targetType}</Td>
-                </tr>
-                <tr>
-                  <LabelTd>피해기관</LabelTd>
-                  <Td colSpan={4}>{v.institution}</Td>
-                </tr>
-                <tr>
-                  <LabelTd>침해신고여부</LabelTd>
-                  <Td colSpan={4}>{v.reportFlag}</Td>
-                </tr>
-                <tr>
-                  <LabelTd>사고번호</LabelTd>
-                  <Td colSpan={4}>{v.supportFlag}</Td>
-                </tr>
-                <tr>
-                  <LabelTd>기술지원여부</LabelTd>
-                  <Td colSpan={4}>{v.incidentId}</Td>
-                </tr>
-                <tr>
-                  <LabelTd>거부사유</LabelTd>
-                  <Td colSpan={4}>{v.reason}</Td>
-                </tr>
-              </>
+              <InnerTableContainer key={v.seqidx}>
+                <InnerTableIndexText>
+                  <span>{index + 1}</span>
+                </InnerTableIndexText>
+                <div>
+                  <Row>
+                    <Label>피해대상</Label>
+                    <Value>
+                      {
+                        targetOptions?.find(
+                          ({ value }: { value: string; label: string }) =>
+                            value === v.targetType
+                        )?.label
+                      }
+                    </Value>
+                  </Row>
+                  <Row>
+                    <Label>피해기관</Label>
+                    <Value>{v.institution}</Value>
+                  </Row>
+                  <Row>
+                    <Label>침해신고여부</Label>
+                    <Value>{v.reportFlag === 'Y' ? '신고' : '미신고'}</Value>
+                  </Row>
+                  <Row>
+                    <Label>사고번호</Label>
+                    <Value>{v.incidentId}</Value>
+                  </Row>
+                  <Row>
+                    <Label>기술지원여부</Label>
+                    <Value>{v.supportFlag === 'Y' ? '동의' : '미동의'}</Value>
+                  </Row>
+                  <Row>
+                    <Label>거부사유</Label>
+                    <Value>{v.reason}</Value>
+                  </Row>
+                </div>
+              </InnerTableContainer>
             )
           )}
-          <tr>
-            <LabelTd>사고유형</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.incidentType}</Td>
-          </tr>
-          <tr>
-            <LabelTd>사고유형 상세</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.incidentTypeDetail}</Td>
-          </tr>
-          <tr>
-            <LabelTd>협박유무</LabelTd>
-            <Td colSpan={5}>
-              {responseDetail.data?.data?.threatFlag === 'Y' ? '있음' : '없음'}
-            </Td>
-          </tr>
-          <tr>
-            <LabelTd>사이트(도메인)</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.domain}</Td>
-          </tr>
-          <tr>
-            <LabelTd>채널구분</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.domainType}</Td>
-          </tr>
-          <tr>
-            <LabelTd>채널명</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.channelName}</Td>
-          </tr>
-          <tr>
-            <LabelTd>게시글/텔레그램 URL</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.url}</Td>
-          </tr>
-          <tr>
-            <LabelTd>다운로드 URL</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.downloadUrl}</Td>
-          </tr>
-          <tr>
-            <LabelTd>제목</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.title}</Td>
-          </tr>
-          <tr>
-            <LabelTd>작성자</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.writer}</Td>
-          </tr>
-          <tr>
-            <LabelTd>게시일</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.publishedDate}</Td>
-          </tr>
-          <tr>
-            <LabelTd>최초인지</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.originType}</Td>
-          </tr>
-          <tr>
-            <LabelTd>최초인지 상세</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.originTypeDetail}</Td>
-          </tr>
-          <tr>
-            <LabelTd>공유</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.shareTarget}</Td>
-          </tr>
-          <tr>
-            <LabelTd>수집정보</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.colInfo}</Td>
-          </tr>
-          <tr>
-            <LabelTd>이미지 유무</LabelTd>
-            <Td colSpan={5}>
-              {responseDetail.data?.data?.imageFlag === 'Y' ? '있음' : '없음'}
-            </Td>
-          </tr>
-          <tr>
-            <LabelTd>보고문구</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.contents}</Td>
-          </tr>
-          <tr>
-            <LabelTd>해커그룹</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.hackGroup}</Td>
-          </tr>
-          <tr>
-            <LabelTd>비고</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.comment}</Td>
-          </tr>
-          <tr>
-            <LabelTd>키워드</LabelTd>
-            <Td colSpan={5}>{responseDetail.data?.data?.leakedInfo}</Td>
-          </tr>
-        </tbody>
-      </Table>
+        </div>
+        <Row>
+          <Label>사고유형</Label>
+          <Value>{responseDetail.data?.data?.incidentType}</Value>
+        </Row>
+        <Row>
+          <Label>사고유형 상세</Label>
+          <Value>{responseDetail.data?.data?.incidentTypeDetail}</Value>
+        </Row>
+        <Row>
+          <Label>협박유무</Label>
+          <Value>
+            {responseDetail.data?.data?.threatFlag === 'Y' ? '있음' : '없음'}
+          </Value>
+        </Row>
+        <Row>
+          <Label>사이트(도메인)</Label>
+          <Value>{responseDetail.data?.data?.domain}</Value>
+        </Row>
+        <Row>
+          <Label>채널구분</Label>
+          <Value>{responseDetail.data?.data?.domainType}</Value>
+        </Row>
+        <Row>
+          <Label>채널명</Label>
+          <Value>{responseDetail.data?.data?.channelName}</Value>
+        </Row>
+        <Row>
+          <Label>게시글/텔레그램 URL</Label>
+          <Value>{responseDetail.data?.data?.url}</Value>
+        </Row>
+        <Row>
+          <Label>다운로드 URL</Label>
+          <Value>{responseDetail.data?.data?.downloadUrl}</Value>
+        </Row>
+        <Row>
+          <Label>제목</Label>
+          <Value>{responseDetail.data?.data?.title}</Value>
+        </Row>
+        <Row>
+          <Label>작성자</Label>
+          <Value>{responseDetail.data?.data?.writer}</Value>
+        </Row>
+        <Row>
+          <Label>게시일</Label>
+          <Value>{responseDetail.data?.data?.publishedDate}</Value>
+        </Row>
+        <Row>
+          <Label>최초인지</Label>
+          <Value>{responseDetail.data?.data?.originType}</Value>
+        </Row>
+        <Row>
+          <Label>최초인지 상세</Label>
+          <Value>{responseDetail.data?.data?.originTypeDetail}</Value>
+        </Row>
+        <Row>
+          <Label>공유</Label>
+          <Value>{responseDetail.data?.data?.shareTarget}</Value>
+        </Row>
+        <Row>
+          <Label>수집정보</Label>
+          <Value>{responseDetail.data?.data?.colInfo}</Value>
+        </Row>
+        <Row>
+          <Label>이미지 유무</Label>
+          <Value>
+            {responseDetail.data?.data?.imageFlag === 'Y' ? '있음' : '없음'}
+          </Value>
+        </Row>
+        <Row>
+          <Label>보고문구</Label>
+          <Value>{responseDetail.data?.data?.contents}</Value>
+        </Row>
+        <Row>
+          <Label>해커그룹</Label>
+          <Value>{responseDetail.data?.data?.hackGroup}</Value>
+        </Row>
+        <Row>
+          <Label>비고</Label>
+          <Value>{responseDetail.data?.data?.comment}</Value>
+        </Row>
+        <Row>
+          <Label>키워드</Label>
+          <Value>{responseDetail.data?.data?.keyword}</Value>
+        </Row>
+      </TableContainer>
       <ButtonContainer>
         <Button
           type={'primary'}
-          onClick={() => navigate(`form?id=${queryParams.get('id')}`)}
+          onClick={() => navigate(`form${navigateFormIdx.search}`)}
           text={'수정'}
         />
         <Button type={'tertiary'} onClick={() => navigate(-1)} text={'닫기'} />
@@ -216,19 +241,3 @@ const TrackingDetailPage = () => {
 }
 
 export default TrackingDetailPage
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  ${({ theme }) => theme.typography.body2};
-  table-layout: fixed;
-`
-const Td = styled.td`
-  padding: 8px 12px;
-  border-bottom: 1px solid #d9d9d9;
-`
-
-const LabelTd = styled(Td)`
-  background-color: #f6f6f6;
-  text-align: center;
-`

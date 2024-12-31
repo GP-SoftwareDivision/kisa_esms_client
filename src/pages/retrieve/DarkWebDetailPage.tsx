@@ -12,6 +12,7 @@ import { highlightText } from '@/utils/highlightText.tsx'
 
 interface DarkWebDetailType {
   seqidx: number
+  issueidx: number
   target: string
   keyword: string
   writetime: string
@@ -73,7 +74,9 @@ const DarkWebDetailPage = () => {
           <Button
             type={'primary'}
             onClick={() =>
-              navigate(`/issue/tracking/detail?seqidx=0&sourceidx=${id}`)
+              navigate(
+                `/issue/tracking/detail?seqidx=${dtDetail.data?T.data.issueidx}`
+              )
             }
             text={'이슈 대응'}
           />

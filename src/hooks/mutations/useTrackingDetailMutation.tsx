@@ -1,13 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 import { AxiosError } from 'axios'
-import { useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import instance from '@/apis/instance.ts'
+import { targetOptions } from '@/data/selectOptions.ts'
 
 // 피해 대상 타입 선언
 export interface VictimType {
-  seqidx?: number
+  id?: number // 클라이언트 관리
+  seqidx: number
   registrationDate: string
   targetType: string
   institution: string
@@ -21,7 +23,7 @@ export interface VictimType {
 // 이슈 대응 타입 선언
 export interface insertResponseType {
   registrationDate: string
-  incidentType: string[]
+  incidentType: string[] | string
   incidentTypeEtc?: string
   incidentTypeDetail: string
   threatFlag: string
@@ -33,15 +35,18 @@ export interface insertResponseType {
   publishedDate: string
   originType: string
   originTypeDetail: string
-  shareTarget: string[]
+  shareTarget: string[] | string
   shareTargetEtc?: string
   colInfo: string
   imageFlag: string
   contents: string
   hackGroup: string
-  leakedInfo: string
+  keyword: string
   comment: string
   indFlag: string[]
+  seqidx: number
+  sourceIdx: number
+  sourceType: string
 }
 
 // 피해 대상 + 이슈 대응 전체 타입 선언
@@ -75,7 +80,7 @@ type Action =
   | { type: 'SET_WRITER'; payload: string } // 작성자 업데이트
   | { type: 'SET_ORIGIN_TYPE_DETAIL'; payload: string } // 최초 인지 정보 상세 업데이트
   | { type: 'SET_HACK_GROUP'; payload: string } // 해킹 그룹 업데이트
-  | { type: 'SET_LEAKED_INFO'; payload: string } // 유출 정보 업데이트
+  | { type: 'SET_KEYWORD'; payload: string } // 유출 정보 업데이트
   | { type: 'SET_COMMENT'; payload: string } // 코멘트 업데이트
 
 const reducer = (
@@ -135,8 +140,8 @@ const reducer = (
       return { ...state, originTypeDetail: action.payload }
     case 'SET_HACK_GROUP':
       return { ...state, hackGroup: action.payload }
-    case 'SET_LEAKED_INFO':
-      return { ...state, leakedInfo: action.payload }
+    case 'SET_KEYWORD':
+      return { ...state, keyword: action.payload }
     case 'SET_COMMENT':
       return { ...state, comment: action.payload }
     case 'SET_INSTITUTION':
@@ -175,10 +180,13 @@ export const useTrackingDetailMutation = () => {
     writer: '', // 작성자
     originTypeDetail: '', // 최초 인지 상세 정보
     hackGroup: '', // 해킹 그룹 정보
-    leakedInfo: '', // 유출 정보
+    keyword: '', // 유출 정보
     comment: '', // 코멘트
     institution: '', // 기관 정보
     incidentId: '', // 사건 ID
+    seqidx: 0,
+    sourceIdx: 0,
+    sourceType: '',
   }
 
   // 이력대응 관리 전체 상태 관리
@@ -195,22 +203,11 @@ export const useTrackingDetailMutation = () => {
     dispatch({ type, payload } as Action)
   }
 
-  // 피해 대상 리스트
-  const targetList = [
-    { value: 'company', label: '기업' },
-    { value: 'assn', label: '협회' },
-    { value: 'pub', label: '공공' },
-    { value: 'edu', label: '교육' },
-    { value: 'fin', label: '금융' },
-    { value: 'med', label: '의료' },
-    { value: 'other', label: '기타(해외)' },
-  ]
-
   // 피해기관 리스트에서 한글로 반환해주는 함수
   const findTargetTypeText = (value: string): string | undefined => {
     if (!value) return undefined
     return (
-      targetList.find(
+      targetOptions.find(
         (list: { value: string; label: string }) => list.value === value
       )?.label || ''
     )
@@ -223,8 +220,9 @@ export const useTrackingDetailMutation = () => {
       const response = await instance.post('/api/issue/victims/insert', data)
       return response.data
     },
-    onSuccess: () => {
+    onSuccess: (_response: any, variables) => {
       notifySuccess('저장되었습니다.')
+      navigate(`/issue/tracking/detail?seqidx=${variables.issueIdx}`)
     },
   })
 
@@ -234,8 +232,6 @@ export const useTrackingDetailMutation = () => {
     mutationFn: async (data: insertResponseType) => {
       const request = {
         ...data,
-        incidentType: data.incidentType.join(','),
-        shareTarget: data.shareTarget.join(','),
         indFlag: data.indFlag.includes('개인') ? 'Y' : 'N',
       }
       if (
@@ -271,21 +267,6 @@ export const useTrackingDetailMutation = () => {
       }
     },
     onSuccess: (response) => {
-      // 대상 구분 개인일 때 빈 리스트 생성
-      if (state.indFlag.length === 1 && state.indFlag[0] === '개인') {
-        setVictims((prevVictims) =>
-          prevVictims.map(() => ({
-            seqidx: undefined,
-            registrationDate: '',
-            targetType: '',
-            institution: '',
-            reportFlag: '',
-            incidentId: '',
-            supportFlag: '',
-            reason: '',
-          }))
-        )
-      }
       insertVictims.mutate({ issueIdx: response.seqidx, list: victims })
     },
   })
@@ -294,9 +275,26 @@ export const useTrackingDetailMutation = () => {
     const isConfirm = confirm(
       '작성 중인 내용이 저장되지 않습니다. 계속하시겠습니까?'
     )
-
     if (isConfirm) navigate(-1)
   }
+
+  useEffect(() => {
+    if (state.indFlag.length === 1 && state.indFlag[0] === '개인') {
+      setVictims([
+        {
+          id: 0,
+          seqidx: 0,
+          registrationDate: '',
+          targetType: 'ind',
+          institution: '',
+          reportFlag: '',
+          incidentId: '',
+          supportFlag: '',
+          reason: '',
+        },
+      ])
+    }
+  }, [state])
 
   return {
     state,
@@ -304,7 +302,7 @@ export const useTrackingDetailMutation = () => {
     insertResponseIssue,
     victims,
     setVictims,
-    targetList,
+    targetOptions,
     findTargetTypeText,
     handleOnExitPage,
   }

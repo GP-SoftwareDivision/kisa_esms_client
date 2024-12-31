@@ -194,7 +194,7 @@ const TrackingPage = () => {
             loading={false}
             data={responseList.data?.data ? responseList.data?.data : []}
             columns={responseListColumns}
-            detailIdx={'issueIdx'}
+            detailIdx={'seqidx'}
           />
           <CustomPagination
             total={responseList.data?.count}

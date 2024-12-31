@@ -195,7 +195,7 @@ export interface responseListType extends insertResponseType {
   institutions: VictimType[]
 }
 
-const TrackingDetailPage = () => {
+const TrackingFormPage = () => {
   const queryParams = new URLSearchParams(location.search)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
@@ -205,7 +205,7 @@ const TrackingDetailPage = () => {
     updateState,
     victims,
     setVictims,
-    targetList,
+    targetOptions,
     findTargetTypeText,
     handleOnExitPage,
   } = useTrackingDetailMutation()
@@ -223,9 +223,8 @@ const TrackingDetailPage = () => {
     method: 'POST',
     url: '/api/issue/history/detail',
     body: {
-      seqidx: queryParams.get('id'),
+      seqidx: Number(queryParams.get('seqidx')),
     },
-    enabled: !!queryParams.get('id'),
   })
 
   // 채널 선택 조회 API
@@ -238,9 +237,11 @@ const TrackingDetailPage = () => {
   // 처음 데이터 받아왔을 때
   useEffect(() => {
     if (responseDetail.isSuccess && responseDetail.data?.data) {
-      const institutionsLength =
-        responseDetail.data?.data?.institutions.length || 0
-      const hasIndFlag = responseDetail.data?.data?.indFlag.includes('Y')
+      const detail = responseDetail.data?.data
+
+      const institutionsLength = detail?.institutions.length || 0
+
+      const hasIndFlag = detail?.indFlag.includes('Y')
       if (hasIndFlag) {
         updateState(
           'SET_IND_FLAG',
@@ -250,26 +251,31 @@ const TrackingDetailPage = () => {
         updateState('SET_IND_FLAG', institutionsLength > 0 ? ['개인 외'] : [])
       }
 
-      updateState(
-        'SET_CHANNEL_ID',
-        responseDetail.data?.data?.channelId?.toString() ?? ''
-      )
-      updateState('SET_COL_INFO', responseDetail.data?.data?.colInfo ?? '')
-      updateState('SET_COMMENT', responseDetail.data?.data?.comment ?? '')
-      updateState('SET_CONTENTS', responseDetail.data?.data?.contents ?? '')
-      updateState(
-        'SET_DOWNLOAD_URL',
-        responseDetail.data?.data?.downloadUrl ?? ''
-      )
-      updateState('SET_HACK_GROUP', responseDetail.data?.data?.hackGroup ?? '')
-      updateState('SET_IMAGE_FLAG', responseDetail.data?.data?.imageFlag ?? '')
-      // updateState(
-      //   'SET_INCIDENT_TYPE',
-      //   responseDetail.data?.data?.incidentType?.split(',') ?? []
-      // )
+      updateState('SET_CHANNEL_ID', detail?.channelId?.toString() ?? '')
+      updateState('SET_COL_INFO', detail?.colInfo ?? '')
+      updateState('SET_COMMENT', detail?.comment ?? '')
+      updateState('SET_CONTENTS', detail?.contents ?? '')
+      updateState('SET_DOWNLOAD_URL', detail?.downloadUrl ?? '')
+      updateState('SET_HACK_GROUP', detail?.hackGroup ?? '')
+      updateState('SET_IMAGE_FLAG', detail?.imageFlag ?? '')
 
-      if (responseDetail.data?.data?.institutions.length > 0) {
-        const firstInstitution = responseDetail.data?.data?.institutions[0]
+      // 사고유형 - '기타' 포함 여부에 따른 분기 처리
+      if (detail?.incidentType.includes('기타')) {
+        const tmpIncidentType = (detail?.incidentType as string).split(':')
+
+        updateState('SET_INCIDENT_TYPE', tmpIncidentType[0].split(','))
+        updateState('SET_INCIDENT_TYPE_ETC', tmpIncidentType[1])
+      }
+
+      if (!detail?.incidentType.includes('기타')) {
+        updateState(
+          'SET_INCIDENT_TYPE',
+          (detail?.incidentType as string).split(',')
+        )
+      }
+
+      if (detail?.institutions.length > 0) {
+        const firstInstitution = detail?.institutions[0]
         updateState('SET_TARGET_TYPE', firstInstitution?.targetType ?? '')
         updateState('SET_INSTITUTION', firstInstitution?.institution ?? '')
         updateState('SET_REPORT_FLAG', firstInstitution?.reportFlag ?? ' ')
@@ -278,37 +284,32 @@ const TrackingDetailPage = () => {
         updateState('SET_INCIDENT_ID', firstInstitution?.incidentId ?? '')
       }
 
-      updateState(
-        'SET_REGISTRATION_DATE',
-        responseDetail.data?.data?.registrationDate ?? ''
-      )
-      updateState(
-        'SET_LEAKED_INFO',
-        responseDetail.data?.data?.leakedInfo ?? ''
-      )
-      updateState(
-        'SET_ORIGIN_TYPE',
-        responseDetail.data?.data?.originType ?? ''
-      )
-      updateState(
-        'SET_ORIGIN_TYPE_DETAIL',
-        responseDetail.data?.data?.originTypeDetail ?? ''
-      )
-      updateState(
-        'SET_PUBLISHED_DATE',
-        responseDetail.data?.data?.publishedDate ?? ''
-      )
-      // updateState(
-      //   'SET_SHARE_TARGET',
-      //   responseDetail.data?.data?.shareTarget?.split(',') ?? []
-      // )
-      updateState(
-        'SET_THREAT_FLAG',
-        responseDetail.data?.data?.threatFlag ?? ''
-      )
-      updateState('SET_TITLE', responseDetail.data?.data?.title ?? '')
-      updateState('SET_URL', responseDetail.data?.data?.url ?? '')
-      updateState('SET_WRITER', responseDetail.data?.data?.writer ?? '')
+      updateState('SET_REGISTRATION_DATE', detail?.registrationDate ?? '')
+      updateState('SET_KEYWORD', detail?.keyword ?? '')
+      updateState('SET_ORIGIN_TYPE', detail?.originType ?? '')
+      updateState('SET_ORIGIN_TYPE_DETAIL', detail?.originTypeDetail ?? '')
+      updateState('SET_PUBLISHED_DATE', detail?.publishedDate ?? '')
+
+      // 공유 - '기타' 포함 여부에 따른 분기 처리
+      if (detail?.shareTarget.includes('기타')) {
+        const tmpShareTarget = (detail?.shareTarget as string).split(':')
+
+        updateState('SET_SHARE_TARGET', tmpShareTarget[0].split(','))
+        updateState('SET_SHARE_TARGET_ETC', tmpShareTarget[1])
+      }
+
+      if (!detail?.shareTarget.includes('기타')) {
+        updateState(
+          'SET_SHARE_TARGET',
+          (detail?.shareTarget as string).split(',')
+        )
+      }
+      updateState('SET_THREAT_FLAG', detail?.threatFlag ?? '')
+      updateState('SET_TITLE', detail?.title ?? '')
+      updateState('SET_URL', detail?.url ?? '')
+      updateState('SET_WRITER', detail?.writer ?? '')
+
+      setVictims(detail?.institutions ?? [])
     }
   }, [responseDetail.isSuccess, responseDetail.data])
 
@@ -319,7 +320,8 @@ const TrackingDetailPage = () => {
       return
     }
     const request = {
-      seqidx: victims.length + 1,
+      id: victims.length + 1,
+      seqidx: 0,
       registrationDate: state.registrationDate,
       targetType: state.targetType,
       institution: state.institution,
@@ -348,7 +350,7 @@ const TrackingDetailPage = () => {
     event.stopPropagation()
 
     setVictims((prevVictims) =>
-      prevVictims.filter((victim) => victim.seqidx !== id)
+      prevVictims.filter((victim) => victim.id !== id)
     )
   }
 
@@ -422,7 +424,7 @@ const TrackingDetailPage = () => {
             </Td>
             <LabelTd colSpan={2}>
               <span>*</span>
-              대상 구분
+              대상구분
             </LabelTd>
             <Td colSpan={10}>
               <CustomCheckBoxGroup
@@ -440,7 +442,7 @@ const TrackingDetailPage = () => {
                 </LabelTd>
                 <Td colSpan={7}>
                   <CustomRadio
-                    items={targetList}
+                    items={targetOptions}
                     value={state.targetType}
                     onChange={(item: { value: string }) =>
                       updateState('SET_TARGET_TYPE', item.value)
@@ -581,7 +583,7 @@ const TrackingDetailPage = () => {
                           </span>
                           <button
                             onClick={(e) =>
-                              handleOnCancelVictims(e, victim.seqidx!)
+                              handleOnCancelVictims(e, victim.id!)
                             }
                           >
                             <IoMdClose />
@@ -604,16 +606,16 @@ const TrackingDetailPage = () => {
                 items={[
                   '정보유출',
                   '공격예고',
-                  '데이터불일치',
                   'DDoS',
                   '랜섬웨어',
                   '웹변조',
                   '취약점',
+                  '정보노출',
                   '기타해킹',
                   '확인불가',
                   '기타',
                 ]}
-                value={state.incidentType}
+                value={state.incidentType as string[]}
                 onChange={(value) => updateState('SET_INCIDENT_TYPE', value)}
                 children={
                   <CustomEditable
@@ -808,7 +810,7 @@ const TrackingDetailPage = () => {
                   '개보위',
                   '기타',
                 ]}
-                value={state.shareTarget}
+                value={state.shareTarget as string[]}
                 onChange={(value) => updateState('SET_SHARE_TARGET', value)}
                 children={
                   <CustomEditable
@@ -908,41 +910,48 @@ const TrackingDetailPage = () => {
             <LabelTd>키워드</LabelTd>
             <Td colSpan={15}>
               <CustomEditable
-                id={'leakedInfo'}
-                value={state.leakedInfo}
+                id={'keyword'}
+                value={state.keyword}
                 onChange={(item: { value: string }) =>
-                  updateState('SET_LEAKED_INFO', item.value)
+                  updateState('SET_KEYWORD', item.value)
                 }
               />
             </Td>
           </tr>
-        </tbody>
+        </tbody>{' '}
       </Table>
       <ButtonContainer>
         <Button
           type={'primary'}
           onClick={() => {
             insertResponseIssue.mutate({
-              registrationDate: state.registrationDate,
-              incidentType: state.incidentType,
-              incidentTypeDetail: state.incidentTypeDetail,
-              threatFlag: state.threatFlag,
-              channelId: state.channelId,
-              url: state.url,
-              downloadUrl: state.downloadUrl,
-              title: state.title,
-              writer: state.writer,
-              publishedDate: state.publishedDate,
-              originType: state.originType,
-              originTypeDetail: state.originTypeDetail,
-              shareTarget: state.shareTarget,
-              colInfo: state.colInfo,
-              imageFlag: state.imageFlag,
-              contents: state.contents,
-              hackGroup: state.hackGroup,
-              leakedInfo: state.leakedInfo,
-              comment: state.comment,
-              indFlag: state.indFlag,
+              registrationDate: state.registrationDate || '',
+              incidentType: !state.incidentTypeEtc
+                ? state.incidentType
+                : `${state.incidentType}:${state.incidentTypeEtc}`,
+              incidentTypeDetail: state.incidentTypeDetail || '',
+              threatFlag: state.threatFlag || '',
+              channelId: state.channelId || '',
+              url: state.url || '',
+              downloadUrl: state.downloadUrl || '',
+              title: state.title || '',
+              writer: state.writer || '',
+              publishedDate: state.publishedDate || '',
+              originType: state.originType || '',
+              originTypeDetail: state.originTypeDetail || '',
+              shareTarget: !state.shareTargetEtc
+                ? state.shareTarget
+                : `${state.shareTarget}:${state.shareTargetEtc}`,
+              colInfo: state.colInfo || '',
+              imageFlag: state.imageFlag || '',
+              contents: state.contents || '',
+              hackGroup: state.hackGroup || '',
+              keyword: state.keyword || '',
+              comment: state.comment || '',
+              indFlag: state.indFlag || '',
+              seqidx: Number(queryParams.get('seqidx')) || 0,
+              sourceIdx: Number(responseDetail.data?.data.sourceIdx) || 0,
+              sourceType: responseDetail.data?.data.sourceType || '',
             })
           }}
           text={'저장'}
@@ -1000,4 +1009,4 @@ const TrackingDetailPage = () => {
   )
 }
 
-export default React.memo(TrackingDetailPage)
+export default React.memo(TrackingFormPage)

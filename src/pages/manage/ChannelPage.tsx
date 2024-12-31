@@ -15,6 +15,7 @@ import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
+import instance from '@/apis/instance.ts'
 
 interface ServerType {
   servername: string
@@ -29,19 +30,19 @@ const ChannelPage = () => {
   const [channelName, setChannelName] = useState<string>('')
 
   const [request, setRequest] = useState<{
-    page: number
     channelName: string
-  }>({ page, channelName })
+  }>({ channelName: '' })
 
   const channelList = useQueries<{ data: ServerType[]; count: number }>({
     queryKey: `channelList`,
     method: 'POST',
     url: '/api/manage/channel/list',
-    body: request,
+    body: { ...request, page },
   })
 
   const handleOnClick = () => {
-    setRequest({ page, channelName })
+    handlePageChange(1)
+    setRequest({ channelName })
   }
 
   const DomainColumns = [
@@ -83,6 +84,27 @@ const ChannelPage = () => {
     },
   ]
 
+  const excelDownload = async () => {
+    try {
+      const response = await instance.post(
+        '/api/download/channel',
+        { channelName: channelName },
+        { responseType: 'blob' }
+      )
+
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'test.xlsx')
+      link.style.cssText = 'display:none'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    } catch (error) {
+      console.error('Excel 다운로드 실패:', error)
+    }
+  }
+
   return (
     <ContentContainer>
       <PageTitle
@@ -90,7 +112,7 @@ const ChannelPage = () => {
         children={
           <Button
             type={'secondary'}
-            onClick={handleOnClick}
+            onClick={excelDownload}
             text={'엑셀 다운로드'}
           />
         }
@@ -118,7 +140,7 @@ const ChannelPage = () => {
               columns={DomainColumns}
             />
             <CustomPagination
-              total={1}
+              total={channelList.data.count}
               page={page}
               handlePageChange={(newPage) =>
                 handlePageChange(newPage as number)

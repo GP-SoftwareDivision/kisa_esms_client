@@ -1,5 +1,5 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
 import { Box, Stack } from '@chakra-ui/react'
 
@@ -16,6 +16,7 @@ import CustomEditable from '@/components/elements/Editable.tsx'
 
 interface TelegramDetailType {
   seqidx: number
+  issueidx: number
   keyword: string
   writetime: string
   channelurl: string
@@ -39,9 +40,10 @@ interface TelegramDetailHistory {
 }
 
 const TelegramDetailPage = () => {
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
   const location = useLocation()
   const urlParams = new URLSearchParams(location.search)
+
   const id = urlParams.get('id')
   const [seqidx, setSeqidx] = useState<string>(id || '')
 
@@ -57,7 +59,7 @@ const TelegramDetailPage = () => {
   const currentMessageRef = useRef<any>(null)
 
   // 텔레그램 데이터 상세 조회 API
-  const ttDetail = useQueries<{ data: TelegramDetailType[] }>({
+  const ttDetail = useQueries<{ data: TelegramDetailType }>({
     queryKey: `ttDetail`,
     method: 'POST',
     url: `/api/monitoring/ttDetail`,
@@ -92,8 +94,8 @@ const TelegramDetailPage = () => {
         ) : ttDetail.isSuccess ? (
           highlightText(
             v.contents,
-            ttDetail.data?.data[0].keyword,
-            ttDetail.data?.data[0].threatlog.split('/')
+            ttDetail.data?.data.keyword,
+            ttDetail.data?.data.threatlog.split('/')
           )
         ) : (
           <span>{v.contents}</span>
@@ -109,7 +111,7 @@ const TelegramDetailPage = () => {
             <Button
               text={v.threatflag === 'Y' ? '해킹' : '미해킹'}
               type={v.threatflag === 'Y' ? 'danger' : 'tertiary'}
-              onClick={() => console.log('')}
+              onClick={() => navigate(`/issue/tracking/detail?seqidx=${id}`)}
             />
           </ButtonWrapper>
         </StyledInfoBox>
@@ -145,32 +147,45 @@ const TelegramDetailPage = () => {
 
   return (
     <ContentContainer>
-      <PageTitle text={'텔레그램 데이터 상세 조회'} />
+      <PageTitle
+        text={'텔레그램 데이터 상세 조회'}
+        children={
+          <Button
+            type={'primary'}
+            onClick={() =>
+              navigate(
+                `/issue/tracking/detail?seqidx=${ttDetail.data?.data.issueidx}`
+              )
+            }
+            text={'이슈 대응'}
+          />
+        }
+      />
       <Table>
-        <tbody key={ttDetail.data?.data[0].seqidx}>
+        <tbody key={ttDetail.data?.data.seqidx}>
           <tr>
             <LabelTd>채널명</LabelTd>
-            <Td colSpan={2}>{ttDetail.data?.data[0].channel}</Td>
+            <Td colSpan={2}>{ttDetail.data?.data.channel}</Td>
             <LabelTd>URL</LabelTd>
-            <Td colSpan={2}>{ttDetail.data?.data[0].channelurl}</Td>
+            <Td colSpan={2}>{ttDetail.data?.data.channelurl}</Td>
           </tr>
           <tr>
             <LabelTd>작성자</LabelTd>
-            <Td colSpan={2}>{ttDetail.data?.data[0].username}</Td>
+            <Td colSpan={2}>{ttDetail.data?.data.username}</Td>
             <LabelTd>작성시간</LabelTd>
-            <Td colSpan={2}>{ttDetail.data?.data[0].writetime}</Td>
+            <Td colSpan={2}>{ttDetail.data?.data.writetime}</Td>
           </tr>
           <tr>
             <LabelTd>해킹 여부</LabelTd>
-            <Td colSpan={2}>{ttDetail.data?.data[0].threatflag}</Td>
+            <Td colSpan={2}>{ttDetail.data?.data.threatflag}</Td>
             <LabelTd>대응 여부</LabelTd>
-            <Td colSpan={2}>{ttDetail.data?.data[0].issueresponseflag}</Td>
+            <Td colSpan={2}>{ttDetail.data?.data.issueresponseflag}</Td>
           </tr>
           <tr>
             <LabelTd>수집 키워드</LabelTd>
-            <Td colSpan={2}>{ttDetail.data?.data[0].keyword}</Td>
+            <Td colSpan={2}>{ttDetail.data?.data.keyword}</Td>
             <LabelTd>핀단 키워드</LabelTd>
-            <Td colSpan={2}>{ttDetail.data?.data[0].threatlog}</Td>
+            <Td colSpan={2}>{ttDetail.data?.data.threatlog}</Td>
           </tr>
           <tr>
             <LabelTd>번역 보기</LabelTd>
