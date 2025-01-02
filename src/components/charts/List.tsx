@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 interface ListType {
   label: string
-  value: string
+  value: string | number
   loading?: boolean
 }
 const CustomList = (props: ListType) => {

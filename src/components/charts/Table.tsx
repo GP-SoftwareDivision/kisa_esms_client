@@ -38,7 +38,7 @@ const CustomTable = ({
   return (
     <TableWrapper>
       {loading ? (
-        <CustomSkeleton lines={3} />
+        <CustomSkeleton lines={3} height={5} />
       ) : (
         <TableContainer $maxHeight={maxHeight ? maxHeight : 'none'}>
           <StyledTable>
