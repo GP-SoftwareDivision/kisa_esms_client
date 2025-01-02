@@ -17,9 +17,11 @@ import { ToastContainer } from 'react-toastify'
 import { routeConfig } from './routes/routeConfig.tsx'
 import instance from '@/apis/instance.ts'
 import { theme } from '@/assets/styles/theme.ts'
-import Wrapper from '@/layouts/Wrapper'
-import LoginPage from '@/pages/LoginPage.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
+import Wrapper from '@/layouts/Wrapper'
+import ErrorPage from '@/pages/ErrorPage.tsx'
+import LoginPage from '@/pages/LoginPage.tsx'
+import NotFoundPage from '@/pages/NotFoundPage.tsx'
 
 const queryClient = new QueryClient()
 
@@ -61,6 +63,8 @@ const App = () => {
           <Suspense fallback={<Loading />}>
             <Routes>
               <Route path='/' element={<RootRoute />} />
+              <Route path='*' element={<NotFoundPage />} />
+              <Route path='/error' element={<ErrorPage />} />
               <Route path='/login' element={<LoginPage />} />
               <Route element={<Layout />}>
                 {routeConfig.map((route, index) => (

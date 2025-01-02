@@ -62,7 +62,9 @@ const Telegram = () => {
     insertSearchOpen,
   } = useSearchSaveMutation()
 
-  const { page, setPage, handlePageChange } = usePagination(1)
+  const { page, setPage, handlePageChange } = usePagination(
+    Number(queryParams.get('page'))
+  )
 
   // 검색 조건 불러오기
   const [savedSearchCondition, setSavedSearchCondition] = useState<string>('')

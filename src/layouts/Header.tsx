@@ -1,12 +1,13 @@
+import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import styled from '@emotion/styled'
 
 import menu from '@/data/menu.json'
+
 import NavBar from '@/components/elements/NavBar.tsx'
 import { mq } from '@/utils/mediaQueries.ts'
 import instance from '../apis/instance.ts'
-import dayjs from 'dayjs'
 import { notifyError } from '@/utils/notify.ts'
 
 interface UserInfoType {
@@ -31,7 +32,8 @@ const Header = () => {
         )
       }
     },
-    staleTime: 10 * 60 * 1000, // 10분 동안 캐시 유지
+    staleTime: 60000,
+    gcTime: 10 * 60000, // 10분 동안 캐시 유지
   })
 
   const onSubMenuSelect = (subItemKey: string | null) => {
@@ -103,7 +105,11 @@ const Header = () => {
     <HeaderContainer>
       <HeaderContent>
         <NavBar
-          menus={menu.list}
+          menus={
+            accountInfo.data?.data.type === 'administrator'
+              ? menu.admin
+              : menu.user
+          }
           onSubMenuSelect={onSubMenuSelect}
           account={accountInfo.data?.data}
         />

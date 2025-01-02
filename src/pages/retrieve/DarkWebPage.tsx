@@ -51,9 +51,10 @@ const DarkWebPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const { page, setPage, handlePageChange } = usePagination(1)
+  const { page, setPage, handlePageChange } = usePagination(
+    Number(queryParams.get('page'))
+  )
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
-
   // 조회 조건 저장
   const {
     SaveSearch,
@@ -165,6 +166,7 @@ const DarkWebPage = () => {
         console.error(error)
       }
     },
+    staleTime: 60000,
   })
 
   // 검색 조건 적용 후 파라미터 변경

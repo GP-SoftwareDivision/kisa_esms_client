@@ -1,9 +1,11 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
-import instance from '@/apis/instance.ts'
 import { useState, useEffect } from 'react'
-import { notifyError } from '@/utils/notify.ts'
-import { AxiosError } from 'axios'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { AxiosError } from 'axios'
+
+import instance from '@/apis/instance.ts'
+import { notifyError } from '@/utils/notify.ts'
+import { TelegramDetailType } from '@/pages/retrieve/TelegramDetailPage.tsx'
 
 interface IUseInfiniteQuery {
   queryKey: string
@@ -11,27 +13,15 @@ interface IUseInfiniteQuery {
   type: 'prev' | 'default' | 'next'
 }
 
-interface infiniteDataType {
-  seqidx: number
-  channelurl: string
-  username: string
-  keyword: string
-  channel: string
-  writetime: string
-  contents: string
-  contents2: string
-  trancontents: string
-  trancontents2: string
-  threatflag: string
-  threatlog: string
-  issueresponseflag: string
-  regdate: string
-}
-
 export const useInfiniteQueries = (props: IUseInfiniteQuery) => {
   const navigate = useNavigate()
   const { queryKey, seqidx, type } = props
-  const [infiniteData, setInfiniteData] = useState<infiniteDataType[]>([])
+
+  const [infiniteData, setInfiniteData] = useState<TelegramDetailType[]>([])
+  const [originalInfiniteData, setOriginalInfiniteData] = useState<
+    TelegramDetailType[]
+  >([])
+
   const [isNextEnd, setIsNextEnd] = useState<boolean>(false)
   const [isPrevEnd, setIsPrevEnd] = useState<boolean>(false)
 
@@ -79,7 +69,7 @@ export const useInfiniteQueries = (props: IUseInfiniteQuery) => {
   useEffect(() => {
     if (ttHistoryData.isSuccess && ttHistoryData.data) {
       const newData = ttHistoryData.data.pages.flatMap((page) => page)
-
+      // 검색 초기화를 위한 오리지날 데이터
       if (type === 'prev') {
         if (Object.keys(newData[0]).length === 0) {
           notifyError('마지막 데이터 입니다.')
@@ -87,6 +77,7 @@ export const useInfiniteQueries = (props: IUseInfiniteQuery) => {
           return
         }
         setInfiniteData((prevData) => [...newData, ...prevData])
+        setOriginalInfiniteData((prevData) => [...prevData, ...newData])
       } else if (type === 'next') {
         if (Object.keys(newData[0]).length === 0) {
           notifyError('마지막 데이터 입니다.')
@@ -94,11 +85,20 @@ export const useInfiniteQueries = (props: IUseInfiniteQuery) => {
           return
         }
         setInfiniteData((prevData) => [...prevData, ...newData])
+        setOriginalInfiniteData((prevData) => [...prevData, ...newData])
       } else {
         setInfiniteData(newData)
+        setOriginalInfiniteData(newData)
       }
     }
   }, [ttHistoryData.data, type])
 
-  return { ttHistoryData, infiniteData, setInfiniteData, isPrevEnd, isNextEnd }
+  return {
+    ttHistoryData,
+    originalInfiniteData,
+    infiniteData,
+    setInfiniteData,
+    isPrevEnd,
+    isNextEnd,
+  }
 }

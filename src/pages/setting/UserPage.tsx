@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import styled from '@emotion/styled'
 import { Box, Flex, Input } from '@chakra-ui/react'
 import { withMask } from 'use-mask-input'
@@ -19,7 +20,6 @@ import { useUserAddMutation } from '@/hooks/mutations/useUserAddMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
 import { useUserUpdateMutation } from '@/hooks/mutations/useUserUpdateMutation.tsx'
 import { formatPhoneNumber } from '@/utils/regexChecks.ts'
-import { useState } from 'react'
 import { Checkbox } from '@/components/ui/checkbox.tsx'
 import { usePasswordUpdateMutation } from '@/hooks/mutations/usePasswordUpdateMutation.tsx'
 
@@ -431,7 +431,17 @@ const UserPage = () => {
                 <CustomButton
                   type='primary'
                   text='수정'
-                  onClick={updateUser.mutate}
+                  onClick={() =>
+                    updateUser.mutate({
+                      seqidx: updateData.seqidx,
+                      groupcode: updateData.groupcode,
+                      email: updateData.email,
+                      name: updateData.name,
+                      phonenum: updateData.phonenum,
+                      usertype: updateData.usertype,
+                      useflag: updateData.useflag,
+                    })
+                  }
                 />
               </ButtonWrapper>
             </Box>

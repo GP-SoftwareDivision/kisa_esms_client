@@ -60,6 +60,27 @@ const InnerTableIndexText = styled.div`
   justify-content: center;
 `
 
+const RenderDataRow = ({
+  label,
+  value,
+  loading,
+}: {
+  label: string
+  value: string
+  loading: boolean
+}) => {
+  return (
+    <Row>
+      <Label>{label}</Label>
+      {loading ? (
+        <CustomSkeleton lines={1} height={5} />
+      ) : (
+        <Value>{value}</Value>
+      )}
+    </Row>
+  )
+}
+
 const TrackingDetailPage = () => {
   const queryParams = new URLSearchParams(location.search)
   const navigate = useNavigate()
@@ -92,18 +113,16 @@ const TrackingDetailPage = () => {
     <ContentContainer>
       <PageTitle text={'대응 이력 상세 조회'} />
       <TableContainer>
-        <Row>
-          <Label>등록일시</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.registrationDate}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>대상구분</Label>
-          <Value>{getIndividualType}</Value>
-        </Row>
+        <RenderDataRow
+          label={'등록일시'}
+          value={responseDetail.data?.data?.registrationDate as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'대상구분'}
+          value={getIndividualType as string}
+          loading={responseDetail.isLoading}
+        />
         {responseDetail.isSuccess &&
           responseDetail.data?.data?.institutions?.length > 0 && (
             <div style={{ padding: '0.5rem' }}>
@@ -155,171 +174,108 @@ const TrackingDetailPage = () => {
               )}
             </div>
           )}
-
-        <Row>
-          <Label>사고유형</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.incidentType}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>사고유형 상세</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.incidentTypeDetail}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>협박유무</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>
-              {responseDetail.data?.data?.threatFlag === 'Y' ? '있음' : '없음'}
-            </Value>
-          )}
-        </Row>
-        <Row>
-          <Label>사이트(도메인)</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.domain}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>채널구분</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.domainType}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>채널명</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.channelName}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>게시글/텔레그램 URL</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.url}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>다운로드 URL</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.downloadUrl}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>제목</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.title}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>작성자</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.writer}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>게시일</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.publishedDate}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>최초인지</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.originType}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>최초인지 상세</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.originTypeDetail}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>공유</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.shareTarget}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>수집정보</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.colInfo}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>이미지 유무</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>
-              {responseDetail.data?.data?.imageFlag === 'Y' ? '있음' : '없음'}
-            </Value>
-          )}
-        </Row>
-        <Row>
-          <Label>보고문구</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.contents}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>해커그룹</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.hackGroup}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>비고</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.comment}</Value>
-          )}
-        </Row>
-        <Row>
-          <Label>키워드</Label>
-          {responseDetail.isLoading ? (
-            <CustomSkeleton lines={1} />
-          ) : (
-            <Value>{responseDetail.data?.data?.keyword}</Value>
-          )}
-        </Row>
+        <RenderDataRow
+          label={'사고유형'}
+          value={responseDetail.data?.data?.incidentType as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'사고유형 상세'}
+          value={responseDetail.data?.data?.incidentTypeDetail as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'협박유무'}
+          value={
+            responseDetail.data?.data?.threatFlag === 'Y' ? '있음' : '없음'
+          }
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'사이트(도메인)'}
+          value={responseDetail.data?.data?.domain as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'채널구분'}
+          value={responseDetail.data?.data?.domainType as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'채널명'}
+          value={responseDetail.data?.data?.channelName as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'게시글/텔레그램 URL'}
+          value={responseDetail.data?.data?.url as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'다운로드 URL'}
+          value={responseDetail.data?.data?.downloadUrl as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'제목'}
+          value={responseDetail.data?.data?.title as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'작성자'}
+          value={responseDetail.data?.data?.writer as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'게시일'}
+          value={responseDetail.data?.data?.publishedDate as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'최초인지'}
+          value={responseDetail.data?.data?.originType as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'최초인지 상세'}
+          value={responseDetail.data?.data?.originTypeDetail as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'공유'}
+          value={responseDetail.data?.data?.shareTarget as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'수집정보'}
+          value={responseDetail.data?.data?.colInfo as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'이미지 유무'}
+          value={responseDetail.data?.data?.imageFlag === 'Y' ? '있음' : '없음'}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'보고문구'}
+          value={responseDetail.data?.data?.contents as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'해커그룹'}
+          value={responseDetail.data?.data?.hackGroup as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'비고'}
+          value={responseDetail.data?.data?.comment as string}
+          loading={responseDetail.isLoading}
+        />
+        <RenderDataRow
+          label={'키워드'}
+          value={responseDetail.data?.data?.keyword as string}
+          loading={responseDetail.isLoading}
+        />
       </TableContainer>
       <ButtonContainer>
         <Button

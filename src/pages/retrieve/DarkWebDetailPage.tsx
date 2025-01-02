@@ -9,6 +9,7 @@ import Button from '@/components/elements/Button.tsx'
 import CustomSwitch from '@/components/elements/Switch.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import { highlightText } from '@/utils/highlightText.tsx'
+import { CustomSkeleton } from '@/components/elements/Skeleton.tsx'
 
 interface DarkWebDetailType {
   seqidx: number
@@ -30,6 +31,31 @@ interface DarkWebDetailType {
   regdate: string
 }
 
+const RenderDataRow = ({
+  label,
+  value,
+  colSpan,
+  loading,
+}: {
+  label: string
+  value: string
+  colSpan: number
+  loading: boolean
+}) => {
+  return (
+    <>
+      <LabelTd>{label}</LabelTd>
+      {loading ? (
+        <Td colSpan={colSpan}>
+          <CustomSkeleton lines={1} height={5} />
+        </Td>
+      ) : (
+        <Td colSpan={colSpan}>{value}</Td>
+      )}
+    </>
+  )
+}
+
 const DarkWebDetailPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -39,7 +65,10 @@ const DarkWebDetailPage = () => {
   // 번역 여부
   const [isTranslation, setTranslation] = useState<boolean>(false)
 
-  const [keywordHighLight, setKeywordHighLight] = useState<string>('')
+  // 수집키워드 하이라이트
+  const [keywordHighLight, setKeywordHighLight] = useState<string[]>([])
+
+  // 판단키워드 하이라이트
   const [logHighLight, setLogHighLight] = useState<string[]>([])
 
   // 다크웹 데이터 상세 조회 API
@@ -54,8 +83,7 @@ const DarkWebDetailPage = () => {
 
   useEffect(() => {
     if (dtDetail.isSuccess) {
-      setKeywordHighLight(dtDetail.data?.data?.keyword)
-
+      setKeywordHighLight(dtDetail.data?.data?.keyword.split('/'))
       if (dtDetail.data?.data?.threatlog)
         setLogHighLight(dtDetail.data?.data?.threatlog.split('/'))
     }
@@ -83,58 +111,102 @@ const DarkWebDetailPage = () => {
         }
       />
       <Table>
-        {dtDetail.isSuccess && (
-          <tbody>
-            <tr>
-              <LabelTd>제목</LabelTd>
-              <Td colSpan={3}>{dtDetail.data?.data?.title}</Td>
-              <LabelTd>카테고리</LabelTd>
-              <Td>{dtDetail.data?.data?.target}</Td>
-            </tr>
-            <tr>
-              <LabelTd>작성자</LabelTd>
-              <Td>{dtDetail.data?.data?.writer}</Td>
-              <LabelTd>작성시간</LabelTd>
-              <Td>{dtDetail.data?.data?.writetime}</Td>
-              <LabelTd>수집시간</LabelTd>
-              <Td>{dtDetail.data?.data?.regdate}</Td>
-            </tr>
-            <tr>
-              <LabelTd>해킹 여부</LabelTd>
-              <Td>
-                {dtDetail.data?.data?.threatflag === 'Y' ? '해킹' : '미해킹'}
-              </Td>
-              <LabelTd>대응 여부</LabelTd>
-              <Td>
-                {dtDetail.data?.data?.issueresponseflag === 'Y'
+        <tbody>
+          <tr>
+            <RenderDataRow
+              label={'제목'}
+              colSpan={3}
+              value={dtDetail.data?.data.title as string}
+              loading={dtDetail.isLoading}
+            />
+            <RenderDataRow
+              label={'카테고리'}
+              colSpan={1}
+              value={dtDetail.data?.data.target as string}
+              loading={dtDetail.isLoading}
+            />
+          </tr>
+          <tr>
+            <RenderDataRow
+              label={'작성자'}
+              colSpan={2}
+              value={dtDetail.data?.data.writer as string}
+              loading={dtDetail.isLoading}
+            />
+            <RenderDataRow
+              label={'작성시간'}
+              colSpan={2}
+              value={dtDetail.data?.data.writetime as string}
+              loading={dtDetail.isLoading}
+            />
+          </tr>
+          <tr>
+            <RenderDataRow
+              label={'해킹여부'}
+              colSpan={2}
+              value={dtDetail.data?.data.threatflag === 'Y' ? '해킹' : '미해킹'}
+              loading={dtDetail.isLoading}
+            />
+            <RenderDataRow
+              label={'대응여부'}
+              colSpan={2}
+              value={
+                dtDetail.data?.data.issueresponseflag === 'Y'
                   ? '대응'
-                  : '미대응'}
+                  : '미대응'
+              }
+              loading={dtDetail.isLoading}
+            />
+          </tr>
+          <tr>
+            <RenderDataRow
+              label={'수집키워드'}
+              colSpan={2}
+              value={dtDetail.data?.data.keyword as string}
+              loading={dtDetail.isLoading}
+            />
+            <RenderDataRow
+              label={'판단키워드'}
+              colSpan={2}
+              value={dtDetail.data?.data.threatlog as string}
+              loading={dtDetail.isLoading}
+            />
+          </tr>
+          <tr>
+            <RenderDataRow
+              label={'URL'}
+              colSpan={2}
+              value={dtDetail.data?.data.url as string}
+              loading={dtDetail.isLoading}
+            />
+            <LabelTd>HTML 보기</LabelTd>
+            <Td colSpan={2}>
+              <HtmlIcon onClick={ViewHtml} />
+            </Td>
+          </tr>
+          <tr>
+            <LabelTd>번역 보기</LabelTd>
+            <Td colSpan={2}>
+              <CustomSwitch
+                label={''}
+                checked={isTranslation}
+                setChecked={setTranslation}
+              />
+            </Td>
+            <RenderDataRow
+              label={'수집시간'}
+              colSpan={2}
+              value={dtDetail.data?.data.regdate as string}
+              loading={dtDetail.isLoading}
+            />
+          </tr>
+          <tr>
+            <LabelTd>내용</LabelTd>
+            {dtDetail.isLoading ? (
+              <Td colSpan={5}>
+                <CustomSkeleton lines={5} height={5} />
               </Td>
-              <LabelTd>수집 키워드</LabelTd>
-              <Td>{dtDetail.data?.data?.keyword}</Td>
-            </tr>
-            <tr>
-              <LabelTd>URL</LabelTd>
-              <Td colSpan={3}>{dtDetail.data?.data?.url}</Td>
-              <LabelTd>판단 키워드</LabelTd>
-              <Td>{dtDetail.data?.data?.threatlog}</Td>
-            </tr>
-            <tr>
-              <LabelTd>번역 보기</LabelTd>
-              <Td colSpan={3}>
-                <CustomSwitch
-                  label={''}
-                  checked={isTranslation}
-                  setChecked={setTranslation}
-                />
-              </Td>
-              <LabelTd>HTML 보기</LabelTd>
-              <Td>
-                <HtmlIcon onClick={ViewHtml} />
-              </Td>
-            </tr>
-            <tr>
-              <LabelTd>내용</LabelTd>
+            ) : (
               <Td colSpan={5}>
                 {isTranslation
                   ? `${dtDetail.data?.data?.trancontents}${dtDetail.data?.data?.trancontents2}`
@@ -144,9 +216,9 @@ const DarkWebDetailPage = () => {
                       logHighLight
                     )}
               </Td>
-            </tr>
-          </tbody>
-        )}
+            )}
+          </tr>
+        </tbody>
       </Table>
     </ContentContainer>
   )

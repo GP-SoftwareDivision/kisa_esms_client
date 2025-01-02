@@ -13,11 +13,11 @@ interface UserRowType {
   seqidx: number
   name: string
   email: string
-  password: string
   phonenum: string
-  usertype: string
-  groupcode: string
-  useflag: string
+  password?: string
+  usertype?: string
+  groupcode?: string
+  useflag?: string
 }
 
 export const useUserUpdateMutation = () => {
@@ -38,26 +38,17 @@ export const useUserUpdateMutation = () => {
   // 유저 수정 API
   const updateUser = useMutation({
     mutationKey: ['updateUser'],
-    mutationFn: async () => {
-      const request = {
-        seqidx: updateData.seqidx,
-        groupcode: updateData.groupcode,
-        email: updateData.email,
-        name: updateData.name,
-        phonenum: updateData.phonenum,
-        usertype: updateData.usertype,
-        useflag: updateData.useflag,
-      }
-      const isRequestValid = hasEmptyValue(request)
+    mutationFn: async (data: UserRowType) => {
+      const isRequestValid = hasEmptyValue(data)
       if (isRequestValid) {
         notifyError('모든 항목을 전부 입력해주세요.')
         throw new Error()
       }
-      if (!isValidEmail(request.email)) {
+      if (!isValidEmail(data.email)) {
         notifyError('이메일 형식이 맞지 않습니다.')
         throw new Error()
       }
-      const response = await instance.post('/api/setting/user/update', request)
+      const response = await instance.post('/api/setting/user/update', data)
       return response.data
     },
     onError: (error) => {

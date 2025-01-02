@@ -147,6 +147,10 @@ const TrackingPage = () => {
       accessorKey: 'originType',
     },
     {
+      header: '키워드',
+      accessorKey: 'keyword',
+    },
+    {
       header: '업로드',
       accessorKey: '',
       id: 'actions',

@@ -1,69 +1,128 @@
-{"list" : [
-  {
-    "label": "메인",
-    "key": "main",
-    "subMenu": {
-      "title": "데이터 조회",
-      "items": [
-        { "label": "대시보드", "key": "dashboard" },
-        { "label": "모니터링", "key": "monitoring" }
-      ]
+{
+  "admin" : [
+    {
+      "label": "메인",
+      "key": "main",
+      "subMenu": {
+        "title": "데이터 조회",
+        "items": [
+          { "label": "대시보드", "key": "dashboard" },
+          { "label": "모니터링", "key": "monitoring" }
+        ]
+      }
+    },
+    {
+      "label": "데이터 조회",
+      "key": "retrieve",
+      "subMenu": {
+        "title": "데이터 조회",
+        "items": [
+          { "label": "다크웹", "key": "darkweb" },
+          { "label": "텔레그램", "key": "telegram" }
+        ]
+      }
+    },
+    {
+      "label": "이력 관리",
+      "key": "issue",
+      "subMenu": {
+        "title": "이력 관리",
+        "items": [{ "label": "대응 이력", "key": "tracking" },{ "label": "피해 대상 관리", "key": "damagetarget" }, { "label": "유출 정보 판별", "key": "infringement" }]
+      }
+    },
+    {
+      "label": "관리",
+      "key": "manage",
+      "subMenu": {
+        "title": "관리",
+        "items": [
+          { "label": "판단 키워드 관리", "key": "rulesetkeyword" },
+          { "label": "검색 기록 관리", "key": "searchhistory" },
+          { "label": "수집 채널 관리", "key": "channel"}
+        ]
+      }
+    },
+    {
+      "label": "설정",
+      "key": "setting",
+      "subMenu": {
+        "title": "설정",
+        "items": [
+          {
+            "label": "사용자 관리",
+            "key": "user"
+          },
+          {
+            "label": "알람 관리",
+            "key": "group"
+          },
+          {
+            "label": "알림 내역",
+            "key": "alert"
+          },
+          {
+            "label": "서버 관리",
+            "key": "server"
+          }
+        ]
+      }
     }
-  },
-  {
-    "label": "데이터 조회",
-    "key": "retrieve",
-    "subMenu": {
-      "title": "데이터 조회",
-      "items": [
-        { "label": "다크웹", "key": "darkweb" },
-        { "label": "텔레그램", "key": "telegram" }
-      ]
+  ],
+  "user" : [
+    {
+      "label": "메인",
+      "key": "main",
+      "subMenu": {
+        "title": "데이터 조회",
+        "items": [
+          { "label": "대시보드", "key": "dashboard" },
+          { "label": "모니터링", "key": "monitoring" }
+        ]
+      }
+    },
+    {
+      "label": "데이터 조회",
+      "key": "retrieve",
+      "subMenu": {
+        "title": "데이터 조회",
+        "items": [
+          { "label": "다크웹", "key": "darkweb" },
+          { "label": "텔레그램", "key": "telegram" }
+        ]
+      }
+    },
+    {
+      "label": "이력 관리",
+      "key": "issue",
+      "subMenu": {
+        "title": "이력 관리",
+        "items": [{ "label": "대응 이력", "key": "tracking" },{ "label": "피해 대상 관리", "key": "damagetarget" }, { "label": "유출 정보 판별", "key": "infringement" }]
+      }
+    },
+    {
+      "label": "관리",
+      "key": "manage",
+      "subMenu": {
+        "title": "관리",
+        "items": [
+          { "label": "판단 키워드 관리", "key": "rulesetkeyword" },
+          { "label": "검색 기록 관리", "key": "searchhistory" },
+          { "label": "수집 채널 관리", "key": "channel"}
+        ]
+      }
+    },
+    {
+      "label": "설정",
+      "key": "setting",
+      "subMenu": {
+        "title": "mypage",
+        "items": [
+          {
+            "label": "마이 페이지",
+            "key": "mypage"
+          }
+        ]
+      }
     }
-  },
-  {
-    "label": "이력 관리",
-    "key": "issue",
-    "subMenu": {
-      "title": "이력 관리",
-      "items": [{ "label": "대응 이력", "key": "tracking" },{ "label": "피해 대상 관리", "key": "damagetarget" }, { "label": "유출 정보 판별", "key": "infringement" }]
-    }
-  },
-  {
-    "label": "관리",
-    "key": "manage",
-    "subMenu": {
-      "title": "관리",
-      "items": [
-        { "label": "판단 키워드 관리", "key": "rulesetkeyword" },
-        { "label": "검색 기록 관리", "key": "searchhistory" },
-        { "label": "수집 채널 관리", "key": "channel"}
-      ]
-    }
-  },
-  {
-    "label": "설정",
-    "key": "setting",
-    "subMenu": {
-      "title": "설정",
-      "items": [
-        {
-          "label": "사용자 관리",
-          "key": "user"
-        },
-        {
-          "label": "알람 관리",
-          "key": "group"
-        },
-        {
-          "label": "알림 내역",
-          "key": "alert"
-        },
-        {
-          "label": "서버 관리",
-          "key": "server"
-        }
-      ]
-    }
-  }
-]}
+  ]
+}

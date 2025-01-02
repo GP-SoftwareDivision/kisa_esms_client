@@ -9,6 +9,100 @@ import { useLoginMutation } from '@/hooks/mutations/useLoginMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
 import { FormatTimer } from '@/utils/formatTimer.ts'
 
+const LoginContainer = styled.div`
+  background-image: url('/background.png');
+  background-size: cover;
+  width: 100vw;
+  height: 100vh;
+`
+
+const LoginContent = styled.div`
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+`
+
+const LoginLogo = styled.img`
+  width: 200px;
+  height: auto;
+`
+
+const StyledForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 24rem;
+`
+
+const StyledInput = styled.input<{ variant: 'default' | 'warning' }>`
+  height: 40px;
+  border-radius: 4px;
+  border: ${(props) =>
+    props.variant === 'default' ? '1px solid #c7c7c7' : '1px solid #ef4444'};
+  outline: none;
+  padding-left: 10px;
+  ${({ theme }) => theme.typography.body2};
+`
+
+const StyledButton = styled.button`
+  height: 40px;
+  border-radius: 2px;
+  border: none;
+  background: #061f5c;
+  color: #fff;
+  margin-top: 20px;
+  cursor: pointer;
+  ${({ theme }) => theme.typography.body2};
+`
+
+const ModalContents = styled.div`
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+const ModalDescription = styled.p`
+  font-size: 0.825rem;
+  padding: 0 8px;
+`
+
+const VerificationBox = styled.div`
+  display: flex;
+  gap: 5px;
+`
+
+const VerificationInput = styled.input`
+  outline: none;
+  max-width: 100px;
+  border: 1px solid #c7c7c7;
+  padding-left: 4px;
+`
+
+const VerificationButton = styled.button`
+  background-color: #061f5c;
+  color: #fff;
+  border: none;
+  margin-left: 15px;
+  border-radius: 2px;
+  font-size: 0.725rem;
+  cursor: pointer;
+  padding: 4px;
+`
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+`
+
 const LoginPage = () => {
   const { login, phoneNum, timeLeft, isOpen, handleOnCancel } =
     useLoginMutation()
@@ -127,97 +221,3 @@ const LoginPage = () => {
 }
 
 export default LoginPage
-
-const LoginContainer = styled.div`
-  background-image: url('/background.png');
-  background-size: cover;
-  width: 100vw;
-  height: 100vh;
-`
-
-const LoginContent = styled.div`
-  position: absolute;
-  left: 50%;
-  top: 45%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 30px;
-`
-
-const LoginLogo = styled.img`
-  width: 200px;
-  height: auto;
-`
-
-const StyledForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 24rem;
-`
-
-const StyledInput = styled.input<{ variant: 'default' | 'warning' }>`
-  height: 40px;
-  border-radius: 4px;
-  border: ${(props) =>
-    props.variant === 'default' ? '1px solid #c7c7c7' : '1px solid #ef4444'};
-  outline: none;
-  padding-left: 10px;
-  ${({ theme }) => theme.typography.body2};
-`
-
-const StyledButton = styled.button`
-  height: 40px;
-  border-radius: 2px;
-  border: none;
-  background: #061f5c;
-  color: #fff;
-  margin-top: 20px;
-  cursor: pointer;
-  ${({ theme }) => theme.typography.body2};
-`
-
-const ModalContents = styled.div`
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`
-
-const ModalDescription = styled.p`
-  font-size: 0.825rem;
-  padding: 0 8px;
-`
-
-const VerificationBox = styled.div`
-  display: flex;
-  gap: 5px;
-`
-
-const VerificationInput = styled.input`
-  outline: none;
-  max-width: 100px;
-  border: 1px solid #c7c7c7;
-  padding-left: 4px;
-`
-
-const VerificationButton = styled.button`
-  background-color: #061f5c;
-  color: #fff;
-  border: none;
-  margin-left: 15px;
-  border-radius: 2px;
-  font-size: 0.725rem;
-  cursor: pointer;
-  padding: 4px;
-`
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-`

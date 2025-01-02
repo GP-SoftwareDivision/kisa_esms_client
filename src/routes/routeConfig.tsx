@@ -16,7 +16,6 @@ export const routeConfig: RouteObject[] = [
   },
   { path: '/issue/infringement', element: <Components.Infringement /> },
   { path: '/issue/damagetarget', element: <Components.DamageTarget /> },
-
   { path: '/retrieve/darkweb', element: <Components.DarkWeb /> },
   { path: '/retrieve/darkweb/detail', element: <Components.DarkWebDetail /> },
   { path: '/retrieve/telegram', element: <Components.Telegram /> },
@@ -28,4 +27,5 @@ export const routeConfig: RouteObject[] = [
   { path: '/setting/alert', element: <Components.Alert /> },
   { path: '/setting/group', element: <Components.Group /> },
   { path: '/setting/server', element: <Components.Server /> },
+  { path: '/setting/mypage', element: <Components.MyPage /> },
 ]

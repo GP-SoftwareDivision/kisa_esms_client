@@ -8,10 +8,10 @@ import Bar from '@/components/charts/Bar.tsx'
 import Pie from '@/components/charts/Pie.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomList from '@/components/charts/List.tsx'
-import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import CustomDatePicker from '@/components/elements/DatePicker.tsx'
 import { targetOptions } from '@/data/selectOptions.ts'
 import { Loading } from '@/components/elements/Loading.tsx'
+import { useQueries } from '@/hooks/queries/useQueries.tsx'
 
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
@@ -49,7 +49,7 @@ const DashBoardPage = () => {
     enddate: dayjs().format('YYYY-MM-DD'),
   })
 
-  // 대응 현황 데이터 조회 API
+  //대응 현황 데이터 조회 API
   const responseStatus = useQueries<{ data: ResponseStatusType }>({
     queryKey: `responseList`,
     method: 'POST',

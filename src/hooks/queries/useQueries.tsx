@@ -61,12 +61,14 @@ export function useQueries<TData>({
               notifyError(
                 `일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`
               )
+            // navigate('/error')
           }
         }
         throw new AxiosError()
       }
     },
     retry: 0,
+    staleTime: 60000,
     enabled: !!queryKey && !!url && !!method && (enabled ?? true), // 기본값 true
   })
 }
