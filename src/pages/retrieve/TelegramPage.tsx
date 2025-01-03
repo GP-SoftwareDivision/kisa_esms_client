@@ -174,6 +174,7 @@ const Telegram = () => {
 
   // 검색 조건 적용 후 파라미터 변경
   const handleOnSearch = () => {
+    setPage(1)
     const params = new URLSearchParams({
       startdate: date.startdate,
       enddate: date.enddate,
@@ -188,7 +189,6 @@ const Telegram = () => {
       re_channel: reChannel,
       re_username: reUsername,
     }).toString()
-    setPage(1)
     navigate(`?${params}`)
   }
 

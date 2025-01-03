@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import styled from '@emotion/styled'
 
+import instance from '../apis/instance.ts'
 import menu from '@/data/menu.json'
-
 import NavBar from '@/components/elements/NavBar.tsx'
 import { mq } from '@/utils/mediaQueries.ts'
-import instance from '../apis/instance.ts'
 import { notifyError } from '@/utils/notify.ts'
 
 interface UserInfoType {
@@ -74,14 +73,39 @@ const Header = () => {
     const trackingParams = new URLSearchParams({
       type: 'I',
       page: '1',
-      startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
+      startdate: dayjs().subtract(14, 'd').format('YYYY-MM-DD'),
       enddate: dayjs().format('YYYY-MM-DD'),
       institution: '',
-      channelname: '',
-      targettype: '',
-      incidenttype: '',
-      apitype: '',
-      origintype: '',
+      channelName: '',
+      targetType: '',
+      incidentType: '',
+      apiType: '',
+      originType: '',
+      keyword: '',
+    }).toString()
+
+    // 피해 대상 관리 파라미터
+    const DamageTargetParams = new URLSearchParams({
+      page: '1',
+      startdate: dayjs().subtract(14, 'd').format('YYYY-MM-DD'),
+      enddate: dayjs().format('YYYY-MM-DD'),
+      targetType: '',
+      reportFlag: '',
+      supportFlag: '',
+      institution: '',
+    }).toString()
+
+    // 유출 정보 판별 파라미터
+    const InfringementParams = new URLSearchParams({
+      page: '1',
+      startdate: dayjs().subtract(14, 'd').format('YYYY-MM-DD'),
+      enddate: dayjs().format('YYYY-MM-DD'),
+    }).toString()
+
+    // 유출 정보 판별 파라미터
+    const ChannelParams = new URLSearchParams({
+      page: '1',
+      channelName: '',
     }).toString()
 
     if (subItemKey) {
@@ -97,6 +121,15 @@ const Header = () => {
       // 이력관리 - 대응이력
       else if (pathName === 'tracking')
         navigate(`/${subItemKey}?${trackingParams}`)
+      // 이력관리 - 피해대상관리
+      else if (pathName === 'damagetarget')
+        navigate(`/${subItemKey}?${DamageTargetParams}`)
+      // 이력관리 - 유출정보판별
+      else if (pathName === 'infringement')
+        navigate(`/${subItemKey}?${InfringementParams}`)
+      // 관리 - 수집 채널 관리
+      else if (pathName === 'channel')
+        navigate(`/${subItemKey}?${ChannelParams}`)
       else navigate(`/${subItemKey}`)
     }
   }

@@ -16,33 +16,45 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import instance from '@/apis/instance.ts'
+import { useLocation, useNavigate } from 'react-router-dom'
+import queryToJson from '@/utils/queryToJson.ts'
 
 interface ServerType {
-  servername: string
   ip: string
-  lastcrawl: string
   count: number
   apitype: string
+  lastcrawl: string
+  servername: string
 }
 
 const ChannelPage = () => {
-  const { page, handlePageChange } = usePagination(1)
-  const [channelName, setChannelName] = useState<string>('')
+  const navigate = useNavigate()
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const { page, setPage, handlePageChange } = usePagination(
+    Number(queryParams.get('page')) || 1
+  )
 
-  const [request, setRequest] = useState<{
-    channelName: string
-  }>({ channelName: '' })
+  // 채널명
+  const [channelName, setChannelName] = useState<string>(
+    queryParams.get('channelName') || ''
+  )
 
   const channelList = useQueries<{ data: ServerType[]; count: number }>({
     queryKey: `channelList`,
     method: 'POST',
     url: '/api/manage/channel/list',
-    body: { ...request, page },
+    body: queryToJson(location.search),
   })
 
-  const handleOnClick = () => {
-    handlePageChange(1)
-    setRequest({ channelName })
+  // 검색 조회 이벤트
+  const handleOnSearch = () => {
+    setPage(1)
+    const params = new URLSearchParams({
+      page: page.toString(),
+      channelName: channelName,
+    }).toString()
+    navigate(`?${params}`)
   }
 
   const DomainColumns = [
@@ -128,7 +140,7 @@ const ChannelPage = () => {
           />
         </StyledBox>
         <ButtonContainer>
-          <Button type={'primary'} onClick={handleOnClick} text={'조회'} />
+          <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
         </ButtonContainer>
       </SelectContainer>
       <ContentBox>
@@ -142,9 +154,11 @@ const ChannelPage = () => {
             <CustomPagination
               total={channelList.data.count}
               page={page}
-              handlePageChange={(newPage) =>
+              handlePageChange={(newPage) => {
                 handlePageChange(newPage as number)
-              }
+                queryParams.set('page', newPage.toString())
+                navigate(`?${queryParams.toString()}`)
+              }}
             />
           </>
         )}

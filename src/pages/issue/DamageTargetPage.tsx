@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import styled from '@emotion/styled'
 import { Box, Flex } from '@chakra-ui/react'
-import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -14,7 +13,6 @@ import PageTitle from '@/components/elements/PageTitle.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
-import { useForm } from '@/hooks/common/useForm.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import CustomModal from '@/components/elements/Modal.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
@@ -25,6 +23,8 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import Empty from '@/components/elements/Empty.tsx'
 import { targetOptions } from '@/data/selectOptions.ts'
 import { useDamageTargetUpdateMutation } from '@/hooks/mutations/useDamageTargetUpdateMutation.tsx'
+import queryToJson from '@/utils/queryToJson.ts'
+import { updateSearchCondition } from '@/utils/stateHandlers.ts'
 
 const ButtonWrapper = styled.div`
   display: flex;
@@ -58,9 +58,11 @@ interface DamageTargetListType {
 }
 
 const DamageTargetPage = () => {
-  const { page, handlePageChange } = usePagination(1)
   const navigate = useNavigate()
-  const { fields, handleOnChange } = useForm()
+  const queryParams = new URLSearchParams(location.search)
+  const { page, setPage, handlePageChange } = usePagination(
+    Number(queryParams.get('page')) || 1
+  )
   const {
     updateDamageTarget,
     openUpdateDamageTarget,
@@ -74,24 +76,29 @@ const DamageTargetPage = () => {
 
   // 조회기간
   const [date, setDate] = useState({
-    startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
-    enddate: dayjs().format('YYYY-MM-DD'),
+    startdate: queryParams.get('startdate') || '',
+    enddate: queryParams.get('enddate') || '',
   })
 
-  // 대상 구분 / 피해 기관 / 신고 여부 /  채널 구분
-  const [selectFields, setSelectFields] = useState({
-    targetType: '',
-    reportFlag: '',
-    supportFlag: '',
+  // 대상 구분 / 피해 기관 / 신고 여부 / 기술 지원 여부
+  const [searchConditions, setSearchConditions] = useState({
+    targetType: queryParams.get('targetType') || '',
+    institution: queryParams.get('institution') || '',
+    reportFlag: queryParams.get('reportFlag') || '',
+    supportFlag: queryParams.get('supportFlag') || '',
   })
 
-  // 요청 파라미터
-  const [request, setRequest] = useState({
-    page: 1,
-    ...date,
-    ...selectFields,
-    institution: fields.institution ?? '',
-  })
+  // 검색 조회 이벤트
+  const handleOnSearch = () => {
+    setPage(1)
+    const params = new URLSearchParams({
+      page: page.toString(),
+      startdate: date.startdate,
+      enddate: date.enddate,
+      ...searchConditions,
+    }).toString()
+    navigate(`?${params}`)
+  }
 
   const damageTargetList = useQueries<{
     data: DamageTargetListType[]
@@ -100,7 +107,7 @@ const DamageTargetPage = () => {
     queryKey: `damageTargetList`,
     method: 'POST',
     url: '/api/issue/victims',
-    body: request,
+    body: queryToJson(location.search),
   })
 
   // 판단 키워드 관리 테이블 컬럼 정의
@@ -190,21 +197,6 @@ const DamageTargetPage = () => {
     },
   ]
 
-  // 셀렉트 박스 옵션 변경 이벤트
-  const handleSelectChange = (field: string, value: any) => {
-    setSelectFields((prev) => ({ ...prev, [field]: value }))
-  }
-
-  // 조회 이벤트
-  const handleOnClick = () => {
-    setRequest({
-      page: 1,
-      ...date,
-      ...selectFields,
-      institution: fields.institution ?? '',
-    })
-  }
-
   const renderTable = useMemo(() => {
     if (!damageTargetList.data) return <Empty />
     if (damageTargetList.isSuccess)
@@ -218,7 +210,11 @@ const DamageTargetPage = () => {
           <CustomPagination
             total={damageTargetList.data.count}
             page={page}
-            handlePageChange={(newPage) => handlePageChange(newPage as number)}
+            handlePageChange={(newPage) => {
+              handlePageChange(newPage as number)
+              queryParams.set('page', newPage.toString())
+              navigate(`?${queryParams.toString()}`)
+            }}
           />
         </>
       )
@@ -243,10 +239,14 @@ const DamageTargetPage = () => {
         <Box>
           <CustomSelect
             label={'대상구분'}
-            options={targetOptions}
-            value={selectFields.targetType}
+            options={[{ value: '', label: '전체' }, ...targetOptions]}
+            value={searchConditions.targetType}
             onChange={(item: { items: any; value: string[] }) =>
-              handleSelectChange('targetType', item.value.join(','))
+              updateSearchCondition(
+                setSearchConditions,
+                'targetType',
+                item.value.join(',')
+              )
             }
           />
         </Box>
@@ -255,8 +255,14 @@ const DamageTargetPage = () => {
             id={'institution'}
             label={'피해기관'}
             placeholder={'내용을 입력하세요.'}
-            value={fields.institution}
-            onChange={handleOnChange}
+            value={searchConditions.institution}
+            onChange={(e) =>
+              updateSearchCondition(
+                setSearchConditions,
+                'institution',
+                e.target.value
+              )
+            }
           />
         </Box>
         <Box>
@@ -267,9 +273,13 @@ const DamageTargetPage = () => {
               { value: 'Y', label: '신고' },
               { value: 'N', label: '미신고' },
             ]}
-            value={selectFields.reportFlag}
+            value={searchConditions.reportFlag}
             onChange={(item: { items: any; value: string[] }) =>
-              handleSelectChange('reportFlag', item.value.join(','))
+              updateSearchCondition(
+                setSearchConditions,
+                'reportFlag',
+                item.value.join(',')
+              )
             }
           />
         </Box>
@@ -281,16 +291,20 @@ const DamageTargetPage = () => {
               { value: 'Y', label: '동의' },
               { value: 'N', label: '미동의' },
             ]}
-            value={selectFields.supportFlag}
+            value={searchConditions.supportFlag}
             onChange={(item: { items: any; value: string[] }) =>
-              handleSelectChange('supportFlag', item.value.join(','))
+              updateSearchCondition(
+                setSearchConditions,
+                'supportFlag',
+                item.value.join(',')
+              )
             }
           />
         </Box>
         <Box></Box>
         <Box></Box>
         <ButtonContainer>
-          <Button type={'primary'} onClick={handleOnClick} text={'조회'} />
+          <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
         </ButtonContainer>
       </SelectContainer>
       <ContentBox>{renderTable}</ContentBox>

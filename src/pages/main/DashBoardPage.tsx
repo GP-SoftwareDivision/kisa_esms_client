@@ -123,82 +123,82 @@ const DashBoardPage = () => {
     if (responseStatus.isSuccess)
       return (
         <>
-          <PageTitle
-            text={'대응현황'}
-            children={
-              <div>
-                <CustomDatePicker label={''} date={date} setDate={setDate} />
-              </div>
-            }
-          />
-          {responseStatus.data?.data.pie ? (
-            <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap={4}>
-              <GridItem>
-                <Flex direction='column' height='100%'>
-                  <ChartBox>
-                    <ChartWrapper>
-                      <h3>사고 유형</h3>
-                      <Bar
-                        series={responseStatus.data?.data.bar?.map(
-                          (v) => v.value
-                        )}
-                        categories={responseStatus.data?.data.bar?.map(
-                          (v) => v.label
-                        )}
+          <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap={4}>
+            <GridItem>
+              <Flex direction='column' height='100%'>
+                <PageTitle
+                  text={'대응현황'}
+                  children={
+                    <div>
+                      <CustomDatePicker
+                        label={''}
+                        date={date}
+                        setDate={setDate}
                       />
-                    </ChartWrapper>
-                    <ChartWrapper>
-                      <h3>대응 현황</h3>
-                      <Pie
-                        series={responseStatus.data?.data.pie?.map(
-                          (v) => v.value
-                        )}
-                        categories={responseStatus.data?.data.pie?.map(
-                          (v) => v.label
-                        )}
-                      />
-                    </ChartWrapper>
-                  </ChartBox>
-                </Flex>
-              </GridItem>
-              <GridItem>
-                <Flex direction='column' height='100%'>
-                  <PageTitle text={'이슈 내역'} />
-                  <ListBox>
-                    <VStack
-                      align='stretch'
-                      height='-webkit-fill-available'
-                      gap={'0.3rem'}
-                    >
-                      <ListSubTitle>데이터 수집</ListSubTitle>
-                      <CustomList
-                        label={'다크웹 해킹 판단 건수'}
-                        value={responseStatus.data?.data.list.darkweb.hacking}
-                      />
-                      <CustomList
-                        label={'텔레그램 해킹 판단 건수'}
-                        value={responseStatus.data?.data.list.telegram.hacking}
-                      />
-                      <CustomList
-                        label={'다크웹 대응 건수'}
-                        value={responseStatus.data?.data.list.darkweb.response}
-                      />
-                      <CustomList
-                        label={'텔레그램 대응 건수'}
-                        value={responseStatus.data?.data.list.telegram.response}
-                      />
-                      <ListSubTitle>Top 10 채널</ListSubTitle>
-                      {responseStatus.data?.data.topChannelList.map((v) => (
-                        <CustomList label={v.label} value={v.value} />
-                      ))}
-                    </VStack>
-                  </ListBox>
-                </Flex>
-              </GridItem>
-            </Grid>
-          ) : (
-            <Empty />
-          )}
+                    </div>
+                  }
+                />
+                <ChartBox>
+                  <ChartWrapper>
+                    <h3>사고 유형</h3>
+                    <Bar
+                      series={responseStatus.data?.data.bar?.map(
+                        (v) => v.value
+                      )}
+                      categories={responseStatus.data?.data.bar?.map(
+                        (v) => v.label
+                      )}
+                    />
+                  </ChartWrapper>
+                  <ChartWrapper>
+                    <h3>대응 현황</h3>
+                    <Pie
+                      series={responseStatus.data?.data.pie?.map(
+                        (v) => v.value
+                      )}
+                      categories={responseStatus.data?.data.pie?.map(
+                        (v) => v.label
+                      )}
+                    />
+                  </ChartWrapper>
+                </ChartBox>
+              </Flex>
+            </GridItem>
+            <GridItem>
+              <Flex direction='column' height='100%'>
+                <PageTitle text={'이슈 내역'} />
+                <ListBox>
+                  <VStack
+                    align='stretch'
+                    height='-webkit-fill-available'
+                    gap={'0.3rem'}
+                  >
+                    <ListSubTitle>데이터 수집</ListSubTitle>
+                    <CustomList
+                      label={'다크웹 해킹 판단 건수'}
+                      value={responseStatus.data?.data.list.darkweb.hacking}
+                    />
+                    <CustomList
+                      label={'텔레그램 해킹 판단 건수'}
+                      value={responseStatus.data?.data.list.telegram.hacking}
+                    />
+                    <CustomList
+                      label={'다크웹 대응 건수'}
+                      value={responseStatus.data?.data.list.darkweb.response}
+                    />
+                    <CustomList
+                      label={'텔레그램 대응 건수'}
+                      value={responseStatus.data?.data.list.telegram.response}
+                    />
+                    <ListSubTitle>Top 10 채널</ListSubTitle>
+                    {responseStatus.data?.data.topChannelList.map((v) => (
+                      <CustomList label={v.label} value={v.value} />
+                    ))}
+                  </VStack>
+                </ListBox>
+              </Flex>
+            </GridItem>
+          </Grid>
         </>
       )
   }, [responseStatus.isSuccess, responseStatus.data])

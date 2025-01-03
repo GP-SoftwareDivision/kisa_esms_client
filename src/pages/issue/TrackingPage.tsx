@@ -20,16 +20,17 @@ import Button from '@/components/elements/Button.tsx'
 import CustomPagination from '@/components/elements/Pagination.tsx'
 import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
-import { useForm } from '@/hooks/common/useForm.tsx'
 import instance from '@/apis/instance.ts'
 import CustomModal from '@/components/elements/Modal.tsx'
 import useUploadMutation from '@/hooks/mutations/useUploadMutation.tsx'
 import { CloseButton } from '@/components/ui/close-button.tsx'
 import useFileDragDrop from '@/hooks/common/useFileDragDrop.tsx'
-import { notifyError } from '@/utils/notify.ts'
 import { targetOptions } from '@/data/selectOptions.ts'
-import Empty from '@/components/elements/Empty.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
+import Empty from '@/components/elements/Empty.tsx'
+import queryToJson from '@/utils/queryToJson.ts'
+import { notifyError } from '@/utils/notify.ts'
+import { updateSearchCondition } from '@/utils/stateHandlers.ts'
 
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
@@ -46,14 +47,14 @@ interface ResponseListType {
 
 const TrackingPage = () => {
   const navigate = useNavigate()
-  const { page, handlePageChange } = usePagination(1)
   const queryParams = new URLSearchParams(location.search)
+  const { page, setPage, handlePageChange } = usePagination(
+    Number(queryParams.get('page')) || 1
+  )
   const { openInsertUpload, closeInsertUpload, insertUploadOpen } =
     useUploadMutation()
   const { uploadFile, uploadFileName, dragFile, startUpload, abortUpload } =
     useFileDragDrop()
-
-  const { fields, handleOnChange } = useForm()
   const [seqidx, setSeqidx] = useState<number>(0)
 
   // 조회기간
@@ -62,34 +63,28 @@ const TrackingPage = () => {
     enddate: queryParams.get('enddate') || '',
   })
 
-  // 대상 구분 / 사고 유형 / 채널 구분 / 최초 인지
-  const [selectFields, setSelectFields] = useState({
-    targetType: queryParams.get('targettype') || '',
-    incidentType: queryParams.get('incidenttype') || '',
-    apiType: queryParams.get('apitype'),
-    originType: queryParams.get('origintype'),
+  // 대상 구분 / 사고 유형 / 채널 구분 / 최초 인지 / 피해기관 / 채널명 / 키워드
+  const [searchConditions, setSearchConditions] = useState({
+    targetType: queryParams.get('targetType') || '',
+    incidentType: queryParams.get('incidentType') || '',
+    apiType: queryParams.get('apiType') || '',
+    originType: queryParams.get('originType') || '',
+    institution: queryParams.get('institution') || '',
+    channelName: queryParams.get('channelName') || '',
+    keyword: queryParams.get('keyword') || '',
   })
 
-  // 요청 파라미터
-  const [request, setRequest] = useState({
-    startdate: date.startdate,
-    enddate: date.enddate,
-    institution: queryParams.get('institution'), // 피해기관
-    channelName: queryParams.get('channelname'), // 채널명
-    keyword: queryParams.get('keyword'), // 키워드
-    ...selectFields,
-  })
-
-  // 조회 이벤트
-  const handleOnClick = () => {
-    setRequest({
+  // 검색 이벤트
+  const handleOnSearch = () => {
+    const params = new URLSearchParams({
+      type: 'I',
+      page: page.toString(),
       startdate: date.startdate,
       enddate: date.enddate,
-      institution: fields.institution || '',
-      channelName: fields.channelName || '',
-      keyword: fields.keyword || '',
-      ...selectFields,
-    })
+      ...searchConditions,
+    }).toString()
+    setPage(1)
+    navigate(`?${params}`)
   }
 
   // 이슈 대응 이력 리스트 API
@@ -97,14 +92,10 @@ const TrackingPage = () => {
     queryKey: `responseList`,
     method: 'POST',
     url: `/api/issue/history`,
-    body: { type: 'I', page: page, ...request },
+    body: queryToJson(location.search),
   })
 
-  // 셀렉트 박스 옵션 변경 이벤트
-  const handleSelectChange = (field: string, value: any) => {
-    setSelectFields((prev) => ({ ...prev, [field]: value }))
-  }
-
+  // 파일 업로드할 수 있는 팝업 열리는 이벤트
   const handleOnFileUpload = (event: any, id: number) => {
     event.stopPropagation()
     openInsertUpload()
@@ -206,7 +197,11 @@ const TrackingPage = () => {
           <CustomPagination
             total={responseList.data?.count}
             page={page}
-            handlePageChange={(newPage) => handlePageChange(newPage as number)}
+            handlePageChange={(newPage) => {
+              handlePageChange(newPage as number)
+              queryParams.set('page', newPage.toString())
+              navigate(`?${queryParams.toString()}`)
+            }}
           />
         </ContentBox>
       )
@@ -225,7 +220,7 @@ const TrackingPage = () => {
             />
             <Button
               type={'secondary'}
-              onClick={handleOnClick}
+              onClick={() => {}}
               text={'엑셀 다운로드'}
             />
           </ButtonContainer>
@@ -238,10 +233,14 @@ const TrackingPage = () => {
         <Box>
           <CustomSelect
             label={'대상구분'}
-            options={targetOptions}
-            value={selectFields.targetType}
+            options={[{ value: '', label: '전체' }, ...targetOptions]}
+            value={searchConditions.targetType}
             onChange={(item: { items: any; value: string[] }) =>
-              handleSelectChange('targetType', item.value.join(','))
+              updateSearchCondition(
+                setSearchConditions,
+                'targetType',
+                item.value.join(',')
+              )
             }
           />
         </Box>
@@ -250,8 +249,14 @@ const TrackingPage = () => {
             id={'institution'}
             label={'피해기관'}
             placeholder={'내용을 입력하세요.'}
-            value={fields.institution}
-            onChange={handleOnChange}
+            value={searchConditions.institution}
+            onChange={(e) =>
+              updateSearchCondition(
+                setSearchConditions,
+                'institution',
+                e.target.value
+              )
+            }
           />
         </Box>
         <Box>
@@ -270,9 +275,13 @@ const TrackingPage = () => {
               { value: '확인불가', label: '확인불가' },
               { value: '기타', label: '기타' },
             ]}
-            value={selectFields.incidentType}
+            value={searchConditions.incidentType}
             onChange={(item: { items: any; value: string[] }) =>
-              handleSelectChange('incidentType', item.value.join(','))
+              updateSearchCondition(
+                setSearchConditions,
+                'incidentType',
+                item.value.join(',')
+              )
             }
           />
         </Box>
@@ -288,9 +297,13 @@ const TrackingPage = () => {
               { value: '블로그', label: '블로그' },
               { value: '기타', label: '기타' },
             ]}
-            value={fields.apiType}
+            value={searchConditions.apiType}
             onChange={(item: { items: any; value: string[] }) =>
-              handleSelectChange('apiType', item.value.join(','))
+              updateSearchCondition(
+                setSearchConditions,
+                'apiType',
+                item.value.join(',')
+              )
             }
           />
         </Box>
@@ -299,8 +312,14 @@ const TrackingPage = () => {
             id={'channelName'}
             label={'채널명'}
             placeholder={'내용을 입력하세요.'}
-            value={fields.channelName}
-            onChange={handleOnChange}
+            value={searchConditions.channelName}
+            onChange={(e) =>
+              updateSearchCondition(
+                setSearchConditions,
+                'channelName',
+                e.target.value
+              )
+            }
           />
         </Box>
         <Box>
@@ -315,9 +334,13 @@ const TrackingPage = () => {
               { value: '언론보도', label: '언론보도' },
               { value: '기타', label: '기타' },
             ]}
-            value={selectFields.originType}
+            value={searchConditions.originType}
             onChange={(item: { items: any; value: string[] }) =>
-              handleSelectChange('originType', item.value.join(','))
+              updateSearchCondition(
+                setSearchConditions,
+                'originType',
+                item.value.join(',')
+              )
             }
           />
         </Box>
@@ -326,15 +349,21 @@ const TrackingPage = () => {
             id={'keyword'}
             label={'키워드'}
             placeholder={'내용을 입력하세요.'}
-            value={fields.keyword}
-            onChange={handleOnChange}
+            value={searchConditions.keyword}
+            onChange={(e) =>
+              updateSearchCondition(
+                setSearchConditions,
+                'keyword',
+                e.target.value
+              )
+            }
           />
         </Box>
         <Box></Box>
         <Box></Box>
         <Box></Box>
         <ButtonContainer>
-          <Button type={'primary'} onClick={handleOnClick} text={'조회'} />
+          <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
         </ButtonContainer>
       </SelectContainer>
       {renderTable}

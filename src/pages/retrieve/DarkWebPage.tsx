@@ -171,6 +171,7 @@ const DarkWebPage = () => {
 
   // 검색 조건 적용 후 파라미터 변경
   const handleOnSearch = () => {
+    setPage(1)
     const params = new URLSearchParams({
       startdate: date.startdate,
       enddate: date.enddate,
@@ -186,8 +187,6 @@ const DarkWebPage = () => {
       re_keyword: reKeyword,
       page: page.toString(),
     }).toString()
-
-    setPage(1)
     navigate(`?${params}`)
   }
 

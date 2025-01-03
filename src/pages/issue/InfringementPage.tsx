@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
 import { Box, Flex } from '@chakra-ui/react'
 import styled from '@emotion/styled'
@@ -21,6 +20,7 @@ import Empty from '@/components/elements/Empty.tsx'
 import CustomModal from '@/components/elements/Modal.tsx'
 import CustomList from '@/components/charts/List.tsx'
 import CustomButton from '@/components/elements/Button'
+import queryToJson from '@/utils/queryToJson.ts'
 
 const ButtonWrapper = styled(Box)`
   display: flex;
@@ -67,20 +67,17 @@ interface DetectionType {
 
 const InfringementPage = () => {
   const navigate = useNavigate()
-  const { page, handlePageChange } = usePagination(1)
-
+  const queryParams = new URLSearchParams(location.search)
+  const { page, setPage, handlePageChange } = usePagination(
+    Number(queryParams.get('page')) || 1
+  )
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [viewData, setViewData] = useState<DetectionType>()
 
   // 조회기간
   const [date, setDate] = useState({
-    startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
-    enddate: dayjs().format('YYYY-MM-DD'),
-  })
-
-  // 유출 정보 판별 요청
-  const [request, setRequest] = useState<object>({
-    ...date,
+    startdate: queryParams.get('startdate') || '',
+    enddate: queryParams.get('enddate') || '',
   })
 
   // 유출 정보 판별 리스트 전체 조회
@@ -91,8 +88,19 @@ const InfringementPage = () => {
     queryKey: `detectionList`,
     method: 'POST',
     url: '/api/issue/detection',
-    body: { ...request, page: page },
+    body: queryToJson(location.search),
   })
+
+  // 검색 조회 이벤트
+  const handleOnSearch = () => {
+    setPage(1)
+    const params = new URLSearchParams({
+      page: page.toString(),
+      startdate: date.startdate,
+      enddate: date.enddate,
+    }).toString()
+    navigate(`?${params}`)
+  }
 
   // 데이터 일차원 리스트로 변경
   const flattenData = (dataArray: DetectionListType[]) => {
@@ -175,13 +183,10 @@ const InfringementPage = () => {
           <Button
             type={'outline'}
             text={'보기'}
-            onClick={
-              () => {
-                setIsModalOpen(true)
-                setViewData(row.original)
-              }
-              //
-            }
+            onClick={() => {
+              setIsModalOpen(true)
+              setViewData(row.original)
+            }}
           />
         </ButtonWrapper>
       ),
@@ -200,7 +205,11 @@ const InfringementPage = () => {
           <CustomPagination
             total={detectionList.data?.count}
             page={page}
-            handlePageChange={(newPage) => handlePageChange(newPage as number)}
+            handlePageChange={(newPage) => {
+              handlePageChange(newPage as number)
+              queryParams.set('page', newPage.toString())
+              navigate(`?${queryParams.toString()}`)
+            }}
           />
         </>
       )
@@ -217,17 +226,7 @@ const InfringementPage = () => {
         <Box></Box>
         <Box>
           <ButtonContainer>
-            <Button
-              type={'primary'}
-              onClick={() =>
-                setRequest({
-                  page: 1,
-                  startdate: date.startdate,
-                  enddate: date.enddate,
-                })
-              }
-              text={'조회'}
-            />
+            <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
           </ButtonContainer>
         </Box>
       </SelectContainer>
