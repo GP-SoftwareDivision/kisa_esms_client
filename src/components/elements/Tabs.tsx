@@ -28,7 +28,9 @@ const CustomTabs = (props: TabsType) => {
     >
       <Tabs.List>
         {items.map((item) => (
-          <Tabs.Trigger value={item.value}>{item.label}</Tabs.Trigger>
+          <Tabs.Trigger key={item.value} value={item.value}>
+            {item.label}
+          </Tabs.Trigger>
         ))}
       </Tabs.List>
     </StyledTabs>

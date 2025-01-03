@@ -12,6 +12,7 @@ import CustomDatePicker from '@/components/elements/DatePicker.tsx'
 import { targetOptions } from '@/data/selectOptions.ts'
 import { Loading } from '@/components/elements/Loading.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
+import Empty from '@/components/elements/Empty.tsx'
 
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
@@ -116,36 +117,32 @@ const DashBoardPage = () => {
     },
   ]
 
-  const renderDashBoard = useMemo(() => {
-    if (responseList.isLoading || responseStatus.isLoading) return <Loading />
+  const renderResponseStatus = useMemo(() => {
+    if (responseStatus.isLoading) return <Loading />
 
-    return (
-      <>
-        <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap={4}>
-          {responseStatus.isSuccess && (
-            <>
+    if (responseStatus.isSuccess)
+      return (
+        <>
+          <PageTitle
+            text={'대응현황'}
+            children={
+              <div>
+                <CustomDatePicker label={''} date={date} setDate={setDate} />
+              </div>
+            }
+          />
+          {responseStatus.data?.data.pie ? (
+            <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap={4}>
               <GridItem>
                 <Flex direction='column' height='100%'>
-                  <PageTitle
-                    text={'대응현황'}
-                    children={
-                      <div>
-                        <CustomDatePicker
-                          label={''}
-                          date={date}
-                          setDate={setDate}
-                        />
-                      </div>
-                    }
-                  />
                   <ChartBox>
                     <ChartWrapper>
                       <h3>사고 유형</h3>
                       <Bar
-                        series={responseStatus.data?.data.bar.map(
+                        series={responseStatus.data?.data.bar?.map(
                           (v) => v.value
                         )}
-                        categories={responseStatus.data?.data.bar.map(
+                        categories={responseStatus.data?.data.bar?.map(
                           (v) => v.label
                         )}
                       />
@@ -153,10 +150,10 @@ const DashBoardPage = () => {
                     <ChartWrapper>
                       <h3>대응 현황</h3>
                       <Pie
-                        series={responseStatus.data?.data.pie.map(
+                        series={responseStatus.data?.data.pie?.map(
                           (v) => v.value
                         )}
-                        categories={responseStatus.data?.data.pie.map(
+                        categories={responseStatus.data?.data.pie?.map(
                           (v) => v.label
                         )}
                       />
@@ -198,12 +195,22 @@ const DashBoardPage = () => {
                   </ListBox>
                 </Flex>
               </GridItem>
-            </>
+            </Grid>
+          ) : (
+            <Empty />
           )}
-        </Grid>
-        {responseList.isSuccess && (
-          <Box mt={4}>
-            <PageTitle text={'대응 이력 현황'} />
+        </>
+      )
+  }, [responseStatus.isSuccess, responseStatus.data])
+
+  const renderResponseList = useMemo(() => {
+    if (responseList.isLoading) return <Loading />
+
+    if (responseList.isSuccess)
+      return (
+        <Box mt={4}>
+          <PageTitle text={'대응 이력 현황'} />
+          {responseList.data.data.length > 0 ? (
             <ChartBox>
               <CustomTable
                 loading={false}
@@ -213,18 +220,19 @@ const DashBoardPage = () => {
                 detailIdx={'seqidx'}
               />
             </ChartBox>
-          </Box>
-        )}
-      </>
-    )
-  }, [
-    responseStatus.isSuccess,
-    responseStatus.data,
-    responseList.isSuccess,
-    responseList.data,
-  ])
+          ) : (
+            <Empty />
+          )}
+        </Box>
+      )
+  }, [responseList.isSuccess, responseList.data])
 
-  return <>{renderDashBoard}</>
+  return (
+    <>
+      {renderResponseStatus}
+      {renderResponseList}
+    </>
+  )
 }
 
 export default DashBoardPage

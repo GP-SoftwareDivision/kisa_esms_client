@@ -361,8 +361,6 @@ const Telegram = () => {
               disabled={isReSearch}
             />
           </Box>
-          <Box></Box>
-          <Box></Box>
           <Box>
             <CustomInput
               id={'regex'}
@@ -373,6 +371,8 @@ const Telegram = () => {
               disabled={isReSearch}
             />
           </Box>
+          <Box></Box>
+          <Box></Box>
           <Box></Box>
           <Box></Box>
           <Box>

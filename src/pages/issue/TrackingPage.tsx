@@ -39,6 +39,7 @@ interface ResponseListType {
   hackedorganization: string
   incidenttype: string
   channeltype: string
+  keyword: string
   darktelegramname: string
   firstrecogition: string
 }
@@ -73,8 +74,9 @@ const TrackingPage = () => {
   const [request, setRequest] = useState({
     startdate: date.startdate,
     enddate: date.enddate,
-    institution: queryParams.get('institution'),
-    channelName: queryParams.get('channelname'),
+    institution: queryParams.get('institution'), // 피해기관
+    channelName: queryParams.get('channelname'), // 채널명
+    keyword: queryParams.get('keyword'), // 키워드
     ...selectFields,
   })
 
@@ -85,6 +87,7 @@ const TrackingPage = () => {
       enddate: date.enddate,
       institution: fields.institution || '',
       channelName: fields.channelName || '',
+      keyword: fields.keyword || '',
       ...selectFields,
     })
   }
