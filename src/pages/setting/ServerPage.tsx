@@ -26,12 +26,6 @@ const ServerPage = () => {
     {
       header: '수집타입',
       accessorKey: 'apitype',
-      cell: ({ row }: any) =>
-        row.original?.apitype === 'DT' ? (
-          <span>다크웹</span>
-        ) : (
-          <span>텔레그램</span>
-        ),
     },
     {
       header: '수집개수',
