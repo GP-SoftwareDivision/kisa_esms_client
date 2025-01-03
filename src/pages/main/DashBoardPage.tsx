@@ -72,6 +72,7 @@ const DashBoardPage = () => {
       channelName: '',
       targetType: '',
       incidentType: '',
+      keyword: '',
       apiType: '',
       originType: '',
     },
@@ -115,6 +116,10 @@ const DashBoardPage = () => {
       header: '최초인지',
       accessorKey: 'originType',
     },
+    {
+      header: '키워드',
+      accessorKey: 'keyword',
+    },
   ]
 
   const renderResponseStatus = useMemo(() => {
@@ -138,64 +143,72 @@ const DashBoardPage = () => {
                     </div>
                   }
                 />
-                <ChartBox>
-                  <ChartWrapper>
-                    <h3>사고 유형</h3>
-                    <Bar
-                      series={responseStatus.data?.data.bar?.map(
-                        (v) => v.value
-                      )}
-                      categories={responseStatus.data?.data.bar?.map(
-                        (v) => v.label
-                      )}
-                    />
-                  </ChartWrapper>
-                  <ChartWrapper>
-                    <h3>대응 현황</h3>
-                    <Pie
-                      series={responseStatus.data?.data.pie?.map(
-                        (v) => v.value
-                      )}
-                      categories={responseStatus.data?.data.pie?.map(
-                        (v) => v.label
-                      )}
-                    />
-                  </ChartWrapper>
-                </ChartBox>
+                {responseStatus.data.data.pie ? (
+                  <ChartBox>
+                    <ChartWrapper>
+                      <h3>사고 유형</h3>
+                      <Bar
+                        series={responseStatus.data?.data.bar?.map(
+                          (v) => v.value
+                        )}
+                        categories={responseStatus.data?.data.bar?.map(
+                          (v) => v.label
+                        )}
+                      />
+                    </ChartWrapper>
+                    <ChartWrapper>
+                      <h3>대응 현황</h3>
+                      <Pie
+                        series={responseStatus.data?.data.pie?.map(
+                          (v) => v.value
+                        )}
+                        categories={responseStatus.data?.data.pie?.map(
+                          (v) => v.label
+                        )}
+                      />
+                    </ChartWrapper>
+                  </ChartBox>
+                ) : (
+                  <Empty />
+                )}
               </Flex>
             </GridItem>
             <GridItem>
-              <Flex direction='column' height='100%'>
+              <Flex direction='column' height='100%' paddingTop={'0.5rem'}>
                 <PageTitle text={'이슈 내역'} />
-                <ListBox>
-                  <VStack
-                    align='stretch'
-                    height='-webkit-fill-available'
-                    gap={'0.3rem'}
-                  >
-                    <ListSubTitle>데이터 수집</ListSubTitle>
-                    <CustomList
-                      label={'다크웹 해킹 판단 건수'}
-                      value={responseStatus.data?.data.list.darkweb.hacking}
-                    />
-                    <CustomList
-                      label={'텔레그램 해킹 판단 건수'}
-                      value={responseStatus.data?.data.list.telegram.hacking}
-                    />
-                    <CustomList
-                      label={'다크웹 대응 건수'}
-                      value={responseStatus.data?.data.list.darkweb.response}
-                    />
-                    <CustomList
-                      label={'텔레그램 대응 건수'}
-                      value={responseStatus.data?.data.list.telegram.response}
-                    />
-                    <ListSubTitle>Top 10 채널</ListSubTitle>
-                    {responseStatus.data?.data.topChannelList.map((v) => (
-                      <CustomList label={v.label} value={v.value} />
-                    ))}
-                  </VStack>
-                </ListBox>
+                {responseStatus.data.data.list ? (
+                  <ListBox>
+                    <VStack
+                      align='stretch'
+                      height='-webkit-fill-available'
+                      gap={'0.3rem'}
+                    >
+                      <ListSubTitle>데이터 수집</ListSubTitle>
+                      <CustomList
+                        label={'다크웹 해킹 판단 건수'}
+                        value={responseStatus.data?.data.list.darkweb.hacking}
+                      />
+                      <CustomList
+                        label={'텔레그램 해킹 판단 건수'}
+                        value={responseStatus.data?.data.list.telegram.hacking}
+                      />
+                      <CustomList
+                        label={'다크웹 대응 건수'}
+                        value={responseStatus.data?.data.list.darkweb.response}
+                      />
+                      <CustomList
+                        label={'텔레그램 대응 건수'}
+                        value={responseStatus.data?.data.list.telegram.response}
+                      />
+                      <ListSubTitle>Top 10 채널</ListSubTitle>
+                      {responseStatus.data?.data.topChannelList.map((v) => (
+                        <CustomList label={v.label} value={v.value} />
+                      ))}
+                    </VStack>
+                  </ListBox>
+                ) : (
+                  <Empty />
+                )}
               </Flex>
             </GridItem>
           </Grid>
