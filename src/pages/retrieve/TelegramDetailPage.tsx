@@ -296,47 +296,39 @@ const TelegramDetailPage = () => {
           </tr>
           <tr>
             <LabelTd>내용</LabelTd>
-            {ttHistoryData.isLoading ? (
-              <Td colSpan={5}>
-                <CustomSkeleton lines={5} height={5} />
-              </Td>
-            ) : (
-              <>
-                <Td colSpan={5}>
-                  <StyledContentsContainer>
-                    {!isPrevEnd &&
-                      (ttHistoryData.isLoading ? (
-                        <Button
-                          text={'가져오는 중'}
-                          type={'outline'}
-                          onClick={() => {}}
-                        />
-                      ) : (
-                        <Button
-                          text={'더보기'}
-                          type={'outline'}
-                          onClick={() => moreHistoryData('prev')}
-                        />
-                      ))}
-                    {renderHistories}
-                    {!isNextEnd &&
-                      (ttHistoryData.isLoading ? (
-                        <Button
-                          text={'가져오는 중'}
-                          type={'outline'}
-                          onClick={() => {}}
-                        />
-                      ) : (
-                        <Button
-                          text={'더보기'}
-                          type={'outline'}
-                          onClick={() => moreHistoryData('next')}
-                        />
-                      ))}
-                  </StyledContentsContainer>
-                </Td>
-              </>
-            )}
+            <Td colSpan={5}>
+              <StyledContentsContainer>
+                {!isPrevEnd &&
+                  (ttHistoryData.isLoading ? (
+                    <Button
+                      text={'가져오는 중'}
+                      type={'outline'}
+                      onClick={() => {}}
+                    />
+                  ) : (
+                    <Button
+                      text={'더보기'}
+                      type={'outline'}
+                      onClick={() => moreHistoryData('prev')}
+                    />
+                  ))}
+                {renderHistories}
+                {!isNextEnd &&
+                  (ttHistoryData.isLoading ? (
+                    <Button
+                      text={'가져오는 중'}
+                      type={'outline'}
+                      onClick={() => {}}
+                    />
+                  ) : (
+                    <Button
+                      text={'더보기'}
+                      type={'outline'}
+                      onClick={() => moreHistoryData('next')}
+                    />
+                  ))}
+              </StyledContentsContainer>
+            </Td>
           </tr>
         </tbody>
       </Table>
