@@ -54,6 +54,9 @@ const Td = styled.td`
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-all;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: thin;
   input {
     height: 25px !important;
   }
@@ -85,7 +88,7 @@ const AddVictimsWrapper = styled.div`
   padding: 2px 4px;
   border-radius: 4px;
   max-width: 120px;
-  overflow: hidden;
+  //overflow: hidden;
   cursor: pointer;
 
   span {
@@ -225,6 +228,7 @@ const TrackingFormPage = () => {
     body: {
       seqidx: Number(queryParams.get('seqidx')),
     },
+    enabled: queryParams.get('seqidx') !== null,
   })
 
   // 채널 선택 조회 API
@@ -318,7 +322,6 @@ const TrackingFormPage = () => {
     }
   }, [responseDetail.isSuccess, responseDetail.data])
 
-  console.log(victims)
   // 피해 대상 생성 취소
   const handleOnCancelVictims = (event: any, id: number) => {
     event.stopPropagation()
