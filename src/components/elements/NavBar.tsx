@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { css } from '@emotion/react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import styled from '@emotion/styled'
@@ -24,98 +24,115 @@ interface Props {
 }
 
 const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
-  const location = useLocation()
   const navigate = useNavigate()
+  const location = useLocation()
   const { logout } = useLoginMutation()
 
-  // const pathname = location.pathname.split('/')
   const pathnameRef = useRef(location.pathname.split('/')[1])
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 상위 메뉴 현재 상태
   const [activeMenu, setActiveMenu] = useState<string | null>(
     pathnameRef.current
   )
+
+  // 서브 메뉴 열리기 위한 상태
+  const [isActiveSubMenu, setIsActiveSubMenu] = useState<boolean>(false)
+
+  // 선택된 서브 메뉴
   const [selectedSubMenu, setSelectedSubMenu] = useState<string | null>(
     location.pathname.split('/')[2]
   )
-  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null) // 호버만 하고 이동하지 않을 시 메뉴 제 자리
 
+  const [menuTimer, setMenuTimer] = useState<NodeJS.Timeout | null>(null)
+
+  // 호버만 하고 이동하지 않을 시 메뉴 제 자리
   useEffect(() => {
     pathnameRef.current = location.pathname.split('/')[1]
     setActiveMenu(pathnameRef.current)
     setSelectedSubMenu(location.pathname.split('/')[2])
   }, [location])
 
-  const handleOnMouseLeave = () => {
-    if (timer) clearTimeout(timer)
+  const handleOnMouseLeave = useCallback(() => {
+    if (menuTimer) clearTimeout(menuTimer)
 
-    const newTimer = setTimeout(() => {
-      setActiveMenu((prevActiveMenu) => {
-        if (prevActiveMenu !== pathnameRef.current) {
-          return pathnameRef.current
-        }
-        return prevActiveMenu
-      })
+    const subMenuTimer = setTimeout(() => {
+      setActiveMenu((prev) =>
+        prev !== pathnameRef.current ? pathnameRef.current : prev
+      )
     }, 2000)
 
-    setTimer(newTimer)
-  }
+    setMenuTimer(subMenuTimer)
+  }, [menuTimer])
 
   const handleMenuClick = (menuKey: string, subItemKey?: string) => {
     setActiveMenu(menuKey)
     if (subItemKey) {
       setSelectedSubMenu(subItemKey)
       onSubMenuSelect?.(`${menuKey}/${subItemKey}`)
+      setIsActiveSubMenu(false)
     }
   }
 
   // 컴포넌트가 언마운트될 때 타이머 정리
   useEffect(() => {
     return () => {
-      if (timer) clearTimeout(timer)
+      if (timerRef.current) clearTimeout(timerRef.current)
+      if (menuTimer) clearTimeout(menuTimer)
     }
-  }, [timer])
+  }, [timerRef, menuTimer])
 
   return (
-    <nav css={navBarStyle}>
-      <div css={menuListStyle}>
-        <HeaderLogo>
-          <img src={'/logo.jpeg'} alt='logo' onClick={() => navigate('/')} />
-        </HeaderLogo>
-        <div css={listStyle}>
-          {menus.map((menu) => (
-            <div
-              key={menu.key}
-              onMouseEnter={() => setActiveMenu(menu.key)}
-              onMouseLeave={handleOnMouseLeave}
-              css={[
-                menuItemStyle,
-                activeMenu === menu.key && selectedMainMenuStyle, // 메인 메뉴 스타일 적용
-              ]}
-            >
-              {menu.label}
-            </div>
-          ))}
+    <NavBarContainer onMouseLeave={() => setIsActiveSubMenu(false)}>
+      <NavBarStyle>
+        <div css={menuListStyle}>
+          <HeaderLogo>
+            <img src={'/logo.jpeg'} alt='logo' onClick={() => navigate('/')} />
+          </HeaderLogo>
+          <div css={listStyle}>
+            {menus.map((menu) => (
+              <div
+                key={menu.key}
+                onMouseEnter={() => {
+                  setActiveMenu(menu.key)
+                  setIsActiveSubMenu(true)
+                }}
+                onMouseLeave={handleOnMouseLeave}
+                css={[
+                  menuItemStyle,
+                  activeMenu === menu.key && selectedMainMenuStyle, // 메인 메뉴 스타일 적용
+                ]}
+              >
+                {menu.label}
+              </div>
+            ))}
+          </div>
+          {account?.name ? (
+            <UserInfoContainerStyle>
+              <UserNameStyle>{account?.name}님</UserNameStyle>
+              <Button
+                type={'primary'}
+                text={'로그아웃'}
+                onClick={logout.mutate}
+              />
+            </UserInfoContainerStyle>
+          ) : (
+            <UserInfoContainerStyle />
+          )}
         </div>
-        {account?.name ? (
-          <UserInfoContainerStyle>
-            <UserNameStyle>{account?.name}님</UserNameStyle>
-            <Button
-              type={'primary'}
-              text={'로그아웃'}
-              onClick={logout.mutate}
-            />
-          </UserInfoContainerStyle>
-        ) : (
-          <UserInfoContainerStyle />
-        )}
-      </div>
-      <div css={horizontalSubMenuStyle}>
-        <div css={SublistStyle}>
+      </NavBarStyle>
+      <HorizontalSubMenuStyle className={isActiveSubMenu ? 'active' : ''}>
+        <SublistStyle>
           {menus.map((menu) => (
             <div key={menu.key} css={subMenuListStyle(activeMenu === menu.key)}>
               {activeMenu === menu.key &&
                 menu.subMenu?.items.map((subItem) => (
                   <div
                     key={subItem.key}
+                    onMouseEnter={() => {
+                      setIsActiveSubMenu(true)
+                    }}
+                    onMouseLeave={handleOnMouseLeave}
                     onClick={() => {
                       handleMenuClick(menu.key, subItem.key)
                     }} // 서브 메뉴 선택 시
@@ -129,13 +146,20 @@ const NavBar = ({ menus, onSubMenuSelect, account }: Props) => {
                 ))}
             </div>
           ))}
-        </div>
-      </div>
-    </nav>
+        </SublistStyle>
+      </HorizontalSubMenuStyle>
+    </NavBarContainer>
   )
 }
 
-const navBarStyle = css`
+const NavBarContainer = styled.div`
+  display: flex;
+  width: 100%;
+  margin: 0 auto;
+  flex-direction: column;
+`
+
+const NavBarStyle = styled.div`
   background-color: white;
   position: sticky;
   top: 0;
@@ -143,8 +167,11 @@ const navBarStyle = css`
   width: 100%;
   z-index: 1000;
   display: flex;
-  flex-direction: column;
+  //flex-direction: column;
   align-items: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #f5f5f5;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
 `
 
 const selectedMainMenuStyle = css`
@@ -152,17 +179,24 @@ const selectedMainMenuStyle = css`
   color: #4f79a5;
   border-bottom: 2px solid #4f79a5;
 `
-
-const horizontalSubMenuStyle = css`
+const HorizontalSubMenuStyle = styled.nav`
   list-style: none;
-  display: flex;
   width: 100%;
   justify-content: center;
   background-color: #f5f5f5;
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
   position: relative;
-  height: 40px;
-  align-items: center;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition:
+    max-height 0.3s ease-out,
+    opacity 0.3s ease-out;
+
+  &.active {
+    max-height: 50px;
+    padding: 0.5rem 0;
+    opacity: 1;
+  }
 `
 
 const subMenuListStyle = (isActive: boolean) => css`
@@ -176,7 +210,7 @@ const subMenuListStyle = (isActive: boolean) => css`
   font-size: 14px;
 `
 
-const SublistStyle = css`
+const SublistStyle = styled.div`
   display: flex;
   justify-content: center;
   //width: 26rem;
@@ -205,7 +239,6 @@ const menuListStyle = () => css`
   font-size: 16px;
   margin: 0 auto;
   max-width: 1240px;
-
   ${mq.xxl} {
     max-width: 1400px;
     padding: 0.5rem 1rem;

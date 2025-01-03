@@ -14,7 +14,7 @@ const Wrapper = ({ children }: { children: ReactNode }) => {
 export default Wrapper
 
 const MainContainer = styled.div`
-  padding: 8rem 1rem 2rem 1rem;
+  padding: 5.5rem 1rem 2rem 1rem;
 `
 
 const BodyContainer = styled.div`

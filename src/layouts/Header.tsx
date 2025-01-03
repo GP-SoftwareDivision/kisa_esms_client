@@ -136,17 +136,15 @@ const Header = () => {
 
   return (
     <HeaderContainer>
-      <HeaderContent>
-        <NavBar
-          menus={
-            accountInfo.data?.data.type === 'administrator'
-              ? menu.admin
-              : menu.user
-          }
-          onSubMenuSelect={onSubMenuSelect}
-          account={accountInfo.data?.data}
-        />
-      </HeaderContent>
+      <NavBar
+        menus={
+          accountInfo.data?.data.type === 'administrator'
+            ? menu.admin
+            : menu.user
+        }
+        onSubMenuSelect={onSubMenuSelect}
+        account={accountInfo.data?.data}
+      />
     </HeaderContainer>
   )
 }
@@ -159,18 +157,12 @@ const HeaderContainer = styled.header`
   position: fixed;
   top: 0;
   left: 0;
-  border-bottom: 1px solid #f5f5f5;
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
+  //border-bottom: 1px solid #f5f5f5;
+  //box-shadow: 0 3px 5px rgba(0, 0, 0, 0.04);
   background-color: #fff;
   z-index: 1;
 
   ${mq.sm} {
     padding-top: 0.5rem;
   }
-`
-
-const HeaderContent = styled.div`
-  display: flex;
-  width: 100%;
-  margin: 0 auto;
 `

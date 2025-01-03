@@ -255,7 +255,7 @@ const TelegramDetailPage = () => {
               loading={ttDetail.isLoading}
             />
             <RenderDataRow
-              label={'핀단 키워드'}
+              label={'판단 키워드'}
               colSpan={2}
               value={ttDetail.data?.data.threatlog as string}
               loading={ttDetail.isLoading}
