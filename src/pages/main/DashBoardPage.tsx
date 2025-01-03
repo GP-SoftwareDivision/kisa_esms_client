@@ -14,6 +14,40 @@ import { Loading } from '@/components/elements/Loading.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import Empty from '@/components/elements/Empty.tsx'
 
+const ListSubTitle = styled.p`
+  padding: 0.3rem 0;
+  ${({ theme }) => theme.typography.subtitle};
+`
+
+const ChartBox = styled(Box)`
+  border: 1px solid ${({ theme }) => theme.color.gray200};
+  border-radius: 4px;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 1rem;
+  justify-content: space-between;
+  height: -webkit-fill-available;
+`
+
+const ListBox = styled(Box)`
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => theme.color.gray200};
+  padding: 0 12px 12px 12px;
+  height: -webkit-fill-available;
+`
+const ChartWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  h3 {
+    ${({ theme }) => theme.typography.subtitle};
+    padding-left: 1rem;
+  }
+`
+
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
   seqidx: number
@@ -66,8 +100,8 @@ const DashBoardPage = () => {
     body: {
       type: 'M',
       page: 1,
-      startdate: dayjs().subtract(7, 'd').format('YYYY-MM-DD'),
-      enddate: dayjs().format('YYYY-MM-DD'),
+      startdate: date.startdate,
+      enddate: date.enddate,
       institution: '',
       channelName: '',
       targetType: '',
@@ -125,96 +159,95 @@ const DashBoardPage = () => {
   const renderResponseStatus = useMemo(() => {
     if (responseStatus.isLoading) return <Loading />
 
-    if (responseStatus.isSuccess)
-      return (
-        <>
-          <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap={4}>
-            <GridItem>
-              <Flex direction='column' height='100%'>
-                <PageTitle
-                  text={'대응현황'}
-                  children={
-                    <div>
-                      <CustomDatePicker
-                        label={''}
-                        date={date}
-                        setDate={setDate}
-                      />
-                    </div>
-                  }
-                />
-                {responseStatus.data.data.pie ? (
-                  <ChartBox>
-                    <ChartWrapper>
-                      <h3>사고 유형</h3>
-                      <Bar
-                        series={responseStatus.data?.data.bar?.map(
-                          (v) => v.value
-                        )}
-                        categories={responseStatus.data?.data.bar?.map(
-                          (v) => v.label
-                        )}
-                      />
-                    </ChartWrapper>
-                    <ChartWrapper>
-                      <h3>대응 현황</h3>
-                      <Pie
-                        series={responseStatus.data?.data.pie?.map(
-                          (v) => v.value
-                        )}
-                        categories={responseStatus.data?.data.pie?.map(
-                          (v) => v.label
-                        )}
-                      />
-                    </ChartWrapper>
-                  </ChartBox>
-                ) : (
-                  <Empty />
-                )}
-              </Flex>
-            </GridItem>
-            <GridItem>
-              <Flex direction='column' height='100%' paddingTop={'0.5rem'}>
-                <PageTitle text={'이슈 내역'} />
-                {responseStatus.data.data.list ? (
-                  <ListBox>
-                    <VStack
-                      align='stretch'
-                      height='-webkit-fill-available'
-                      gap={'0.3rem'}
-                    >
-                      <ListSubTitle>데이터 수집</ListSubTitle>
-                      <CustomList
-                        label={'다크웹 해킹 판단 건수'}
-                        value={responseStatus.data?.data.list.darkweb.hacking}
-                      />
-                      <CustomList
-                        label={'텔레그램 해킹 판단 건수'}
-                        value={responseStatus.data?.data.list.telegram.hacking}
-                      />
-                      <CustomList
-                        label={'다크웹 대응 건수'}
-                        value={responseStatus.data?.data.list.darkweb.response}
-                      />
-                      <CustomList
-                        label={'텔레그램 대응 건수'}
-                        value={responseStatus.data?.data.list.telegram.response}
-                      />
-                      <ListSubTitle>Top 10 채널</ListSubTitle>
-                      {responseStatus.data?.data.topChannelList.map((v) => (
-                        <CustomList label={v.label} value={v.value} />
-                      ))}
-                    </VStack>
-                  </ListBox>
-                ) : (
-                  <Empty />
-                )}
-              </Flex>
-            </GridItem>
-          </Grid>
-        </>
-      )
-  }, [responseStatus.isSuccess, responseStatus.data])
+    return (
+      <>
+        <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap={4}>
+          <GridItem>
+            <Flex direction='column' height='100%'>
+              <PageTitle
+                text={'대응현황'}
+                children={
+                  <div>
+                    <CustomDatePicker
+                      label={''}
+                      date={date}
+                      setDate={setDate}
+                    />
+                  </div>
+                }
+              />
+              {responseStatus.isSuccess && responseStatus.data.data.pie ? (
+                <ChartBox>
+                  <ChartWrapper>
+                    <h3>사고 유형</h3>
+                    <Bar
+                      series={responseStatus.data?.data.bar?.map(
+                        (v) => v.value
+                      )}
+                      categories={responseStatus.data?.data.bar?.map(
+                        (v) => v.label
+                      )}
+                    />
+                  </ChartWrapper>
+                  <ChartWrapper>
+                    <h3>대응 현황</h3>
+                    <Pie
+                      series={responseStatus.data?.data.pie?.map(
+                        (v) => v.value
+                      )}
+                      categories={responseStatus.data?.data.pie?.map(
+                        (v) => v.label
+                      )}
+                    />
+                  </ChartWrapper>
+                </ChartBox>
+              ) : (
+                <Empty />
+              )}
+            </Flex>
+          </GridItem>
+          <GridItem>
+            <Flex direction='column' height='100%' paddingTop={'0.5rem'}>
+              <PageTitle text={'이슈 내역'} />
+              {responseStatus.isSuccess && responseStatus.data.data.list ? (
+                <ListBox>
+                  <VStack
+                    align='stretch'
+                    height='-webkit-fill-available'
+                    gap={'0.3rem'}
+                  >
+                    <ListSubTitle>데이터 수집</ListSubTitle>
+                    <CustomList
+                      label={'다크웹 해킹 판단 건수'}
+                      value={responseStatus.data?.data.list.darkweb.hacking}
+                    />
+                    <CustomList
+                      label={'텔레그램 해킹 판단 건수'}
+                      value={responseStatus.data?.data.list.telegram.hacking}
+                    />
+                    <CustomList
+                      label={'다크웹 대응 건수'}
+                      value={responseStatus.data?.data.list.darkweb.response}
+                    />
+                    <CustomList
+                      label={'텔레그램 대응 건수'}
+                      value={responseStatus.data?.data.list.telegram.response}
+                    />
+                    <ListSubTitle>Top 10 채널</ListSubTitle>
+                    {responseStatus.data?.data.topChannelList.map((v) => (
+                      <CustomList label={v.label} value={v.value} />
+                    ))}
+                  </VStack>
+                </ListBox>
+              ) : (
+                <Empty />
+              )}
+            </Flex>
+          </GridItem>
+        </Grid>
+      </>
+    )
+  }, [responseStatus.isLoading, responseStatus.isSuccess, responseStatus.data])
 
   const renderResponseList = useMemo(() => {
     if (responseList.isLoading) return <Loading />
@@ -238,7 +271,7 @@ const DashBoardPage = () => {
           )}
         </Box>
       )
-  }, [responseList.isSuccess, responseList.data])
+  }, [responseList.isLoading, responseList.isSuccess, responseList.data])
 
   return (
     <>
@@ -249,36 +282,3 @@ const DashBoardPage = () => {
 }
 
 export default DashBoardPage
-
-const ListSubTitle = styled.p`
-  padding: 0.3rem 0;
-  ${({ theme }) => theme.typography.subtitle};
-`
-
-const ChartBox = styled(Box)`
-  border: 1px solid ${({ theme }) => theme.color.gray200};
-  border-radius: 4px;
-  padding: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  gap: 1rem;
-  justify-content: space-between;
-  height: -webkit-fill-available;
-`
-
-const ListBox = styled(Box)`
-  border-radius: 4px;
-  border: 1px solid ${({ theme }) => theme.color.gray200};
-  padding: 0 12px 12px 12px;
-`
-const ChartWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-
-  h3 {
-    ${({ theme }) => theme.typography.subtitle};
-    padding-left: 1rem;
-  }
-`
