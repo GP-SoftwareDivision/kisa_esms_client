@@ -8,6 +8,7 @@ import { notifyError } from '@/utils/notify.ts'
 interface ExcelDownloadType {
   endpoint: string
   params: Record<string, any>
+  fileName: string
 }
 
 export const useExcelDownload = () => {
@@ -25,7 +26,7 @@ export const useExcelDownload = () => {
       const url = window.URL.createObjectURL(response.data as Blob)
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', 'test.xlsx')
+      link.setAttribute('download', `${data.fileName}.xlsx`)
       link.style.cssText = 'display:none'
       document.body.appendChild(link)
       link.click()

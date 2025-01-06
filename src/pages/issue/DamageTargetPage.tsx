@@ -26,6 +26,7 @@ import { useDamageTargetUpdateMutation } from '@/hooks/mutations/useDamageTarget
 import queryToJson from '@/utils/queryToJson.ts'
 import { updateSearchCondition } from '@/utils/stateHandlers.ts'
 import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
+import dayjs from 'dayjs'
 
 const ButtonWrapper = styled.div`
   display: flex;
@@ -59,6 +60,7 @@ interface DamageTargetListType {
 }
 
 const DamageTargetPage = () => {
+  const now = dayjs()
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const { page, setPage, handlePageChange } = usePagination(
@@ -233,6 +235,7 @@ const DamageTargetPage = () => {
               excelDownload.mutate({
                 endpoint: '/issue/victims',
                 params: queryToJson(location.search),
+                fileName: `피해대상관리_${now.format('YYYY-MM-DD HH:mm:ss')}`,
               })
             }
             text={'엑셀 다운로드'}

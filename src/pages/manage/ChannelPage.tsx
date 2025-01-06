@@ -17,6 +17,8 @@ import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import queryToJson from '@/utils/queryToJson.ts'
+import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
+import dayjs from 'dayjs'
 
 interface ServerType {
   ip: string
@@ -33,6 +35,8 @@ const ChannelPage = () => {
   const { page, setPage, handlePageChange } = usePagination(
     Number(queryParams.get('page')) || 1
   )
+  const now = dayjs()
+  const excelDownload = useExcelDownload()
 
   // 채널명
   const [channelName, setChannelName] = useState<string>(
@@ -102,7 +106,13 @@ const ChannelPage = () => {
         children={
           <Button
             type={'secondary'}
-            onClick={() => {}}
+            onClick={() =>
+              excelDownload.mutate({
+                endpoint: '/channel',
+                params: { channelName: channelName },
+                fileName: `수집채널관리_${now.format('YYYY-MM-DD HH:mm:ss')}`,
+              })
+            }
             text={'엑셀 다운로드'}
           />
         }
