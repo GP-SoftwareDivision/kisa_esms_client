@@ -12,7 +12,7 @@ interface ttListType {
   issueresponseflag: string
   keyword: string
   seqidx: number
-  channel: string
+  title: string
   threatflag: string
   threatlog: string
   username: string
@@ -29,7 +29,7 @@ const TelegramCard = (props: ttListType) => {
     issueresponseflag,
     keyword,
     seqidx,
-    channel,
+    title,
     threatflag,
     threatlog,
     username,
@@ -66,7 +66,7 @@ const TelegramCard = (props: ttListType) => {
         <BodyLayout>
           <StyledBodyBox>
             <StyledLabel style={{ minWidth: '80px' }}>대화방(URL)</StyledLabel>
-            <StyledContents>{`${channel}  (${channelurl})`} </StyledContents>
+            <StyledContents>{`${title} (${channelurl})`} </StyledContents>
           </StyledBodyBox>
           <StyledBodyBox>
             <StyledLabel style={{ minWidth: '80px' }}>내용</StyledLabel>

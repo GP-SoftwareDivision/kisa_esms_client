@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Box, SimpleGrid, Stack } from '@chakra-ui/react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import styled from '@emotion/styled'
@@ -29,6 +29,7 @@ import { notifyError } from '@/utils/notify.ts'
 import { useQuery } from '@tanstack/react-query'
 import instance from '@/apis/instance.ts'
 import { responseOptions, hackingOptions } from '@/data/selectOptions.ts'
+import queryToJson from '@/utils/queryToJson.ts'
 
 export interface dtListType {
   seqidx: number
@@ -119,29 +120,6 @@ const DarkWebPage = () => {
     queryParams.get('re_title') !== '' || queryParams.get('re_keyword') !== ''
   )
 
-  useEffect(() => {
-    if (savedSearchCondition) {
-      const params = new URLSearchParams(savedSearchCondition)
-      setDate({
-        startdate: params.get('startdate') || '',
-        enddate: params.get('enddate') || '',
-      })
-      setCategory(params.get('category') || '')
-      setThreatFlag(params.get('threatflag') || '')
-      setResponseFlag(params.get('responseflag') || '')
-      setTitle(params.get('title') || '')
-      setWriter(params.get('writer') || '')
-      setRetitle(params.get('re_title') || '')
-      setKeyword(params.get('keyword') || '')
-      setReKeyword(params.get('re_keyword') || '')
-      setUrl(params.get('url') || '')
-      setRegex(params.get('regex') || '')
-      setIsReSearch(
-        params.get('re_title') !== '' || params.get('re_keyword') !== ''
-      )
-    }
-  }, [savedSearchCondition])
-
   // 다크웹 데이터 조회 API
   const dtList = useQueries<{ data: dtListType[]; count: number }>({
     queryKey: `dtList`,
@@ -166,7 +144,6 @@ const DarkWebPage = () => {
         console.error(error)
       }
     },
-    staleTime: 60000,
   })
 
   // 검색 조건 적용 후 파라미터 변경
@@ -220,6 +197,30 @@ const DarkWebPage = () => {
     handleOnAddSearchCancel()
   }
 
+  // 불러오기 후 적용 클릭 이벤트
+  const handleOnApplySavedCondition = () => {
+    if (savedSearchCondition) {
+      const jsonSavedData = queryToJson(savedSearchCondition)
+
+      setDate({
+        startdate: jsonSavedData.startdate as string,
+        enddate: jsonSavedData.enddate as string,
+      })
+      setCategory(jsonSavedData.category as string)
+      setResponseFlag(jsonSavedData.responseflag as string)
+      setTitle(jsonSavedData.title as string)
+      setWriter(jsonSavedData.writer as string)
+      setRetitle(jsonSavedData.re_title as string)
+      setKeyword(jsonSavedData.keyword as string)
+      setReKeyword(jsonSavedData.re_keyword as string)
+      setUrl(jsonSavedData.url as string)
+      setRegex(jsonSavedData.regex as string)
+      setIsReSearch(
+        jsonSavedData.re_title !== '' || jsonSavedData.re_keyword !== ''
+      )
+    }
+  }
+
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderDarkwebList = useMemo(() => {
     if (dtList.isLoading) return <Loading />
@@ -269,7 +270,7 @@ const DarkWebPage = () => {
         children={
           <Button
             type={'secondary'}
-            onClick={() => console.log('')}
+            onClick={() => {}}
             text={'엑셀 다운로드'}
           />
         }
@@ -278,6 +279,11 @@ const DarkWebPage = () => {
         <StyledLoad>
           <CustomSelect
             label={'불러오기'}
+            value={
+              searchHistory.data?.data.find(
+                (history) => history.searchlog === location.search.split('?')[1]
+              )?.searchlog || ''
+            }
             options={
               searchHistory.isSuccess &&
               searchHistory.data?.message !== 'nodata'
@@ -292,8 +298,8 @@ const DarkWebPage = () => {
             }
           />
           <Button
-            type={'primary'}
-            onClick={() => navigate(`?${savedSearchCondition}`)}
+            type={savedSearchCondition ? 'primary' : 'ghost'}
+            onClick={handleOnApplySavedCondition}
             text={'적용'}
           />
         </StyledLoad>

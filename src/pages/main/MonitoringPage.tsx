@@ -90,6 +90,8 @@ const DashBoardPage = () => {
                 trancontents={
                   v.trancontents ? v.trancontents + v.trancontents2 : ''
                 }
+                channelurl={v.curl}
+                title={v.title}
                 issueresponseflag={v.responseflag}
                 onClick={() =>
                   navigate(`/retrieve/telegram/detail?id=${v.seqidx}`)

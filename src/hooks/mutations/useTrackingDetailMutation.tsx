@@ -311,8 +311,9 @@ export const useTrackingDetailMutation = () => {
     updateState('SET_REASON_ETC', '')
   }
 
+  // 대상구분이 개인일 경우 빈 리스트 추가
   useEffect(() => {
-    if (state.indFlag.length === 1 && state.indFlag[0] === '개인') {
+    if (state.indFlag[0] === '개인') {
       setVictims([
         {
           id: 0,
@@ -327,6 +328,8 @@ export const useTrackingDetailMutation = () => {
         },
       ])
     }
+    if (!state.indFlag.includes('개인') || state.indFlag.length > 1)
+      setVictims((prev) => prev.filter((v) => v.id !== 0))
   }, [state])
 
   return {

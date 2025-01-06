@@ -49,7 +49,7 @@ export const useSearchSaveMutation = () => {
     },
     onSuccess: () => {
       notifySuccess('저장되었습니다.')
-      queryClient?.invalidateQueries({ queryKey: ['searchHistory'] })
+      queryClient?.invalidateQueries({ queryKey: ['searchHistoryList'] })
     },
   })
 

@@ -50,19 +50,7 @@ const Bar = (props: BarProps) => {
       formatter: function (legendName: string, opts: any) {
         return `${legendName} ${opts.w.globals.stackedSeriesTotals[opts.seriesIndex]}건`
       },
-      customLegendItems: [
-        '정보유출',
-        '정보유출(협박)',
-        '공격예고(협박)',
-        'DDos',
-        '랜섬웨어',
-        '웹변조',
-        '취약점',
-        '정보노출',
-        '확인불가',
-        '기타해킹',
-        '기타',
-      ],
+      customLegendItems: categories,
       markers: {
         fillColors: [
           '#142956',
@@ -91,8 +79,8 @@ const Bar = (props: BarProps) => {
         },
       ]}
       type='bar'
-      // height={350}
-      width={420}
+      height={300}
+      width={450}
       className='charts-custom'
     />
   )

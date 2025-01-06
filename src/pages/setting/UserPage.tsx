@@ -400,7 +400,7 @@ const UserPage = () => {
                 required
               />
               <CustomSelect
-                label={'사용'}
+                label={'사용여부'}
                 value={updateData.useflag}
                 options={[
                   { label: '사용', value: 'Y' },

@@ -1,5 +1,6 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { keyframes } from '@emotion/react'
 import styled from '@emotion/styled'
 import { Box, Stack } from '@chakra-ui/react'
 
@@ -13,6 +14,108 @@ import { useInfiniteQueries } from '@/hooks/queries/useInfiniteQueries.tsx'
 import { highlightText } from '@/utils/highlightText.tsx'
 import CustomEditable from '@/components/elements/Editable.tsx'
 import { CustomSkeleton } from '@/components/elements/Skeleton.tsx'
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  ${({ theme }) => theme.typography.body2};
+  table-layout: fixed;
+`
+const Td = styled.td`
+  padding: 8px 12px;
+  border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
+`
+const LabelTd = styled(Td)`
+  //width: 25%;
+  background-color: #f6f6f6;
+`
+
+const SearchContainer = styled(Box)`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  span {
+    min-width: 10rem;
+  }
+  button {
+    min-width: 5rem;
+  }
+`
+
+const StyledContentsContainer = styled(Stack)`
+  max-height: 50rem;
+  overflow-y: auto;
+  gap: 1rem;
+`
+
+const StyledContentsBox = styled(Box)<{ $current: boolean }>`
+  border: 1px solid ${({ theme }) => theme.color.gray200};
+  padding: 8px;
+  border-radius: 4px;
+  background-color: ${(props) =>
+    props.$current ? 'rgba(113, 163, 247, 0.2)' : '#fff'};
+`
+
+const StyledInfoBox = styled(Box)`
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+
+  p {
+    color: #3366d6;
+    ${({ theme }) => theme.typography.caption1} !important;
+  }
+`
+const ButtonWrapper = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+
+  button {
+    ${({ theme }) => theme.typography.caption2} !important;
+  }
+`
+const MoreHistoryButton = styled.div`
+  text-align: center;
+  ${({ theme }) => theme.typography.body3};
+  font-weight: bold;
+  cursor: pointer;
+`
+const animloader = keyframes`
+    0% {
+        box-shadow: 11px 0 0 -2px, 24px 0 0 -2px, -11px 0 0 -2px, -24px 0 0 -2px;
+    }
+    25% {
+        box-shadow: 11px 0 0 -2px, 24px 0 0 -2px, -11px 0 0 -2px, -24px 0 0 2px;
+    }
+    50% {
+        box-shadow: 11px 0 0 -2px, 24px 0 0 -2px, -11px 0 0 2px, -24px 0 0 -2px;
+    }
+    75% {
+        box-shadow: 11px 0 0 2px, 24px 0 0 -2px, -11px 0 0 -2px, -24px 0 0 -2px;
+    }
+    100% {
+        box-shadow: 11px 0 0 -2px, 24px 0 0 2px, -11px 0 0 -2px, -24px 0 0 -2px;
+    }
+`
+const LoaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`
+// 로더 스타일 정의
+const LoaderStyle = styled.div`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+  margin: 8px auto;
+  position: relative;
+  color: #ccc;
+  box-sizing: border-box;
+  animation: ${animloader} 2s linear infinite;
+`
 
 export interface TelegramDetailType {
   seqidx: number
@@ -109,7 +212,7 @@ const TelegramDetailPage = () => {
         block: 'center',
       })
     }
-  }, [ttHistoryData.data])
+  }, [infiniteData, ttHistoryData.data])
 
   // 키워드 검색
   const handleOnSearch = () => {
@@ -128,6 +231,9 @@ const TelegramDetailPage = () => {
 
   // 메시지 쌓이는 함수
   const renderHistories = useMemo(() => {
+    if (type === 'default' && ttHistoryData.isLoading)
+      return <CustomSkeleton lines={5} height={5} />
+
     if (ttHistoryData.isSuccess && infiniteData?.length === 0) {
       return <Empty />
     }
@@ -167,8 +273,8 @@ const TelegramDetailPage = () => {
     ))
   }, [infiniteData, isTranslation])
 
-  // 더보기 버튼 이벤트
-  const moreHistoryData = useCallback(
+  // 메시지 더 보기 버튼 이벤트
+  const renderMoreButton = useCallback(
     (rel: 'prev' | 'default' | 'next') => {
       const newId =
         rel === 'prev'
@@ -183,6 +289,24 @@ const TelegramDetailPage = () => {
     [ttHistoryData]
   )
 
+  // 메시지 더 보기
+  const moreHistoryData = (direction: 'prev' | 'default' | 'next') => {
+    if (infiniteData.length <= 1) return null
+
+    const isEnd = direction === 'prev' ? isPrevEnd : isNextEnd
+
+    if (isEnd) return null
+
+    return ttHistoryData.isLoading ? (
+      <LoaderWrapper>
+        <LoaderStyle />
+      </LoaderWrapper>
+    ) : (
+      <MoreHistoryButton onClick={() => renderMoreButton(direction)}>
+        더보기
+      </MoreHistoryButton>
+    )
+  }
   return (
     <ContentContainer>
       <PageTitle
@@ -298,35 +422,9 @@ const TelegramDetailPage = () => {
             <LabelTd>내용</LabelTd>
             <Td colSpan={5}>
               <StyledContentsContainer>
-                {!isPrevEnd &&
-                  (ttHistoryData.isLoading ? (
-                    <Button
-                      text={'가져오는 중'}
-                      type={'outline'}
-                      onClick={() => {}}
-                    />
-                  ) : (
-                    <Button
-                      text={'더보기'}
-                      type={'outline'}
-                      onClick={() => moreHistoryData('prev')}
-                    />
-                  ))}
+                {moreHistoryData('prev')}
                 {renderHistories}
-                {!isNextEnd &&
-                  (ttHistoryData.isLoading ? (
-                    <Button
-                      text={'가져오는 중'}
-                      type={'outline'}
-                      onClick={() => {}}
-                    />
-                  ) : (
-                    <Button
-                      text={'더보기'}
-                      type={'outline'}
-                      onClick={() => moreHistoryData('next')}
-                    />
-                  ))}
+                {moreHistoryData('next')}
               </StyledContentsContainer>
             </Td>
           </tr>
@@ -337,66 +435,3 @@ const TelegramDetailPage = () => {
 }
 
 export default TelegramDetailPage
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  ${({ theme }) => theme.typography.body2};
-  table-layout: fixed;
-`
-const Td = styled.td`
-  padding: 8px 12px;
-  border-bottom: 1px solid ${({ theme }) => theme.color.gray200};
-`
-const LabelTd = styled(Td)`
-  //width: 25%;
-  background-color: #f6f6f6;
-`
-
-const SearchContainer = styled(Box)`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-
-  span {
-    min-width: 10rem;
-  }
-  button {
-    min-width: 5rem;
-  }
-`
-
-const StyledContentsContainer = styled(Stack)`
-  max-height: 50rem;
-  overflow-y: auto;
-  gap: 1rem;
-`
-
-const StyledContentsBox = styled(Box)<{ $current: boolean }>`
-  border: 1px solid ${({ theme }) => theme.color.gray200};
-  padding: 8px;
-  border-radius: 4px;
-  background-color: ${(props) =>
-    props.$current ? 'rgba(113, 163, 247, 0.2)' : '#fff'};
-`
-
-const StyledInfoBox = styled(Box)`
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-
-  p {
-    color: #3366d6;
-    ${({ theme }) => theme.typography.caption1} !important;
-  }
-`
-const ButtonWrapper = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: 0.5rem;
-
-  button {
-    ${({ theme }) => theme.typography.caption2} !important;
-  }
-`

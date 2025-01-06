@@ -203,7 +203,7 @@ const RuleSetKeywordPage = () => {
       {/*판단 키워드 추가 모달*/}
       <CustomModal
         isOpen={insertRulesetOpen}
-        title='수집 키워드 추가'
+        title='판단 키워드 추가'
         onCancel={handleOnCancelAction}
         content={
           <ModalContents>
@@ -211,7 +211,7 @@ const RuleSetKeywordPage = () => {
               <CustomInput
                 id='rule'
                 value={fields.rule}
-                label='룰 키워드'
+                label='키워드'
                 placeholder={'키워드를 입력하세요.'}
                 onChange={handleOnChange}
                 required

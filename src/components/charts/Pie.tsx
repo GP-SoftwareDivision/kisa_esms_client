@@ -61,8 +61,8 @@ const Pie = (props: PieProps) => {
       options={options}
       series={series}
       type='pie'
-      // height={350}
-      width={380}
+      height={350}
+      width={400}
       className='charts-custom'
     />
   )

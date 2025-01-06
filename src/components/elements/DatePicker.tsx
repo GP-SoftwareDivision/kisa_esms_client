@@ -54,7 +54,7 @@ const CustomDatePicker = memo(
             presets={rangePresets}
             onChange={onRangeChange}
             disabledDate={disabledDate}
-            defaultValue={
+            value={
               date
                 ? [dayjs(date.startdate), dayjs(date.enddate)]
                 : [dayjs().subtract(7, 'd'), dayjs()]

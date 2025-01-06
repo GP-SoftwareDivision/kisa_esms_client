@@ -15,13 +15,6 @@ interface TimePickerProps {
 const CustomTimePicker = (props: TimePickerProps) => {
   const { date, onChange } = props
 
-  // const onChange = (date: any) => {
-  //   if (date && setDate) {
-  //     setDate(dayjs(date).format('YYYY-MM-DD'))
-  //     onChange()
-  //   }
-  // }
-
   return (
     <ConfigProvider locale={ko_KR}>
       <SelectBox>

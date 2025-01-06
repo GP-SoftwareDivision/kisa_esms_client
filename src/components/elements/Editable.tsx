@@ -42,4 +42,8 @@ const StyledEditable = styled(Editable.Root)`
   & [data-focus] {
     box-shadow: none;
   }
+
+  & span {
+    width: 100%;
+  }
 `

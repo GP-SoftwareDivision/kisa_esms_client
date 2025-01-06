@@ -158,6 +158,8 @@ const selectStyles = {
   menu: (base: any) => ({
     ...base,
     boxShadow: 'none',
+    borderLeft: '1px solid #d9d9d9',
+    borderBottom: '1px solid #d9d9d9',
   }),
   option: (base: any, state: any) => ({
     ...base,
@@ -238,6 +240,7 @@ const TrackingFormPage = () => {
     url: '/api/issue/history/channel',
   })
 
+  console.log(victims)
   // 페이지 조회
   useEffect(() => {
     if (responseDetail.isSuccess && responseDetail.data?.data) {
@@ -331,6 +334,7 @@ const TrackingFormPage = () => {
     )
   }
 
+  console.log(victims)
   // 채널 신규 생성
   const handleOnInsertChannelAction = () => {
     insertChannel.mutate({
@@ -369,7 +373,7 @@ const TrackingFormPage = () => {
     return (
       <List
         width={'100%'}
-        height={200}
+        height={250}
         itemCount={children.length}
         itemSize={height}
         initialScrollOffset={initialOffset}
@@ -528,44 +532,50 @@ const TrackingFormPage = () => {
                 <tr>
                   <Td colSpan={16}>
                     <VictimsListContainer>
-                      {victims.map((victim: VictimType) => (
-                        <AddVictimsWrapper
-                          key={victim.id}
-                          onClick={() => {
-                            updateState('SET_TARGET_TYPE', victim.targetType)
-                            updateState('SET_INSTITUTION', victim.institution)
-                            updateState(
-                              'SET_REPORT_FLAG',
-                              victim.reportFlag ?? ' '
-                            )
-                            updateState('SET_INCIDENT_ID', victim.incidentId)
-                            updateState(
-                              'SET_SUPPORT_FLAG',
-                              victim.supportFlag ?? ' '
-                            )
-                            updateState(
-                              'SET_REASON',
-                              victim.reason ? victim.reason.split(':')[0] : ' '
-                            )
-                            updateState(
-                              'SET_REASON_ETC',
-                              victim.reason ? victim.reason.split(':')[1] : ' '
-                            )
-                          }}
-                        >
-                          <span>
-                            {findTargetTypeText(victim.targetType)} -
-                            {victim.institution}
-                          </span>
-                          <button
-                            onClick={(e) =>
-                              handleOnCancelVictims(e, victim.id!)
-                            }
+                      {victims
+                        .filter((v: VictimType) => v.id !== 0)
+                        .map((victim: VictimType) => (
+                          <AddVictimsWrapper
+                            key={victim.id}
+                            onClick={() => {
+                              updateState('SET_TARGET_TYPE', victim.targetType)
+                              updateState('SET_INSTITUTION', victim.institution)
+                              updateState(
+                                'SET_REPORT_FLAG',
+                                victim.reportFlag ?? ' '
+                              )
+                              updateState('SET_INCIDENT_ID', victim.incidentId)
+                              updateState(
+                                'SET_SUPPORT_FLAG',
+                                victim.supportFlag ?? ' '
+                              )
+                              updateState(
+                                'SET_REASON',
+                                victim.reason
+                                  ? victim.reason.split(':')[0]
+                                  : ' '
+                              )
+                              updateState(
+                                'SET_REASON_ETC',
+                                victim.reason
+                                  ? victim.reason.split(':')[1]
+                                  : ' '
+                              )
+                            }}
                           >
-                            <IoMdClose />
-                          </button>
-                        </AddVictimsWrapper>
-                      ))}
+                            <span>
+                              {findTargetTypeText(victim.targetType)} -
+                              {victim.institution}
+                            </span>
+                            <button
+                              onClick={(e) =>
+                                handleOnCancelVictims(e, victim.id!)
+                              }
+                            >
+                              <IoMdClose />
+                            </button>
+                          </AddVictimsWrapper>
+                        ))}
                     </VictimsListContainer>
                   </Td>
                 </tr>

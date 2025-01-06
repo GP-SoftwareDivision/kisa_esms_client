@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Box, SimpleGrid } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -30,6 +30,7 @@ import CustomModal from '@/components/elements/Modal.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
 import { notifyError } from '@/utils/notify.ts'
+import queryToJson from '@/utils/queryToJson.ts'
 
 export interface ttListType {
   channelurl: string
@@ -40,7 +41,7 @@ export interface ttListType {
   issueresponseflag: string
   keyword: string
   seqidx: number
-  channel: string
+  title: string
   threatflag: string
   threatlog: string
   username: string
@@ -49,7 +50,6 @@ export interface ttListType {
 }
 const Telegram = () => {
   const navigate = useNavigate()
-
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
@@ -68,6 +68,7 @@ const Telegram = () => {
 
   // 검색 조건 불러오기
   const [savedSearchCondition, setSavedSearchCondition] = useState<string>('')
+
   // 조회기간
   const [date, setDate] = useState({
     startdate: queryParams.get('startdate') || '',
@@ -147,30 +148,31 @@ const Telegram = () => {
     },
   })
 
-  useEffect(() => {
+  // 불러오기 후 적용 클릭 이벤트
+  const handleOnApplySavedCondition = () => {
     if (savedSearchCondition) {
-      const params = new URLSearchParams(savedSearchCondition)
+      const jsonSavedData = queryToJson(savedSearchCondition)
       setDate({
-        startdate: params.get('startdate') || '',
-        enddate: params.get('enddate') || '',
+        startdate: jsonSavedData.startdate as string,
+        enddate: jsonSavedData.enddate as string,
       })
-      setThreatFlag(params.get('threatflag') || '')
-      setResponseFlag(params.get('responseflag') || '')
-      setWriter(params.get('writer') || '')
-      setChannel(params.get('channel') || '')
-      setContents(params.get('contents') || '')
-      setReContents(params.get('re_contents') || '')
-      setReChannel(params.get('re_channel') || '')
-      setReUsername(params.get('re_username') || '')
-      setRegex(params.get('regex') || '')
+      setThreatFlag(jsonSavedData.threatflag as string)
+      setResponseFlag(jsonSavedData.responseflag as string)
+      setWriter(jsonSavedData.writer as string)
+      setChannel(jsonSavedData.channel as string)
+      setContents(jsonSavedData.contents as string)
+      setReContents(jsonSavedData.re_contents as string)
+      setReChannel(jsonSavedData.re_channel as string)
+      setReUsername(jsonSavedData.re_username as string)
+      setRegex(jsonSavedData.regex as string)
 
       setIsReSearch(
-        queryParams.get('re_contents') !== '' ||
-          queryParams.get('re_channel') !== '' ||
-          queryParams.get('re_username') !== ''
+        jsonSavedData.re_contents !== '' ||
+          jsonSavedData.re_channel !== '' ||
+          jsonSavedData.re_username !== ''
       )
     }
-  }, [savedSearchCondition])
+  }
 
   // 검색 조건 적용 후 파라미터 변경
   const handleOnSearch = () => {
@@ -200,7 +202,7 @@ const Telegram = () => {
     }
 
     SaveSearch.mutate({
-      type: 'DT',
+      type: 'TT',
       searchlog: new URLSearchParams({
         startdate: date.startdate,
         enddate: date.enddate,
@@ -221,6 +223,7 @@ const Telegram = () => {
     handleOnCleanForm()
     handleOnAddSearchCancel()
   }
+
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderTelegramList = useMemo(() => {
     if (ttList.isLoading) return <Loading />
@@ -231,7 +234,7 @@ const Telegram = () => {
       return (
         <>
           <Stack margin={'1rem 0'}>
-            {ttList.data.data?.map((v) => (
+            {ttList.data.data?.map((v: ttListType) => (
               <TelegramCard
                 key={v.seqidx}
                 channelurl={v.channelurl}
@@ -245,7 +248,7 @@ const Telegram = () => {
                 threatflag={v.threatflag}
                 threatlog={v.threatlog}
                 username={v.username}
-                channel={v.channel}
+                title={v.title}
                 writetime={v.writetime}
                 regdate={v.regdate}
                 onClick={() => navigate(`detail?id=${v.seqidx}`)}
@@ -281,6 +284,11 @@ const Telegram = () => {
         <StyledLoad>
           <CustomSelect
             label={'불러오기'}
+            value={
+              searchHistory.data?.data.find(
+                (history) => history.searchlog === location.search.split('?')[1]
+              )?.searchlog || ''
+            }
             options={
               searchHistory.isSuccess &&
               searchHistory.data?.message !== 'nodata'
@@ -295,8 +303,8 @@ const Telegram = () => {
             }
           />
           <Button
-            type={'primary'}
-            onClick={() => navigate(`?${savedSearchCondition}`)}
+            type={savedSearchCondition ? 'primary' : 'ghost'}
+            onClick={handleOnApplySavedCondition}
             text={'적용'}
           />
         </StyledLoad>
