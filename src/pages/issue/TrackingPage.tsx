@@ -31,6 +31,7 @@ import Empty from '@/components/elements/Empty.tsx'
 import queryToJson from '@/utils/queryToJson.ts'
 import { notifyError } from '@/utils/notify.ts'
 import { updateSearchCondition } from '@/utils/stateHandlers.ts'
+import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
 
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
@@ -51,10 +52,17 @@ const TrackingPage = () => {
   const { page, setPage, handlePageChange } = usePagination(
     Number(queryParams.get('page')) || 1
   )
+  // 업로드 훅
   const { openInsertUpload, closeInsertUpload, insertUploadOpen } =
     useUploadMutation()
+
+  // 업로드 전 파일 드래그 앤 드롭 훅
   const { uploadFile, uploadFileName, dragFile, startUpload, abortUpload } =
     useFileDragDrop()
+
+  // 엑셀 다운로드
+  const excelDownload = useExcelDownload()
+
   const [seqidx, setSeqidx] = useState<number>(0)
 
   // 조회기간
@@ -94,6 +102,16 @@ const TrackingPage = () => {
     url: `/api/issue/history`,
     body: queryToJson(location.search),
   })
+
+  // 엑셀에서 다운로드 시 제외 시키는 함수
+  const removeQueryParams = (query: string) => {
+    const urlParams = new URLSearchParams(query)
+
+    urlParams.delete('page')
+    urlParams.delete('type')
+
+    return queryToJson(urlParams.toString())
+  }
 
   // 파일 업로드할 수 있는 팝업 열리는 이벤트
   const handleOnFileUpload = (event: any, id: number) => {
@@ -220,7 +238,12 @@ const TrackingPage = () => {
             />
             <Button
               type={'secondary'}
-              onClick={() => {}}
+              onClick={() =>
+                excelDownload.mutate({
+                  endpoint: '/issue/history',
+                  params: removeQueryParams(location.search),
+                })
+              }
               text={'엑셀 다운로드'}
             />
           </ButtonContainer>

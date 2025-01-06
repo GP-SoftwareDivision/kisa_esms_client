@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import styled from '@emotion/styled'
+import { useLocation, useNavigate } from 'react-router-dom'
 import {
   ButtonContainer,
   ContentBox,
@@ -15,8 +16,6 @@ import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import Button from '@/components/elements/Button.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
-import instance from '@/apis/instance.ts'
-import { useLocation, useNavigate } from 'react-router-dom'
 import queryToJson from '@/utils/queryToJson.ts'
 
 interface ServerType {
@@ -96,27 +95,6 @@ const ChannelPage = () => {
     },
   ]
 
-  const excelDownload = async () => {
-    try {
-      const response = await instance.post(
-        '/api/download/channel',
-        { channelName: channelName },
-        { responseType: 'blob' }
-      )
-
-      const url = window.URL.createObjectURL(new Blob([response.data]))
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download', 'test.xlsx')
-      link.style.cssText = 'display:none'
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-    } catch (error) {
-      console.error('Excel 다운로드 실패:', error)
-    }
-  }
-
   return (
     <ContentContainer>
       <PageTitle
@@ -124,7 +102,7 @@ const ChannelPage = () => {
         children={
           <Button
             type={'secondary'}
-            onClick={excelDownload}
+            onClick={() => {}}
             text={'엑셀 다운로드'}
           />
         }

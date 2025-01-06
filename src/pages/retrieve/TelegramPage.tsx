@@ -38,7 +38,7 @@ export interface ttListType {
   contents2: string
   trancontents: string
   trancontents2: string
-  issueresponseflag: string
+  responseflag: string
   keyword: string
   seqidx: number
   title: string
@@ -242,7 +242,7 @@ const Telegram = () => {
                 trancontents={
                   v.trancontents ? v.trancontents + v.trancontents2 : ''
                 }
-                issueresponseflag={v.issueresponseflag}
+                responseflag={v.responseflag}
                 keyword={v.keyword}
                 seqidx={v.seqidx}
                 threatflag={v.threatflag}

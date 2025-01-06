@@ -25,6 +25,7 @@ import { targetOptions } from '@/data/selectOptions.ts'
 import { useDamageTargetUpdateMutation } from '@/hooks/mutations/useDamageTargetUpdateMutation.tsx'
 import queryToJson from '@/utils/queryToJson.ts'
 import { updateSearchCondition } from '@/utils/stateHandlers.ts'
+import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
 
 const ButtonWrapper = styled.div`
   display: flex;
@@ -220,6 +221,7 @@ const DamageTargetPage = () => {
       )
   }, [damageTargetList.data])
 
+  const excelDownload = useExcelDownload()
   return (
     <ContentContainer>
       <PageTitle
@@ -227,7 +229,12 @@ const DamageTargetPage = () => {
         children={
           <Button
             type={'secondary'}
-            onClick={() => {}}
+            onClick={() =>
+              excelDownload.mutate({
+                endpoint: '/issue/victims',
+                params: queryToJson(location.search),
+              })
+            }
             text={'엑셀 다운로드'}
           />
         }

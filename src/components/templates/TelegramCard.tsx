@@ -9,7 +9,7 @@ interface ttListType {
   channelurl: string
   contents: string
   trancontents: string
-  issueresponseflag: string
+  responseflag: string
   keyword: string
   seqidx: number
   title: string
@@ -26,7 +26,7 @@ const TelegramCard = (props: ttListType) => {
     channelurl,
     contents,
     trancontents,
-    issueresponseflag,
+    responseflag,
     keyword,
     seqidx,
     title,
@@ -99,8 +99,8 @@ const TelegramCard = (props: ttListType) => {
             <StyledCaptionBox>
               <StyledLabel>대응 여부</StyledLabel>
               <Caption
-                text={issueresponseflag === 'Y' ? '대응' : '미대응'}
-                type={issueresponseflag === 'Y' ? 'blue' : 'black'}
+                text={responseflag === 'Y' ? '대응' : '미대응'}
+                type={responseflag === 'Y' ? 'blue' : 'black'}
               />
             </StyledCaptionBox>
           </StyledNavContainer>
