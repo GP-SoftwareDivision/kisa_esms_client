@@ -26,11 +26,13 @@ export const useExcelDownload = () => {
       const url = window.URL.createObjectURL(response.data as Blob)
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', `${data.fileName}.xlsx`)
+      link.setAttribute('download', `${data.fileName}`)
       link.style.cssText = 'display:none'
       document.body.appendChild(link)
       link.click()
       link.remove()
+
+      window.URL.revokeObjectURL(url)
     },
     onError: (error) => {
       if (error instanceof AxiosError) {

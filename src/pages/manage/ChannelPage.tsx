@@ -110,7 +110,7 @@ const ChannelPage = () => {
               excelDownload.mutate({
                 endpoint: '/channel',
                 params: { channelName: channelName },
-                fileName: `수집채널관리_${now.format('YYYY-MM-DD HH:mm:ss')}`,
+                fileName: `수집채널관리_${now.format('YYYY-MM-DD HH:mm:ss')}.xlsx`,
               })
             }
             text={'엑셀 다운로드'}

@@ -32,6 +32,7 @@ import queryToJson from '@/utils/queryToJson.ts'
 import { notifyError } from '@/utils/notify.ts'
 import { updateSearchCondition } from '@/utils/stateHandlers.ts'
 import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
+import dayjs from 'dayjs'
 
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
@@ -47,6 +48,7 @@ interface ResponseListType {
 }
 
 const TrackingPage = () => {
+  const now = dayjs()
   const navigate = useNavigate()
   const queryParams = new URLSearchParams(location.search)
   const { page, setPage, handlePageChange } = usePagination(
@@ -102,16 +104,6 @@ const TrackingPage = () => {
     url: `/api/issue/history`,
     body: queryToJson(location.search),
   })
-
-  // 엑셀에서 다운로드 시 제외 시키는 함수
-  const removeQueryParams = (query: string) => {
-    const urlParams = new URLSearchParams(query)
-
-    urlParams.delete('page')
-    urlParams.delete('type')
-
-    return queryToJson(urlParams.toString())
-  }
 
   // 파일 업로드할 수 있는 팝업 열리는 이벤트
   const handleOnFileUpload = (event: any, id: number) => {
@@ -241,7 +233,8 @@ const TrackingPage = () => {
               onClick={() =>
                 excelDownload.mutate({
                   endpoint: '/issue/history',
-                  params: removeQueryParams(location.search),
+                  params: queryToJson(location.search),
+                  fileName: `대응이력_${now.format('YYYY-MM-DD HH:mm:ss')}.xlsx`,
                 })
               }
               text={'엑셀 다운로드'}

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
-import { Box, SimpleGrid, Stack } from '@chakra-ui/react'
+import { Box, SimpleGrid, Stack, HStack } from '@chakra-ui/react'
+import { InputGroup } from '@/components/ui/input-group'
 import { useNavigate, useLocation } from 'react-router-dom'
 import styled from '@emotion/styled'
 
@@ -30,6 +31,7 @@ import { useQuery } from '@tanstack/react-query'
 import instance from '@/apis/instance.ts'
 import { responseOptions, hackingOptions } from '@/data/selectOptions.ts'
 import queryToJson from '@/utils/queryToJson.ts'
+import { useLogicalSelect } from '@/hooks/common/useLogicalSelect.tsx'
 
 export interface dtListType {
   seqidx: number
@@ -56,6 +58,10 @@ const DarkWebPage = () => {
     Number(queryParams.get('page'))
   )
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
+
+  // 논리연산자 훅
+  const { RenderLogicalSelect } = useLogicalSelect()
+
   // 조회 조건 저장
   const {
     SaveSearch,
@@ -437,13 +443,17 @@ const DarkWebPage = () => {
                 />
               </Box>
               <Box>
-                <CustomInput
-                  id={'keyword'}
-                  label={'키워드'}
-                  placeholder={'내용을 입력하세요.'}
-                  value={reKeyword}
-                  onChange={(e) => setReKeyword(e.target.value)}
-                />
+                <HStack gap='10' width='full'>
+                  <InputGroup flex='1' endElement={<RenderLogicalSelect />}>
+                    <CustomInput
+                      id={'keyword'}
+                      label={'키워드'}
+                      placeholder={'내용을 입력하세요.'}
+                      value={reKeyword}
+                      onChange={(e) => setReKeyword(e.target.value)}
+                    />
+                  </InputGroup>
+                </HStack>
               </Box>
               <Box></Box>
               <ButtonContainer>

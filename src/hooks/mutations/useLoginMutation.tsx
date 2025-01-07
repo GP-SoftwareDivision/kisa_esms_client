@@ -36,24 +36,22 @@ export const useLoginMutation = () => {
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
-        notifyError(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
+        const status = error.response?.status
+        switch (status) {
+          case 401:
+            notifyError('아이디나 비밀번호가 일치하지 않습니다.')
+            break
+          default:
+            notifyError(
+              `일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`
+            )
+        }
       }
     },
     onSuccess: (response) => {
-      const { message, data } = response
-      switch (message) {
-        case 'success':
-          setPhoneNum(data.phonenum)
-          openModal('login')
-          startTimer()
-          break
-        case undefined:
-          notifyError('아이디나 비밀번호가 일치하지 않습니다.')
-          break
-        default:
-          console.warn(`Unexpected message: ${message}`)
-          notifyError('잠시 후 다시 시도해주세요.')
-      }
+      setPhoneNum(response.data.phonenum)
+      openModal('login')
+      startTimer()
     },
   })
   const logout = useMutation({

@@ -49,10 +49,14 @@ export const usePasswordUpdateMutation = () => {
       })
       return response.data
     },
+
     onError: (error) => {
       if (error instanceof AxiosError) {
         const status = error.response?.status
         switch (status) {
+          case 400:
+            notifyError(`비밀번호와 비밀번호 확인이 일치하지 않습니다.`)
+            break
           case 401:
             notifyError(
               `세션이 만료되었거나 권한이 없습니다. \n다시 로그인 후 이용해주세요.`

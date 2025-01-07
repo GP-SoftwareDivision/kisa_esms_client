@@ -77,6 +77,8 @@ const DamageTargetPage = () => {
     handleOnUpdateText,
   } = useDamageTargetUpdateMutation()
 
+  const excelDownload = useExcelDownload()
+
   // 조회기간
   const [date, setDate] = useState({
     startdate: queryParams.get('startdate') || '',
@@ -223,7 +225,6 @@ const DamageTargetPage = () => {
       )
   }, [damageTargetList.data])
 
-  const excelDownload = useExcelDownload()
   return (
     <ContentContainer>
       <PageTitle
@@ -235,7 +236,7 @@ const DamageTargetPage = () => {
               excelDownload.mutate({
                 endpoint: '/issue/victims',
                 params: queryToJson(location.search),
-                fileName: `피해대상관리_${now.format('YYYY-MM-DD HH:mm:ss')}`,
+                fileName: `피해대상관리_${now.format('YYYY-MM-DD HH:mm:ss')}.xlsx`,
               })
             }
             text={'엑셀 다운로드'}

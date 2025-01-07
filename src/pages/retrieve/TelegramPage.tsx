@@ -3,6 +3,7 @@ import { Box, SimpleGrid } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { Checkbox } from '@/components/ui/checkbox'
 import styled from '@emotion/styled'
+import dayjs from 'dayjs'
 
 import {
   ButtonContainer,
@@ -31,6 +32,7 @@ import CustomButton from '@/components/elements/Button.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
 import { notifyError } from '@/utils/notify.ts'
 import queryToJson from '@/utils/queryToJson.ts'
+import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
 
 export interface ttListType {
   channelurl: string
@@ -49,10 +51,12 @@ export interface ttListType {
   regdate: string
 }
 const Telegram = () => {
+  const now = dayjs()
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
+  const excelDownload = useExcelDownload()
 
   // 조회 조건 저장
   const {
@@ -275,7 +279,13 @@ const Telegram = () => {
         children={
           <Button
             type={'secondary'}
-            onClick={() => {}}
+            onClick={() =>
+              excelDownload.mutate({
+                endpoint: '/telegram',
+                params: queryToJson(location.search),
+                fileName: `텔레그램_${now.format('YYYY-MM-DD HH:mm:ss')}.csv`,
+              })
+            }
             text={'엑셀 다운로드'}
           />
         }
