@@ -35,6 +35,8 @@ import {
   NativeSelectField,
   NativeSelectRoot,
 } from '@/components/ui/native-select.tsx'
+import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
+import dayjs from 'dayjs'
 
 export interface dtListType {
   seqidx: number
@@ -70,6 +72,7 @@ const RenderLogicalSelect = (props: {
 )
 
 const DarkWebPage = () => {
+  const now = dayjs()
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -78,6 +81,7 @@ const DarkWebPage = () => {
   )
 
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
+  const excelDownload = useExcelDownload()
 
   // 조회 조건 저장
   const {
@@ -199,7 +203,6 @@ const DarkWebPage = () => {
     }).toString()
     navigate(`?${params}`)
   }
-  console.log(reTitle, reTitleLogic)
 
   // 조회조건 저장
   const handleOnAddSearchAction = () => {
@@ -304,7 +307,13 @@ const DarkWebPage = () => {
         children={
           <Button
             type={'secondary'}
-            onClick={() => {}}
+            onClick={() =>
+              excelDownload.mutate({
+                endpoint: '/darkweb',
+                params: location.search,
+                fileName: `다크웹_${now.format('YYYY-MM-DD HH:mm:ss')}.csv`,
+              })
+            }
             text={'엑셀 다운로드'}
           />
         }
