@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react'
-import { Box, SimpleGrid } from '@chakra-ui/react'
+import React, { Dispatch, SetStateAction, useMemo, useState } from 'react'
+import { Box, HStack, SimpleGrid } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { Checkbox } from '@/components/ui/checkbox'
 import styled from '@emotion/styled'
@@ -33,6 +33,11 @@ import { useForm } from '@/hooks/common/useForm.tsx'
 import { notifyError } from '@/utils/notify.ts'
 import queryToJson from '@/utils/queryToJson.ts'
 import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
+import {
+  NativeSelectField,
+  NativeSelectRoot,
+} from '@/components/ui/native-select.tsx'
+import { InputGroup } from '@/components/ui/input-group.tsx'
 
 export interface ttListType {
   channelurl: string
@@ -50,6 +55,23 @@ export interface ttListType {
   writetime: string
   regdate: string
 }
+
+const RenderLogicalSelect = (props: {
+  value: string
+  setValue: Dispatch<SetStateAction<any>>
+}) => (
+  <NativeSelectRoot size='xs' variant='plain' width='auto' me='-1'>
+    <NativeSelectField
+      fontSize='xs'
+      value={props.value}
+      onChange={(e) => props.setValue(e.currentTarget.value)}
+    >
+      <option value='&&'>AND</option>
+      <option value='!'>NOT</option>
+    </NativeSelectField>
+  </NativeSelectRoot>
+)
+
 const Telegram = () => {
   const now = dayjs()
   const navigate = useNavigate()
@@ -104,16 +126,32 @@ const Telegram = () => {
 
   // 재검색 내용
   const [reContents, setReContents] = useState<string>(
-    queryParams.get('re_contents') || ''
+    queryParams.get('re_contents')?.split(':')[1] || ''
   )
+
+  // 재검색 내용 논리연산자
+  const [reContentsLogic, setReContentsLogic] = useState<string>(
+    queryParams.get('re_contents')?.split(':')[0] || '&&'
+  )
+
   // 재검색 대화방
   const [reChannel, setReChannel] = useState<string>(
-    queryParams.get('re_channel') || ''
+    queryParams.get('re_channel')?.split(':')[1] || ''
+  )
+
+  // 재검색 대화방 논리연산자
+  const [reChannelLogic, setReChannelLogic] = useState<string>(
+    queryParams.get('re_channel')?.split(':')[0] || '&&'
   )
 
   // 재검색 작성자
   const [reUsername, setReUsername] = useState<string>(
-    queryParams.get('re_username') || ''
+    queryParams.get('re_username')?.split(':')[1] || ''
+  )
+
+  // 재검색 작성자 논리연산자
+  const [reUsernameLogic, setReUsernameLogic] = useState<string>(
+    queryParams.get('re_username')?.split(':')[0] || '&&'
   )
 
   // 정규표현식
@@ -191,9 +229,9 @@ const Telegram = () => {
       responseflag,
       page: page.toString(),
       regex,
-      re_contents: reContents,
-      re_channel: reChannel,
-      re_username: reUsername,
+      re_contents: `${reContentsLogic}:${reContents}`,
+      re_channel: `${reChannelLogic}:${reChannel}`,
+      re_username: `${reUsernameLogic}:${reUsername}`,
     }).toString()
     navigate(`?${params}`)
   }
@@ -217,9 +255,9 @@ const Telegram = () => {
         responseflag,
         page: '1',
         regex,
-        re_contents: reContents,
-        re_channel: reChannel,
-        re_username: reUsername,
+        re_contents: `${reContentsLogic}:${reContents}`,
+        re_channel: `${reChannelLogic}:${reChannel}`,
+        re_username: `${reUsernameLogic}:${reUsername}`,
       }).toString(),
       title: fields.searchName,
     })
@@ -282,7 +320,7 @@ const Telegram = () => {
             onClick={() =>
               excelDownload.mutate({
                 endpoint: '/telegram',
-                params: queryToJson(location.search),
+                params: location.search,
                 fileName: `텔레그램_${now.format('YYYY-MM-DD HH:mm:ss')}.csv`,
               })
             }
@@ -420,33 +458,67 @@ const Telegram = () => {
           }
           content={
             <AccordionContainer columns={[1, 2, 3, 4]}>
-              <Box>
-                <CustomInput
-                  id={'writer'}
-                  label={'작성자'}
-                  placeholder={'내용을 입력하세요.'}
-                  value={reUsername}
-                  onChange={(e) => setReUsername(e.target.value)}
-                />
-              </Box>
-              <Box>
-                <CustomInput
-                  id={'channel'}
-                  label={'대화방'}
-                  placeholder={'내용을 입력하세요.'}
-                  value={reChannel}
-                  onChange={(e) => setReChannel(e.target.value)}
-                />
-              </Box>
-              <Box>
-                <CustomInput
-                  id={'content'}
-                  label={'내용'}
-                  placeholder={'내용을 입력하세요.'}
-                  value={reContents}
-                  onChange={(e) => setReContents(e.target.value)}
-                />
-              </Box>
+              <HStack gap='10' width='full'>
+                <InputGroup
+                  flex='1'
+                  endElement={
+                    <RenderLogicalSelect
+                      value={reUsernameLogic}
+                      setValue={setReUsernameLogic}
+                    />
+                  }
+                >
+                  <CustomInput
+                    id={'writer'}
+                    label={'작성자'}
+                    placeholder={'내용을 입력하세요.'}
+                    value={reUsername}
+                    onChange={(e) => setReUsername(e.target.value)}
+                    tooltip={`여러 값을 입력하려면 쉼표( , )로 구분하세요.`}
+                  />
+                </InputGroup>
+              </HStack>
+
+              <HStack gap='10' width='full'>
+                <InputGroup
+                  flex='1'
+                  endElement={
+                    <RenderLogicalSelect
+                      value={reChannelLogic}
+                      setValue={setReChannelLogic}
+                    />
+                  }
+                >
+                  <CustomInput
+                    id={'channel'}
+                    label={'대화방'}
+                    placeholder={'내용을 입력하세요.'}
+                    value={reChannel}
+                    onChange={(e) => setReChannel(e.target.value)}
+                    tooltip={`여러 값을 입력하려면 쉼표( , )로 구분하세요.`}
+                  />
+                </InputGroup>
+              </HStack>
+              <HStack gap='10' width='full'>
+                <InputGroup
+                  flex='1'
+                  endElement={
+                    <RenderLogicalSelect
+                      value={reContentsLogic}
+                      setValue={setReContentsLogic}
+                    />
+                  }
+                >
+                  <CustomInput
+                    id={'content'}
+                    label={'내용'}
+                    placeholder={'내용을 입력하세요.'}
+                    value={reContents}
+                    onChange={(e) => setReContents(e.target.value)}
+                    tooltip={`여러 값을 입력하려면 쉼표( , )로 구분하세요.`}
+                  />
+                </InputGroup>
+              </HStack>
               <Box display={'flex'} justifyContent={'flex-end'}>
                 <Button
                   type={'primary'}

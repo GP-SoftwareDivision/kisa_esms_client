@@ -109,7 +109,7 @@ const ChannelPage = () => {
             onClick={() =>
               excelDownload.mutate({
                 endpoint: '/channel',
-                params: { channelName: channelName },
+                params: location.search,
                 fileName: `수집채널관리_${now.format('YYYY-MM-DD HH:mm:ss')}.xlsx`,
               })
             }

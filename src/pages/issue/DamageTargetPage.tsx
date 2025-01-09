@@ -235,7 +235,7 @@ const DamageTargetPage = () => {
             onClick={() =>
               excelDownload.mutate({
                 endpoint: '/issue/victims',
-                params: queryToJson(location.search),
+                params: location.search,
                 fileName: `피해대상관리_${now.format('YYYY-MM-DD HH:mm:ss')}.xlsx`,
               })
             }

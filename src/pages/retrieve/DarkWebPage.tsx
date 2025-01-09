@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { Dispatch, SetStateAction, useMemo, useState } from 'react'
 import { Box, SimpleGrid, Stack, HStack } from '@chakra-ui/react'
 import { InputGroup } from '@/components/ui/input-group'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -31,7 +31,10 @@ import { useQuery } from '@tanstack/react-query'
 import instance from '@/apis/instance.ts'
 import { responseOptions, hackingOptions } from '@/data/selectOptions.ts'
 import queryToJson from '@/utils/queryToJson.ts'
-import { useLogicalSelect } from '@/hooks/common/useLogicalSelect.tsx'
+import {
+  NativeSelectField,
+  NativeSelectRoot,
+} from '@/components/ui/native-select.tsx'
 
 export interface dtListType {
   seqidx: number
@@ -50,6 +53,22 @@ export interface dtListType {
   regdate: string
 }
 
+const RenderLogicalSelect = (props: {
+  value: string
+  setValue: Dispatch<SetStateAction<any>>
+}) => (
+  <NativeSelectRoot size='xs' variant='plain' width='auto' me='-1'>
+    <NativeSelectField
+      fontSize='xs'
+      value={props.value}
+      onChange={(e) => props.setValue(e.currentTarget.value)}
+    >
+      <option value='&&'>AND</option>
+      <option value='!'>NOT</option>
+    </NativeSelectField>
+  </NativeSelectRoot>
+)
+
 const DarkWebPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -57,10 +76,8 @@ const DarkWebPage = () => {
   const { page, setPage, handlePageChange } = usePagination(
     Number(queryParams.get('page'))
   )
-  const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
-  // 논리연산자 훅
-  const { RenderLogicalSelect } = useLogicalSelect()
+  const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
   // 조회 조건 저장
   const {
@@ -100,9 +117,14 @@ const DarkWebPage = () => {
   // 작성자
   const [writer, setWriter] = useState<string>(queryParams.get('writer') || '')
 
-  // 재검색 제목
-  const [reTitle, setRetitle] = useState<string>(
-    queryParams.get('re_title') || ''
+  // 재검색 제목 shs
+  const [reTitle, setReTitle] = useState<string>(
+    queryParams.get('re_title')?.split(':')[1] || '' || ''
+  )
+
+  // 재검색 제목 논리연산자
+  const [reTitleLogic, setReTitleLogic] = useState<string>(
+    queryParams.get('re_title')?.split(':')[0] || '&&'
   )
 
   // 키워드
@@ -112,7 +134,12 @@ const DarkWebPage = () => {
 
   // 재검색 키워드
   const [reKeyword, setReKeyword] = useState<string>(
-    queryParams.get('re_keyword') || ''
+    queryParams.get('re_keyword')?.split(':')[1] || ''
+  )
+
+  // 재검색 키워드 논리연산자
+  const [reKeywordLogic, setReKeywordLogic] = useState<string>(
+    queryParams.get('re_keyword')?.split(':')[0] || '&&'
   )
 
   // URL
@@ -166,12 +193,13 @@ const DarkWebPage = () => {
       keyword,
       url,
       regex,
-      re_title: reTitle,
-      re_keyword: reKeyword,
+      re_title: `${reTitleLogic}:${reTitle}`,
+      re_keyword: `${reKeywordLogic}:${reKeyword}`,
       page: page.toString(),
     }).toString()
     navigate(`?${params}`)
   }
+  console.log(reTitle, reTitleLogic)
 
   // 조회조건 저장
   const handleOnAddSearchAction = () => {
@@ -193,8 +221,8 @@ const DarkWebPage = () => {
         keyword,
         url,
         regex,
-        re_title: reTitle,
-        re_keyword: reKeyword,
+        re_title: `${reTitleLogic}:${reTitle}`,
+        re_keyword: `${reKeywordLogic}:${reKeyword}`,
         page: '1',
       }).toString(),
       title: fields.searchName,
@@ -216,7 +244,7 @@ const DarkWebPage = () => {
       setResponseFlag(jsonSavedData.responseflag as string)
       setTitle(jsonSavedData.title as string)
       setWriter(jsonSavedData.writer as string)
-      setRetitle(jsonSavedData.re_title as string)
+      setReTitle(jsonSavedData.re_title as string)
       setKeyword(jsonSavedData.keyword as string)
       setReKeyword(jsonSavedData.re_keyword as string)
       setUrl(jsonSavedData.url as string)
@@ -378,11 +406,12 @@ const DarkWebPage = () => {
           <Box>
             <CustomInput
               id={'keyword'}
-              label={'키워드'}
+              label={'내용'}
               placeholder={'내용을 입력하세요.'}
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               disabled={isReSearch}
+              tooltip={'내용 및 수집 키워드를 검색합니다.'}
             />
           </Box>
           <Box>
@@ -433,28 +462,46 @@ const DarkWebPage = () => {
           }
           content={
             <AccordionContainer columns={[1, 2, 3, 4]}>
-              <Box>
-                <CustomInput
-                  id={'title'}
-                  label={'제목'}
-                  placeholder={'내용을 입력하세요.'}
-                  value={reTitle}
-                  onChange={(e) => setRetitle(e.target.value)}
-                />
-              </Box>
-              <Box>
-                <HStack gap='10' width='full'>
-                  <InputGroup flex='1' endElement={<RenderLogicalSelect />}>
-                    <CustomInput
-                      id={'keyword'}
-                      label={'키워드'}
-                      placeholder={'내용을 입력하세요.'}
-                      value={reKeyword}
-                      onChange={(e) => setReKeyword(e.target.value)}
+              <HStack gap='10' width='full'>
+                <InputGroup
+                  flex='1'
+                  endElement={
+                    <RenderLogicalSelect
+                      value={reTitleLogic}
+                      setValue={setReTitleLogic}
                     />
-                  </InputGroup>
-                </HStack>
-              </Box>
+                  }
+                >
+                  <CustomInput
+                    id={'title'}
+                    label={'제목'}
+                    placeholder={'내용을 입력하세요.'}
+                    value={reTitle}
+                    onChange={(e) => setReTitle(e.target.value)}
+                    tooltip={`여러 값을 입력하려면 쉼표( , )로 구분하세요.`}
+                  />
+                </InputGroup>
+              </HStack>
+              <HStack gap='10' width='full'>
+                <InputGroup
+                  flex='1'
+                  endElement={
+                    <RenderLogicalSelect
+                      value={reKeywordLogic}
+                      setValue={setReKeywordLogic}
+                    />
+                  }
+                >
+                  <CustomInput
+                    id={'keyword'}
+                    label={'키워드'}
+                    placeholder={'내용을 입력하세요.'}
+                    value={reKeyword}
+                    onChange={(e) => setReKeyword(e.target.value)}
+                    tooltip={`여러 값을 입력하려면 쉼표( , )로 구분하세요.`}
+                  />
+                </InputGroup>
+              </HStack>
               <Box></Box>
               <ButtonContainer>
                 <Button

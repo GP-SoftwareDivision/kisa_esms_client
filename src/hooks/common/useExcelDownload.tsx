@@ -7,7 +7,7 @@ import { notifyError } from '@/utils/notify.ts'
 
 interface ExcelDownloadType {
   endpoint: string
-  params: Record<string, any>
+  params: string
   fileName: string
 }
 
@@ -17,9 +17,8 @@ export const useExcelDownload = () => {
   return useMutation({
     mutationKey: ['excelDownload'],
     mutationFn: async (data: ExcelDownloadType) => {
-      const response = await instance.post(
-        `/api/download${data.endpoint}`,
-        data.params,
+      const response = await instance.get(
+        `/api/download${data.endpoint}${data.params}`,
         { responseType: 'blob' }
       )
 

@@ -233,7 +233,7 @@ const TrackingPage = () => {
               onClick={() =>
                 excelDownload.mutate({
                   endpoint: '/issue/history',
-                  params: queryToJson(location.search),
+                  params: location.search,
                   fileName: `대응이력_${now.format('YYYY-MM-DD HH:mm:ss')}.xlsx`,
                 })
               }

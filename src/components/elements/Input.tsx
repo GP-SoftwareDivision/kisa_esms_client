@@ -1,7 +1,10 @@
 import styled from '@emotion/styled'
 import React, { memo } from 'react'
+import { FaCircleQuestion } from 'react-icons/fa6'
+
 import { Input } from '@chakra-ui/react'
 import { Field } from '@/components/ui/field'
+import { Tooltip } from '@/components/ui/tooltip'
 
 interface InputProps {
   id: string
@@ -11,6 +14,7 @@ interface InputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   required?: boolean
   disabled?: boolean
+  tooltip?: string
 }
 
 const CustomInput = memo(
@@ -22,9 +26,26 @@ const CustomInput = memo(
     onChange,
     required,
     disabled,
+    tooltip,
   }: InputProps) => {
     return (
-      <StyledField label={label} required={required} disabled={disabled}>
+      <StyledField
+        label={
+          <LabelContainer>
+            {label}
+            {tooltip && (
+              <Tooltip
+                content={tooltip}
+                positioning={{ placement: 'right-end' }}
+              >
+                <StyledTooltip />
+              </Tooltip>
+            )}
+          </LabelContainer>
+        }
+        required={required}
+        disabled={disabled}
+      >
         <Input
           id={id}
           value={value || ''}
@@ -53,4 +74,15 @@ const StyledField = styled(Field)`
     ${({ theme }) => theme.typography.body3};
     background-color: #fff;
   }
+`
+
+const LabelContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+`
+
+const StyledTooltip = styled(FaCircleQuestion)`
+  color: ${({ theme }) => theme.color.gray600};
+  cursor: pointer;
 `
