@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState } from 'react'
 import styled from '@emotion/styled'
 import { Stack } from '@chakra-ui/react'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -27,7 +27,7 @@ interface MonitoringType {
   list: dtListType[] | ttListType[]
 }
 
-const DashBoardPage = () => {
+const MonitoringPage = () => {
   const navigate = useNavigate()
 
   const location = useLocation()
@@ -40,15 +40,6 @@ const DashBoardPage = () => {
     method: 'POST',
     url: `/api/main/monitoring`,
   })
-
-  // 30초마다 실행
-  useEffect(() => {
-    const interval = setInterval(() => {
-      issueMonitoring.refetch()
-    }, 30000)
-
-    return () => clearInterval(interval) // 컴포넌트가 언마운트될 때 인터벌 제거
-  }, [issueMonitoring])
 
   // 다크웹 | 텔레그램
   const renderMonitoringList = useMemo(() => {
@@ -132,4 +123,4 @@ const DashBoardPage = () => {
     </ContentContainer>
   )
 }
-export default React.memo(DashBoardPage)
+export default React.memo(MonitoringPage)
