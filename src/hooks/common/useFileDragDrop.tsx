@@ -28,8 +28,8 @@ const useFileDragDrop = () => {
   // 업로드 시작
   const startUpload = async () => {
     if (!uploadFile) {
-      alert('파일을 선택해주세요.')
-      return
+      notifyError('파일을 선택해주세요.')
+      return false
     }
     const type = uploadFile.name.split('.').pop()
     const csvFile = await convertXlsxToCsv(uploadFile)

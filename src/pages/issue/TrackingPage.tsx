@@ -29,7 +29,7 @@ import { targetOptions } from '@/data/selectOptions.ts'
 import { Loading } from '@/components/elements/Loading.tsx'
 import Empty from '@/components/elements/Empty.tsx'
 import queryToJson from '@/utils/queryToJson.ts'
-import { notifyError } from '@/utils/notify.ts'
+import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import { updateSearchCondition } from '@/utils/stateHandlers.ts'
 import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
 import dayjs from 'dayjs'
@@ -59,8 +59,14 @@ const TrackingPage = () => {
     useUploadMutation()
 
   // 업로드 전 파일 드래그 앤 드롭 훅
-  const { uploadFile, uploadFileName, dragFile, startUpload, abortUpload } =
-    useFileDragDrop()
+  const {
+    uploadFile,
+    uploadFileName,
+    formData,
+    dragFile,
+    startUpload,
+    abortUpload,
+  } = useFileDragDrop()
 
   // 엑셀 다운로드
   const excelDownload = useExcelDownload()
@@ -161,7 +167,7 @@ const TrackingPage = () => {
       cell: ({ row }: any) => (
         <Box display={'flex'} justifyContent={'center'}>
           <StyledButton
-            onClick={(e: any) => handleOnFileUpload(e, row.original.issueIdx)}
+            onClick={(e: any) => handleOnFileUpload(e, row.original.seqidx)}
           >
             파일선택
           </StyledButton>
@@ -174,18 +180,27 @@ const TrackingPage = () => {
   const accountUpload = async () => {
     await startUpload()
     try {
-      // const response = await instance.post('/upload', formData, {
-      //   headers: { 'Content-Type': 'multipart/form-data' },
-      //   withCredentials: true,
-      // })
-      const response = await instance.post(`/api/issue/detection/file/upload`, {
-        seqidx,
-        filename: uploadFile?.name,
-        uploader: 'syjin',
-      })
-      return response.data
-      // if (response.status === 200) {
-      // }
+      if (formData) {
+        const uploadResponse = await instance.post('/upload', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          withCredentials: true,
+        })
+        if (uploadResponse.status === 200) {
+          const response = await instance.post(
+            `/api/issue/detection/file/upload`,
+            {
+              seqidx,
+              filename: uploadFile?.name,
+            }
+          )
+          if (response.status === 200) {
+            notifySuccess(
+              '파일 업로드가 완료되었습니다.\n 검증 소요 시간은 수분 이상 걸릴 수 있으며, 결과는 유출정보관리에서 확인 바랍니다.'
+            )
+            closeInsertUpload()
+          }
+        }
+      }
     } catch (error) {
       console.error('Error uploading file', error)
       notifyError(`일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`)
@@ -423,7 +438,7 @@ const TrackingPage = () => {
                   )}
                 </Dropzone>
                 <Button
-                  text={'파일 업로드'}
+                  text={'파일업로드'}
                   type={'primary'}
                   onClick={accountUpload}
                 />

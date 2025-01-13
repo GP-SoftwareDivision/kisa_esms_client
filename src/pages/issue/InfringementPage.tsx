@@ -49,6 +49,7 @@ interface DetectionListType {
     portal: string
     etc: string
   }
+  uStatus: string
   file: string
 }
 
@@ -168,9 +169,30 @@ const InfringementPage = () => {
       cell: ({ row }: any) => (
         <ButtonWrapper>
           <Button
-            type={'secondary'}
-            text={'다운로드'}
-            onClick={() => console.log(row.original)}
+            type={
+              row.original.uStatus === 'S'
+                ? 'secondary'
+                : row.original.uStatus === 'P'
+                  ? 'ghost'
+                  : 'danger'
+            }
+            text={
+              row.original.uStatus === 'S'
+                ? '다운로드'
+                : row.original.uStatus === 'P'
+                  ? '검증중'
+                  : '검증오류'
+            }
+            disabled={
+              row.original.uStatus == 'P' || row.original.uStatus == 'E'
+            }
+            onClick={() => {
+              const downloadUrl = `${import.meta.env.VITE_STORAGE_URL}/uploads/result/${row.original.file}`
+              const anchor = document.createElement('a')
+              anchor.href = downloadUrl
+              anchor.download = row.original.file
+              anchor.click()
+            }}
           />
         </ButtonWrapper>
       ),

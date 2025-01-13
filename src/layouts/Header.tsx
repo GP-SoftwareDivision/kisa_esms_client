@@ -98,11 +98,11 @@ const Header = () => {
     // 유출 정보 판별 파라미터
     const InfringementParams = new URLSearchParams({
       page: '1',
-      startdate: dayjs().subtract(14, 'd').format('YYYY-MM-DD'),
+      startdate: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
       enddate: dayjs().format('YYYY-MM-DD'),
     }).toString()
 
-    // 유출 정보 판별 파라미터
+    // 수집 채널 관리 파라미터
     const ChannelParams = new URLSearchParams({
       page: '1',
       channelName: '',

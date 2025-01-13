@@ -108,8 +108,8 @@ const LoginPage = () => {
     useLoginMutation()
   const { checkAuth, authNum, setAuthNum } = useAuthMutation()
   const { fields, warning, handleOnChange, validateForm } = useForm({
-    id: 'gpadmin',
-    password: '1234',
+    id: '',
+    password: '',
   })
 
   // 로그인
