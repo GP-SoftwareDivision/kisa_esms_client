@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 
 import instance from '@/apis/instance.ts'
 import { notifyError } from '@/utils/notify.ts'
+import queryToJson from '@/utils/queryToJson.ts'
 
 interface ExcelDownloadType {
   endpoint: string
@@ -17,8 +18,9 @@ export const useExcelDownload = () => {
   return useMutation({
     mutationKey: ['excelDownload'],
     mutationFn: async (data: ExcelDownloadType) => {
-      const response = await instance.get(
-        `/api/download${data.endpoint}${data.params}`,
+      const response = await instance.post(
+        `/api/download${data.endpoint}`,
+        queryToJson(data.params),
         { responseType: 'blob' }
       )
 
