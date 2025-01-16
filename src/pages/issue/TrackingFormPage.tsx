@@ -230,7 +230,22 @@ const TrackingFormPage = () => {
     body: {
       seqidx: Number(queryParams.get('seqidx')),
     },
-    enabled: queryParams.get('seqidx') !== null,
+    enabled:
+      Number(queryParams.get('seqidx')) !== 0 &&
+      queryParams.get('type') === null,
+  })
+
+  // 이력 대응 최초 기입 - 데이터 조회 url 받아오기 위함
+  const responseInitDetail = useQueries<{ data: responseListType }>({
+    queryKey: `responseInitDetail`,
+    method: 'POST',
+    url: '/api/issue/history/add',
+    body: {
+      seqidx: Number(queryParams.get('seqidx')),
+      type: queryParams.get('type'),
+    },
+    enabled:
+      queryParams.get('seqidx') !== null && queryParams.get('type') !== null,
   })
 
   // 채널 선택 조회 API
@@ -240,12 +255,22 @@ const TrackingFormPage = () => {
     url: '/api/issue/history/channel',
   })
 
-  console.log(victims)
-  // 페이지 조회
+  // 대응 이력 기존에 작성 X
+  useEffect(() => {
+    const detail = responseInitDetail.data?.data
+    updateState('SET_REGISTRATION_DATE', detail?.registrationDate ?? '')
+    updateState('SET_URL', detail?.url ?? '')
+    updateState('SET_CHANNEL_ID', detail?.channelId?.toString() ?? '')
+    updateState('SET_PUBLISHED_DATE', detail?.publishedDate ?? '')
+    updateState('SET_ORIGIN_TYPE', detail?.originType ?? '')
+    updateState('SET_SOURCE_IDX', detail?.sourceIdx ?? 0)
+    updateState('SET_SOURCE_TYPE', detail?.sourceType ?? '')
+  }, [responseInitDetail.data, responseInitDetail.isSuccess])
+
+  // 대응 이력 기존에 작성 O
   useEffect(() => {
     if (responseDetail.isSuccess && responseDetail.data?.data) {
       const detail = responseDetail.data?.data
-
       const institutionsLength = detail?.institutions.length || 0
 
       const hasIndFlag = detail?.indFlag.includes('Y')
@@ -315,7 +340,8 @@ const TrackingFormPage = () => {
       updateState('SET_TITLE', detail?.title ?? '')
       updateState('SET_URL', detail?.url ?? '')
       updateState('SET_WRITER', detail?.writer ?? '')
-
+      updateState('SET_SOURCE_IDX', detail?.sourceIdx ?? 0)
+      updateState('SET_SOURCE_TYPE', detail?.sourceType ?? '')
       setVictims(
         detail?.institutions.map((item, index) => ({
           ...item,
@@ -334,7 +360,6 @@ const TrackingFormPage = () => {
     )
   }
 
-  console.log(victims)
   // 채널 신규 생성
   const handleOnInsertChannelAction = () => {
     insertChannel.mutate({
@@ -913,8 +938,8 @@ const TrackingFormPage = () => {
             insertResponseIssue.mutate({
               registrationDate: state.registrationDate || '',
               incidentType: !state.incidentTypeEtc
-                ? state.incidentType
-                : `${state.incidentType}:${state.incidentTypeEtc}`,
+                ? (state.incidentType as string[]).join(',')
+                : `${(state.incidentType as string[]).join(',')}:${state.incidentTypeEtc}`,
               incidentTypeDetail: state.incidentTypeDetail || '',
               threatFlag: state.threatFlag || '',
               channelId: state.channelId || '',
@@ -926,8 +951,8 @@ const TrackingFormPage = () => {
               originType: state.originType || '',
               originTypeDetail: state.originTypeDetail || '',
               shareTarget: !state.shareTargetEtc
-                ? state.shareTarget
-                : `${state.shareTarget}:${state.shareTargetEtc}`,
+                ? (state.shareTarget as string[]).join(',')
+                : `${(state.shareTarget as string[]).join(',')}:${state.shareTargetEtc}`,
               colInfo: state.colInfo || '',
               imageFlag: state.imageFlag || '',
               contents: state.contents || '',
@@ -936,8 +961,8 @@ const TrackingFormPage = () => {
               comment: state.comment || '',
               indFlag: state.indFlag || '',
               seqidx: Number(queryParams.get('seqidx')) || 0,
-              sourceIdx: Number(responseDetail.data?.data.sourceIdx) || 0,
-              sourceType: responseDetail.data?.data.sourceType || '',
+              sourceIdx: state.sourceIdx,
+              sourceType: state.sourceType,
             })
           }}
           text={'저장'}

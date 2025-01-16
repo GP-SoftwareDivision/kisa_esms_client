@@ -316,7 +316,9 @@ const TelegramDetailPage = () => {
             type={'primary'}
             onClick={() =>
               navigate(
-                `/issue/tracking/detail?seqidx=${ttDetail.data?.data.issueidx}`
+                ttDetail.data?.data.issueidx
+                  ? `/issue/tracking/detail?seqidx=${ttDetail.data?.data.issueidx}`
+                  : `/issue/tracking/detail/form?seqidx=${ttDetail.data?.data.seqidx}&type=TT`
               )
             }
             text={'이슈 대응'}

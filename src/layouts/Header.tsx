@@ -44,9 +44,9 @@ const Header = () => {
       category: '',
       keyword: '',
       writer: '',
-      re_keyword: '',
+      re_keyword: '&&:',
       title: '',
-      re_title: '',
+      re_title: '&&:',
       url: '',
       responseflag: '',
       regex: '',
@@ -63,10 +63,10 @@ const Header = () => {
       contents: '',
       responseflag: '',
       page: '1',
-      re_channel: '',
-      re_contents: '',
+      re_channel: '&&:',
+      re_contents: '&&:',
       regex: '',
-      re_username: '',
+      re_username: '&&:',
     }).toString()
 
     // 대응 이력 파라미터

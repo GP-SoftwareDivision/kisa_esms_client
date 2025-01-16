@@ -159,9 +159,9 @@ const Telegram = () => {
 
   // 결과 내 재검색
   const [isReSearch, setIsReSearch] = useState<boolean>(
-    queryParams.get('re_contents') !== '' ||
-      queryParams.get('re_channel') !== '' ||
-      queryParams.get('re_username') !== ''
+    queryParams.get('re_contents') !== '&&:' ||
+      queryParams.get('re_channel') !== '&&:' ||
+      queryParams.get('re_username') !== '&&:'
   )
 
   // 텔레그램 데이터 조회 API
@@ -219,6 +219,13 @@ const Telegram = () => {
   // 검색 조건 적용 후 파라미터 변경
   const handleOnSearch = () => {
     setPage(1)
+    const resetContents = !isReSearch ? '' : reContents
+    const resetContentsLogic = !isReSearch ? '&&' : reContentsLogic
+    const resetChannel = !isReSearch ? '' : reChannel
+    const resetChannelLogic = !isReSearch ? '&&' : reChannelLogic
+    const resetUsername = !isReSearch ? '' : reUsername
+    const resetUsernameLogic = !isReSearch ? '&&' : reUsernameLogic
+
     const params = new URLSearchParams({
       startdate: date.startdate,
       enddate: date.enddate,
@@ -228,10 +235,9 @@ const Telegram = () => {
       contents,
       responseflag,
       page: page.toString(),
-      regex,
-      re_contents: `${reContentsLogic}:${reContents}`,
-      re_channel: `${reChannelLogic}:${reChannel}`,
-      re_username: `${reUsernameLogic}:${reUsername}`,
+      re_contents: `${resetContentsLogic}:${resetContents}`,
+      re_channel: `${resetChannelLogic}:${resetChannel}`,
+      re_username: `${resetUsernameLogic}:${resetUsername}`,
     }).toString()
     navigate(`?${params}`)
   }

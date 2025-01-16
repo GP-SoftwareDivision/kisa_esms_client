@@ -123,7 +123,7 @@ const DarkWebPage = () => {
 
   // 재검색 제목 shs
   const [reTitle, setReTitle] = useState<string>(
-    queryParams.get('re_title')?.split(':')[1] || '' || ''
+    queryParams.get('re_title')?.split(':')[1] || ''
   )
 
   // 재검색 제목 논리연산자
@@ -154,7 +154,8 @@ const DarkWebPage = () => {
 
   // 결과 내 재검색
   const [isReSearch, setIsReSearch] = useState<boolean>(
-    queryParams.get('re_title') !== '' || queryParams.get('re_keyword') !== ''
+    queryParams.get('re_title') !== '&&:' ||
+      queryParams.get('re_keyword') !== '&&:'
   )
 
   // 다크웹 데이터 조회 API
@@ -186,6 +187,11 @@ const DarkWebPage = () => {
   // 검색 조건 적용 후 파라미터 변경
   const handleOnSearch = () => {
     setPage(1)
+    const resetTitle = !isReSearch ? '' : reTitle
+    const resetTitleLogic = !isReSearch ? '&&' : reTitleLogic
+    const resetKeyword = !isReSearch ? '' : reKeyword
+    const resetKeywordLogic = !isReSearch ? '&&' : reKeywordLogic
+
     const params = new URLSearchParams({
       startdate: date.startdate,
       enddate: date.enddate,
@@ -197,8 +203,8 @@ const DarkWebPage = () => {
       keyword,
       url,
       regex,
-      re_title: `${reTitleLogic}:${reTitle}`,
-      re_keyword: `${reKeywordLogic}:${reKeyword}`,
+      re_title: `${resetTitleLogic}:${resetTitle}`,
+      re_keyword: `${resetKeywordLogic}:${resetKeyword}`,
       page: page.toString(),
     }).toString()
     navigate(`?${params}`)
@@ -257,7 +263,6 @@ const DarkWebPage = () => {
       )
     }
   }
-
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderDarkwebList = useMemo(() => {
     if (dtList.isLoading) return <Loading />

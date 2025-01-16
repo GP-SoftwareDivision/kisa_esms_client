@@ -82,6 +82,8 @@ type Action =
   | { type: 'SET_HACK_GROUP'; payload: string } // 해킹 그룹 업데이트
   | { type: 'SET_KEYWORD'; payload: string } // 유출 정보 업데이트
   | { type: 'SET_COMMENT'; payload: string } // 코멘트 업데이트
+  | { type: 'SET_SOURCE_IDX'; payload: number }
+  | { type: 'SET_SOURCE_TYPE'; payload: string }
 
 const reducer = (
   state: VictimAndResponseType,
@@ -146,6 +148,10 @@ const reducer = (
       return { ...state, comment: action.payload }
     case 'SET_INSTITUTION':
       return { ...state, institution: action.payload }
+    case 'SET_SOURCE_IDX':
+      return { ...state, sourceIdx: action.payload }
+    case 'SET_SOURCE_TYPE':
+      return { ...state, sourceType: action.payload }
     default:
       return state
   }

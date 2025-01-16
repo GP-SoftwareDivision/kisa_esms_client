@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
@@ -23,13 +22,8 @@ export function useQueries<TData>({
 }: QueryConfig) {
   const navigate = useNavigate()
 
-  const stableQueryKey = useMemo(
-    () => [queryKey, url, body],
-    [queryKey, url, body]
-  )
-
   return useQuery<TData, AxiosError>({
-    queryKey: stableQueryKey,
+    queryKey: [queryKey, url, body],
     queryFn: async () => {
       try {
         const response = await instance({
