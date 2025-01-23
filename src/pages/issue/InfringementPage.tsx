@@ -187,7 +187,7 @@ const InfringementPage = () => {
               row.original.uStatus == 'P' || row.original.uStatus == 'E'
             }
             onClick={() => {
-              const downloadUrl = `${import.meta.env.VITE_STORAGE_URL}/uploads/result/${row.original.file}`
+              const downloadUrl = `${import.meta.env.VITE_STORAGE_URL}/uploads/results/${row.original.file}`
               const anchor = document.createElement('a')
               anchor.href = downloadUrl
               anchor.download = row.original.file

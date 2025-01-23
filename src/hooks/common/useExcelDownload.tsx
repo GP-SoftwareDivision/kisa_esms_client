@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query'
 import instance from '@/apis/instance.ts'
 import { notifyError } from '@/utils/notify.ts'
 import queryToJson from '@/utils/queryToJson.ts'
+import { useState } from 'react'
 
 interface ExcelDownloadType {
   endpoint: string
@@ -14,10 +15,13 @@ interface ExcelDownloadType {
 
 export const useExcelDownload = () => {
   const navigate = useNavigate()
-
-  return useMutation({
+  const [excelDownloadLoading, setExcelDownloadLoading] =
+    useState<boolean>(false)
+  const excelDownload = useMutation({
     mutationKey: ['excelDownload'],
     mutationFn: async (data: ExcelDownloadType) => {
+      setExcelDownloadLoading(true)
+
       const response = await instance.post(
         `/api/download${data.endpoint}`,
         queryToJson(data.params),
@@ -34,10 +38,12 @@ export const useExcelDownload = () => {
       link.remove()
 
       window.URL.revokeObjectURL(url)
+      setExcelDownloadLoading(false)
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
         const status = error.response?.status
+        setExcelDownloadLoading(false)
         switch (status) {
           case 400:
             notifyError(`중복된 계정입니다. 다시 입력해주세요.`)
@@ -60,4 +66,6 @@ export const useExcelDownload = () => {
     },
     onSuccess: () => {},
   })
+
+  return { excelDownload, excelDownloadLoading }
 }

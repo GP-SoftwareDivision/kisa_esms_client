@@ -77,7 +77,7 @@ const DamageTargetPage = () => {
     handleOnUpdateText,
   } = useDamageTargetUpdateMutation()
 
-  const excelDownload = useExcelDownload()
+  const { excelDownload, excelDownloadLoading } = useExcelDownload()
 
   // 조회기간
   const [date, setDate] = useState({
@@ -203,7 +203,7 @@ const DamageTargetPage = () => {
   ]
 
   const renderTable = useMemo(() => {
-    if (!damageTargetList.data) return <Empty />
+    if (!damageTargetList.data || excelDownloadLoading) return <Empty />
     if (damageTargetList.isSuccess)
       return (
         <>
@@ -223,7 +223,7 @@ const DamageTargetPage = () => {
           />
         </>
       )
-  }, [damageTargetList.data])
+  }, [damageTargetList.data, excelDownloadLoading])
 
   return (
     <ContentContainer>

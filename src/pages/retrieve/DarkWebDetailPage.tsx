@@ -92,7 +92,7 @@ const DarkWebDetailPage = () => {
   // html 새 창으로 열기 이벤트
   const ViewHtml = () => {
     window.open(
-      `${import.meta.env.VITE_STORAGE_URL}/${dtDetail.data?.data?.htmlpath}`,
+      `${import.meta.env.VITE_STORAGE_URL}${dtDetail.data?.data?.htmlpath}`,
       '_blank'
     )
   }

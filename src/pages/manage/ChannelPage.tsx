@@ -36,7 +36,7 @@ const ChannelPage = () => {
     Number(queryParams.get('page')) || 1
   )
   const now = dayjs()
-  const excelDownload = useExcelDownload()
+  const { excelDownload } = useExcelDownload()
 
   // 채널명
   const [channelName, setChannelName] = useState<string>(

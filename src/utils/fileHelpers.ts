@@ -1,5 +1,4 @@
 import * as XLSX from 'xlsx'
-import dayjs from 'dayjs'
 
 export const convertXlsxToCsv = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -32,9 +31,6 @@ const getExtensionType = (name: string): string | null => {
 }
 
 export const getFileName = (name: string) => {
-  const now = dayjs()
-
-  const formattedDateTime = now.format('YYYYMMDDHHmmss')
   const fileNameParts = name.split('.')
 
   const fileExtension = fileNameParts.pop() || ''
@@ -42,5 +38,5 @@ export const getFileName = (name: string) => {
 
   const fileType = getExtensionType(name)
   const sanitizedFileName = fileNameWithoutExtension.replace(/[^\w\s-]/g, '')
-  return `${sanitizedFileName}_${formattedDateTime}.${fileType || fileExtension}`
+  return `${sanitizedFileName}.${fileType || fileExtension}`
 }

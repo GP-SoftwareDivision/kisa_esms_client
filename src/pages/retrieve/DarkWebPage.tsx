@@ -81,7 +81,7 @@ const DarkWebPage = () => {
   )
 
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
-  const excelDownload = useExcelDownload()
+  const { excelDownload, excelDownloadLoading } = useExcelDownload()
 
   // 조회 조건 저장
   const {
@@ -205,7 +205,7 @@ const DarkWebPage = () => {
       regex,
       re_title: `${resetTitleLogic}:${resetTitle}`,
       re_keyword: `${resetKeywordLogic}:${resetKeyword}`,
-      page: page.toString(),
+      page: '1',
     }).toString()
     navigate(`?${params}`)
   }
@@ -265,7 +265,7 @@ const DarkWebPage = () => {
   }
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderDarkwebList = useMemo(() => {
-    if (dtList.isLoading) return <Loading />
+    if (dtList.isLoading || excelDownloadLoading) return <Loading />
     if (!dtList.data || dtList.data.count === 0) return <Empty />
     if (!dtList.data || dtList.data.count > 0)
       return (
@@ -303,7 +303,7 @@ const DarkWebPage = () => {
           />
         </>
       )
-  }, [page, navigate, dtList])
+  }, [page, navigate, dtList, excelDownloadLoading])
 
   return (
     <ContentContainer>
@@ -508,7 +508,7 @@ const DarkWebPage = () => {
                 >
                   <CustomInput
                     id={'keyword'}
-                    label={'키워드'}
+                    label={'내용'}
                     placeholder={'내용을 입력하세요.'}
                     value={reKeyword}
                     onChange={(e) => setReKeyword(e.target.value)}

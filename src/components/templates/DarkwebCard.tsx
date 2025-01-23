@@ -49,7 +49,7 @@ const DarkwebCard = (props: dtListType) => {
   // html 새 창으로 열기 이벤트
   const ViewHtml = (e: React.MouseEvent<SVGElement, MouseEvent>) => {
     e.stopPropagation()
-    window.open(`${import.meta.env.VITE_STORAGE_URL}/${htmlpath}`, '_blank')
+    window.open(`${import.meta.env.VITE_STORAGE_URL}${htmlpath}`, '_blank')
   }
 
   return (

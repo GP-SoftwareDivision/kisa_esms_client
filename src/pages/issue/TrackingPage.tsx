@@ -69,7 +69,7 @@ const TrackingPage = () => {
   } = useFileDragDrop()
 
   // 엑셀 다운로드
-  const excelDownload = useExcelDownload()
+  const { excelDownload, excelDownloadLoading } = useExcelDownload()
 
   const [seqidx, setSeqidx] = useState<number>(0)
 
@@ -208,7 +208,7 @@ const TrackingPage = () => {
   }
 
   const renderTable = useMemo(() => {
-    if (responseList.isLoading) return <Loading />
+    if (responseList.isLoading || excelDownloadLoading) return <Loading />
     if (!responseList.data) return <Empty />
     if (responseList.isSuccess)
       return (
@@ -230,7 +230,12 @@ const TrackingPage = () => {
           />
         </ContentBox>
       )
-  }, [responseList.data, responseList.isLoading, responseList.isSuccess])
+  }, [
+    responseList.data,
+    responseList.isLoading,
+    responseList.isSuccess,
+    excelDownloadLoading,
+  ])
 
   return (
     <ContentContainer>

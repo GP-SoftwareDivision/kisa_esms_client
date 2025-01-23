@@ -78,7 +78,7 @@ const Telegram = () => {
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
-  const excelDownload = useExcelDownload()
+  const { excelDownload, excelDownloadLoading } = useExcelDownload()
 
   // 조회 조건 저장
   const {
@@ -234,7 +234,7 @@ const Telegram = () => {
       channel,
       contents,
       responseflag,
-      page: page.toString(),
+      page: '1',
       re_contents: `${resetContentsLogic}:${resetContents}`,
       re_channel: `${resetChannelLogic}:${resetChannel}`,
       re_username: `${resetUsernameLogic}:${resetUsername}`,
@@ -274,7 +274,7 @@ const Telegram = () => {
 
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderTelegramList = useMemo(() => {
-    if (ttList.isLoading) return <Loading />
+    if (ttList.isLoading || excelDownloadLoading) return <Loading />
     if (!ttList.data || ttList.data.count === 0) {
       return <Empty />
     }
@@ -314,7 +314,7 @@ const Telegram = () => {
           </Stack>
         </>
       )
-  }, [page, handlePageChange, navigate, ttList.data])
+  }, [page, handlePageChange, navigate, ttList.data, excelDownloadLoading])
 
   return (
     <ContentContainer>
