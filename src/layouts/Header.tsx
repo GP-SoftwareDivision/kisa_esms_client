@@ -31,7 +31,6 @@ const Header = () => {
         )
       }
     },
-    staleTime: 60000,
     gcTime: 10 * 60000, // 10분 동안 캐시 유지
   })
 

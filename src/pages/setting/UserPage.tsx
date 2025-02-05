@@ -82,6 +82,7 @@ const UserPage = () => {
     queryKey: 'userList',
     method: 'POST',
     url: '/api/setting/user',
+    gcTime: 0,
   })
 
   // 추가 시 그룹 리스트
@@ -90,6 +91,7 @@ const UserPage = () => {
     method: 'POST',
     url: '/api/setting/user/groups',
     enabled: userList.isSuccess && !!userList.data.data?.length,
+    gcTime: 0,
   })
 
   const columns = [

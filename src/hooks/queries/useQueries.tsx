@@ -10,6 +10,7 @@ interface QueryConfig {
   url: string
   method: 'GET' | 'POST' | 'PUT' | 'DELETE'
   body?: object
+  gcTime?: number
   enabled?: boolean
 }
 
@@ -17,6 +18,7 @@ export function useQueries<TData>({
   queryKey,
   url,
   method,
+  gcTime,
   body,
   enabled,
 }: QueryConfig) {
@@ -62,7 +64,7 @@ export function useQueries<TData>({
       }
     },
     retry: 0,
-    staleTime: 60000,
+    gcTime: gcTime ? gcTime : 10 * 60000,
     enabled: !!queryKey && !!url && !!method && (enabled ?? true), // 기본값 true
   })
 }

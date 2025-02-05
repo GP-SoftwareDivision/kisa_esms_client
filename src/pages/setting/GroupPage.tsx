@@ -61,6 +61,7 @@ const GroupPage = () => {
     queryKey: 'groupList',
     method: 'POST',
     url: '/api/setting/group',
+    gcTime: 0,
   })
 
   // 그룹 추가 액션

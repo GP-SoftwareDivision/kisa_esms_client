@@ -61,7 +61,7 @@ export const useUserAddMutation = () => {
       if (error instanceof AxiosError) {
         const status = error.response?.status
         switch (status) {
-          case 400:
+          case 409:
             notifyError(`중복된 계정입니다. 다시 입력해주세요.`)
             break
           case 401:

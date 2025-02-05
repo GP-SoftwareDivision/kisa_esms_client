@@ -55,6 +55,9 @@ export const useUserUpdateMutation = () => {
       if (error instanceof AxiosError) {
         const status = error.response?.status
         switch (status) {
+          case 409:
+            notifyError(`중복된 계정입니다. 다시 입력해주세요.`)
+            break
           case 401:
             notifyError(
               `세션이 만료되었거나 권한이 없습니다. \n다시 로그인 후 이용해주세요.`
@@ -94,9 +97,6 @@ export const useUserUpdateMutation = () => {
       if (error instanceof AxiosError) {
         const status = error.response?.status
         switch (status) {
-          case 400:
-            notifyError(`중복된 계정입니다. 다시 입력해주세요.`)
-            break
           case 401:
             notifyError(
               `세션이 만료되었거나 권한이 없습니다. \n다시 로그인 후 이용해주세요.`
