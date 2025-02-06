@@ -219,19 +219,19 @@ const DashBoardPage = () => {
                     <ListSubTitle>데이터 수집</ListSubTitle>
                     <CustomList
                       label={'다크웹 해킹 판단 건수'}
-                      value={responseStatus.data?.data.list.darkweb.hacking}
+                      value={responseStatus.data?.data.list.darkweb?.hacking || 0}
                     />
                     <CustomList
                       label={'텔레그램 해킹 판단 건수'}
-                      value={responseStatus.data?.data.list.telegram.hacking}
+                      value={responseStatus.data?.data.list.telegram?.hacking  || 0}
                     />
                     <CustomList
                       label={'다크웹 대응 건수'}
-                      value={responseStatus.data?.data.list.darkweb.response}
+                      value={responseStatus.data?.data.list.darkweb?.response || 0}
                     />
                     <CustomList
                       label={'텔레그램 대응 건수'}
-                      value={responseStatus.data?.data.list.telegram.response}
+                      value={responseStatus.data?.data.list.telegram?.response || 0}
                     />
                     <ListSubTitle>Top 10 채널</ListSubTitle>
                     {responseStatus.data?.data.topChannelList.map((v) => (
