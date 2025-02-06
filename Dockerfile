@@ -19,6 +19,6 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 COPY ./nginx/nginx.template.conf /etc/nginx/conf.d/default.conf.template
 
-EXPOSE 10601
+EXPOSE 80
 
 CMD ["/bin/sh", "-c", "envsubst '$BACKEND_URL' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
