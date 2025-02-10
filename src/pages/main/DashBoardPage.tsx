@@ -61,21 +61,21 @@ interface ResponseListType {
 }
 
 //대응 이력 현황 타입 정의
-interface ResponseStatusType {
-  bar: { label: string; value: number }[]
-  pie: { label: string; value: number }[]
-  list: {
-    darkweb: {
-      hacking: number
-      response: number
+  interface ResponseStatusType {
+    bar: { label: string; value: number }[]
+    pie: { label: string; value: number }[]
+    list: {
+      darkweb: {
+        hacking: number
+        response: number
+      }
+      telegram: {
+        hacking: number
+        response: number
+      }
     }
-    telegram: {
-      hacking: number
-      response: number
-    }
+    topChannelList: { label: string; value: number }[]
   }
-  topChannelList: { label: string; value: number }[]
-}
 
 const DashBoardPage = () => {
   // 조회기간

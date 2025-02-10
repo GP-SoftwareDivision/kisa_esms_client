@@ -20,7 +20,7 @@ const CustomPagination = ({
   return (
     <PaginationRoot
       count={total || 0}
-      pageSize={15}
+      pageSize={10}
       siblingCount={2}
       page={page}
       onPageChange={(e) => handlePageChange(e.page)}
