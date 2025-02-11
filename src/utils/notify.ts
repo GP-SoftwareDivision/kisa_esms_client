@@ -1,26 +1,12 @@
 // 에러 알림
-import { toast } from 'react-toastify'
+import toast from 'react-hot-toast'
 
-export const notifyError = (text: string) =>
-  toast.error(text, {
-    position: 'bottom-center',
-    autoClose: 1500,
-    hideProgressBar: true,
-    closeOnClick: false,
-    pauseOnHover: false,
-    draggable: false,
-    progress: undefined,
-    theme: 'light',
-  })
+export const notifyError = (text: string) => {
+    toast.dismiss()
+    toast.error(text)
+}
 
-export const notifySuccess = (text: string) =>
-  toast.success(text, {
-    position: 'bottom-center',
-    autoClose: 1000,
-    hideProgressBar: true,
-    closeOnClick: false,
-    pauseOnHover: false,
-    draggable: false,
-    progress: undefined,
-    theme: 'light',
-  })
+export const notifySuccess = (text: string) =>{
+    toast.dismiss()
+    toast.success(text)
+}

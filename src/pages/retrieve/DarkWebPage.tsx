@@ -121,7 +121,7 @@ const DarkWebPage = () => {
   // 작성자
   const [writer, setWriter] = useState<string>(queryParams.get('writer') || '')
 
-  // 재검색 제목 shs
+  // 재검색 제목
   const [reTitle, setReTitle] = useState<string>(
     queryParams.get('re_title')?.split(':')[1] || ''
   )
@@ -354,7 +354,7 @@ const DarkWebPage = () => {
         <SelectContainer columns={[1, 2, 3, 4]}>
           <Box>
             <CustomDatePicker
-              label={'수집 기간'}
+              label={'작성 기간'}
               date={date}
               setDate={setDate}
               disabled={isReSearch}
