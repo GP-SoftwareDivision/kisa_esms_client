@@ -52,7 +52,7 @@ export interface ttListType {
   threatflag: string
   threatlog: string
   username: string
-  writetime: string
+  writetimes: string
   regdate: string
 }
 
@@ -298,7 +298,7 @@ const Telegram = () => {
                 threatlog={v.threatlog}
                 username={v.username}
                 title={v.title}
-                writetime={v.writetime}
+                writetime={v.writetimes}
                 regdate={v.regdate}
                 onClick={() => navigate(`detail?id=${v.seqidx}`)}
               />

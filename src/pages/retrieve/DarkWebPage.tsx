@@ -42,7 +42,7 @@ export interface dtListType {
   seqidx: number
   target: string
   keyword: string
-  writetime: string
+  writetimes: string
   url: string
   writer: string
   title: string
@@ -285,7 +285,7 @@ const DarkWebPage = () => {
                 title={v.title}
                 url={v.url}
                 writer={v.writer}
-                writetime={v.writetime}
+                writetime={v.writetimes}
                 target={v.target}
                 regdate={v.regdate}
                 htmlpath={v.htmlpath}
