@@ -32,7 +32,7 @@ const ChannelPage = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
-  const { page, setPage, handlePageChange } = usePagination(
+  const { page, handlePageChange } = usePagination(
     Number(queryParams.get('page')) || 1
   )
   const now = dayjs()
@@ -52,9 +52,8 @@ const ChannelPage = () => {
 
   // 검색 조회 이벤트
   const handleOnSearch = () => {
-    setPage(1)
     const params = new URLSearchParams({
-      page: page.toString(),
+      page: '1',
       channelName: channelName,
     }).toString()
     navigate(`?${params}`)
