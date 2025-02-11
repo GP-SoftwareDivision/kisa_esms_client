@@ -232,6 +232,7 @@ const Telegram = () => {
       threatflag,
       username: writer,
       channel,
+      regex,
       contents,
       responseflag,
       page: '1',
