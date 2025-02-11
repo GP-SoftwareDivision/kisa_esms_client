@@ -104,7 +104,7 @@ const Header = () => {
     // 수집 채널 관리 파라미터
     const ChannelParams = new URLSearchParams({
       page: '1',
-      channelName: '',
+      domain: '',
     }).toString()
 
     if (subItemKey) {

@@ -39,8 +39,8 @@ const ChannelPage = () => {
   const { excelDownload } = useExcelDownload()
 
   // 채널명
-  const [channelName, setChannelName] = useState<string>(
-    queryParams.get('channelName') || ''
+  const [domain, setDomain] = useState<string>(
+    queryParams.get('domain') || ''
   )
 
   const channelList = useQueries<{ data: ServerType[]; count: number }>({
@@ -54,7 +54,7 @@ const ChannelPage = () => {
   const handleOnSearch = () => {
     const params = new URLSearchParams({
       page: '1',
-      channelName: channelName,
+      domain: domain,
     }).toString()
     navigate(`?${params}`)
   }
@@ -122,8 +122,8 @@ const ChannelPage = () => {
             id={'channel'}
             label={'채널명'}
             placeholder={'내용을 입력하세요.'}
-            value={channelName}
-            onChange={(e) => setChannelName(e.target.value)}
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
           />
         </StyledBox>
         <ButtonContainer>
