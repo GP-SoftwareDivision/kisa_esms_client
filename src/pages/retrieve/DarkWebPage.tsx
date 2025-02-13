@@ -27,8 +27,6 @@ import CustomModal from '@/components/elements/Modal.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
 import { notifyError } from '@/utils/notify.ts'
-import { useQuery } from '@tanstack/react-query'
-import instance from '@/apis/instance.ts'
 import { responseOptions, hackingOptions } from '@/data/selectOptions.ts'
 import queryToJson from '@/utils/queryToJson.ts'
 import {
@@ -166,21 +164,15 @@ const DarkWebPage = () => {
   })
 
   // 검색조건 불러오기
-  const searchHistory = useQuery<{
+  const searchHistory = useQueries<{
     data: { searchlog: string; title: string }[]
     message: string
   }>({
-    queryKey: ['searchHistoryList'],
-    queryFn: async () => {
-      try {
-        const response = await instance.post(
-          '/api/manage/search/history/data',
-          { type: 'DT' }
-        )
-        return response.data
-      } catch (error) {
-        console.error(error)
-      }
+    queryKey: 'searchHistoryList',
+    method: 'POST',
+    url: '/api/manage/search/history/data',
+    body: {
+      type: 'DT',
     },
   })
 
@@ -285,7 +277,7 @@ const DarkWebPage = () => {
                 title={v.title}
                 url={v.url}
                 writer={v.writer}
-                writetime={v.writetimes}
+                writetimes={v.writetimes}
                 target={v.target}
                 regdate={v.regdate}
                 htmlpath={v.htmlpath}
@@ -354,7 +346,7 @@ const DarkWebPage = () => {
         <SelectContainer columns={[1, 2, 3, 4]}>
           <Box>
             <CustomDatePicker
-              label={'작성 기간'}
+              label={'작성기간'}
               date={date}
               setDate={setDate}
               disabled={isReSearch}

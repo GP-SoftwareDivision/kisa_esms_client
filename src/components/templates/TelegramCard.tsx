@@ -16,7 +16,7 @@ interface ttListType {
   threatflag: string
   threatlog: string
   username: string
-  writetime: string
+  writetimes: string
   regdate: string
   onClick: () => void
 }
@@ -33,7 +33,7 @@ const TelegramCard = (props: ttListType) => {
     threatflag,
     threatlog,
     username,
-    writetime,
+    writetimes,
     regdate,
     onClick,
   } = props
@@ -48,7 +48,7 @@ const TelegramCard = (props: ttListType) => {
           <StyledNavContainer>
             <StyledCaptionBox>
               <StyledLabel>작성시간</StyledLabel>
-              <Caption text={writetime} type={'blue'} />
+              <Caption text={writetimes} type={'blue'} />
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>작성자</StyledLabel>

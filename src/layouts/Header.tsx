@@ -1,13 +1,11 @@
 import dayjs from 'dayjs'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
 import styled from '@emotion/styled'
 
-import instance from '../apis/instance.ts'
 import menu from '@/data/menu.json'
 import NavBar from '@/components/elements/NavBar.tsx'
 import { mq } from '@/utils/mediaQueries.ts'
-import { notifyError } from '@/utils/notify.ts'
+import { useQueries } from '@/hooks/queries/useQueries.tsx'
 
 interface UserInfoType {
   name: string
@@ -18,20 +16,12 @@ const Header = () => {
   const navigate = useNavigate()
 
   // 유저 정보
-  const accountInfo = useQuery<{ data: UserInfoType }>({
-    queryKey: ['account'],
-    queryFn: async () => {
-      try {
-        const response = await instance.post('/api/loginInfo')
-        return response.data
-      } catch (error) {
-        console.error(error)
-        notifyError(
-          `세션이 만료되었거나 권한이 없습니다. \n다시 로그인 후 이용해주세요.`
-        )
-      }
-    },
-    gcTime: 10 * 60000, // 10분 동안 캐시 유지
+  const accountInfo = useQueries<{ data: UserInfoType }>({
+    queryKey: 'account',
+    url: '/api/loginInfo',
+    method: 'POST',
+    staleTime: 5 * 60 * 1000, // 5분
+    gcTime: 10 * 60 * 1000, // 10분
   })
 
   const onSubMenuSelect = (subItemKey: string | null) => {

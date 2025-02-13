@@ -96,6 +96,8 @@ const UserPage = () => {
     queryKey: 'userList',
     method: 'POST',
     url: '/api/setting/user',
+    gcTime: 0,
+    staleTime: 0,
   })
 
   const columns = [
