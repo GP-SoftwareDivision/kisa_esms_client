@@ -25,6 +25,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import Empty from '@/components/elements/Empty.tsx'
 import { Loading } from '@/components/elements/Loading.tsx'
 import { useSearchSaveMutation } from '@/hooks/mutations/useSearchSaveMutation.tsx'
+import { useQuery } from '@tanstack/react-query'
+import instance from '@/apis/instance.ts'
 import CustomModal from '@/components/elements/Modal.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
@@ -170,16 +172,24 @@ const Telegram = () => {
   })
 
   // 검색조건 불러오기
-  const searchHistory = useQueries<{
+  const searchHistory = useQuery<{
     data: { searchlog: string; title: string }[]
     message: string
   }>({
-    queryKey: 'searchHistoryList',
-    method: 'POST',
-    url: '/api/manage/search/history/data',
-    body: {
-      type: 'TT',
+    queryKey: ['searchHistoryList'],
+    queryFn: async () => {
+      try {
+        const response = await instance.post(
+          '/api/manage/search/history/data',
+          { type: 'TT' }
+        )
+        return response.data
+      } catch (error) {
+        console.error(error)
+      }
     },
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
   })
 
   // 불러오기 후 적용 클릭 이벤트
@@ -358,7 +368,7 @@ const Telegram = () => {
         <SelectContainer columns={[1, 2, 3, 4]}>
           <Box>
             <CustomDatePicker
-              label={'작성기간'}
+              label={'작성 기간'}
               date={date}
               setDate={setDate}
               disabled={isReSearch}
