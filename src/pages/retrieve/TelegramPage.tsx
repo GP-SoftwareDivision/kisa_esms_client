@@ -188,7 +188,6 @@ const Telegram = () => {
         console.error(error)
       }
     },
-    staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
   })
 
@@ -368,7 +367,7 @@ const Telegram = () => {
         <SelectContainer columns={[1, 2, 3, 4]}>
           <Box>
             <CustomDatePicker
-              label={'작성 기간'}
+              label={'작성기간'}
               date={date}
               setDate={setDate}
               disabled={isReSearch}

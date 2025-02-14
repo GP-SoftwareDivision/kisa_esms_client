@@ -50,7 +50,7 @@ const CustomSelect = memo(
         defaultValue={!multiple ? [''] : undefined}
         flexDirection={'row'}
         alignItems={'center'}
-        value={value ? isMultipleVal(value) : undefined}
+        value={value ? isMultipleVal(value) : ['']}
         onValueChange={onChange}
       >
         {label && (

@@ -310,8 +310,8 @@ const TrackingFormPage = () => {
         const firstInstitution = detail?.institutions[0]
         updateState('SET_TARGET_TYPE', firstInstitution?.targetType ?? '')
         updateState('SET_INSTITUTION', firstInstitution?.institution ?? '')
-        updateState('SET_REPORT_FLAG', firstInstitution?.reportFlag ?? ' ')
-        updateState('SET_SUPPORT_FLAG', firstInstitution?.supportFlag ?? ' ')
+        updateState('SET_REPORT_FLAG', firstInstitution?.reportFlag ?? '')
+        updateState('SET_SUPPORT_FLAG', firstInstitution?.supportFlag ?? '')
         updateState('SET_REASON', firstInstitution?.reason ?? '')
         updateState('SET_INCIDENT_ID', firstInstitution?.incidentId ?? '')
       }
@@ -409,6 +409,24 @@ const TrackingFormPage = () => {
       </List>
     )
   }
+
+  // 피해 대상 신고 여부에 따른 종속된 상태 초기화 처리 및 거부 사유 기타 취소로 인한 초기화
+  useEffect(() => {
+    if (state.reportFlag === 'Y') {
+      updateState('SET_REASON', '')
+      updateState('SET_REASON_ETC', '')
+    }
+
+    if (state.reportFlag === 'N') {
+      updateState('SET_INCIDENT_ID', '')
+      updateState('SET_SUPPORT_FLAG', '')
+    }
+
+    if (state.reason !== '기타') {
+      updateState('SET_REASON_ETC', '')
+    }
+  }, [state.reportFlag, state.reason])
+
   return (
     <ContentContainer>
       <PageTitle text={'국내 정보 유출 이력 대응'} />
@@ -567,24 +585,20 @@ const TrackingFormPage = () => {
                               updateState('SET_INSTITUTION', victim.institution)
                               updateState(
                                 'SET_REPORT_FLAG',
-                                victim.reportFlag ?? ' '
+                                victim.reportFlag ?? ''
                               )
                               updateState('SET_INCIDENT_ID', victim.incidentId)
                               updateState(
                                 'SET_SUPPORT_FLAG',
-                                victim.supportFlag ?? ' '
+                                victim.supportFlag ?? ''
                               )
                               updateState(
                                 'SET_REASON',
-                                victim.reason
-                                  ? victim.reason.split(':')[0]
-                                  : ' '
+                                victim.reason ? victim.reason.split(':')[0] : ''
                               )
                               updateState(
                                 'SET_REASON_ETC',
-                                victim.reason
-                                  ? victim.reason.split(':')[1]
-                                  : ' '
+                                victim.reason ? victim.reason.split(':')[1] : ''
                               )
                             }}
                           >
@@ -816,6 +830,7 @@ const TrackingFormPage = () => {
                   '공공',
                   '교육',
                   '금융',
+                  '의료',
                   '국방',
                   '민간',
                   '개보위',

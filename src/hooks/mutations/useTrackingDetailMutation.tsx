@@ -310,10 +310,10 @@ export const useTrackingDetailMutation = () => {
 
     updateState('SET_TARGET_TYPE', '')
     updateState('SET_INSTITUTION', '')
-    updateState('SET_REPORT_FLAG', ' ')
+    updateState('SET_REPORT_FLAG', '')
     updateState('SET_INCIDENT_ID', '')
-    updateState('SET_SUPPORT_FLAG', ' ')
-    updateState('SET_REASON', ' ')
+    updateState('SET_SUPPORT_FLAG', '')
+    updateState('SET_REASON', '')
     updateState('SET_REASON_ETC', '')
   }
 

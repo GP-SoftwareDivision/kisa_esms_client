@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import styled from '@emotion/styled'
 import { Box, Flex } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
@@ -142,11 +142,9 @@ const DamageTargetPage = () => {
       header: '신고여부',
       accessorKey: 'reportFlag',
       cell: ({ row }: any) =>
-        row.original?.reportFlag === 'Y' ? (
-          <span>신고</span>
-        ) : (
-          <span>미신고</span>
-        ),
+        row.original?.reportFlag ? (
+          <span>{row.original.reportFlag === 'Y' ? '신고' : '미신고'}</span>
+        ) : null,
     },
     {
       header: '사고번호',
@@ -156,11 +154,9 @@ const DamageTargetPage = () => {
       header: '기술지원여부',
       accessorKey: 'supportFlag',
       cell: ({ row }: any) =>
-        row.original?.supportFlag === 'Y' ? (
-          <span>동의</span>
-        ) : (
-          <span>미동의</span>
-        ),
+        row.original?.supportFlag ? (
+          <span>{row.original.supportFlag === 'Y' ? '동의' : '미동의'}</span>
+        ) : null,
     },
     {
       header: '거부사유',
@@ -176,7 +172,6 @@ const DamageTargetPage = () => {
             type={'outline'}
             text={'이동'}
             onClick={() => {
-              console.log(row.original)
               navigate(`/issue/tracking/detail?seqidx=${row.original.issueIdx}`)
             }}
           />
@@ -194,7 +189,10 @@ const DamageTargetPage = () => {
             text={'수정'}
             onClick={() => {
               openUpdateDamageTarget()
-              setUpdateData(row.original)
+              setUpdateData({
+                ...row.original,
+                reason_etc: row.original.reason.split(':')[1] ?? '',
+              })
             }}
           />
         </TableButtonWrapper>
@@ -224,6 +222,22 @@ const DamageTargetPage = () => {
         </>
       )
   }, [damageTargetList.data, excelDownloadLoading])
+
+  // 신고 여부에 따른 종속된 상태 초기화 처리 및 거부 사유 기타 취소로 인한 초기화
+  useEffect(() => {
+    if (updateData.reportFlag === 'Y') {
+      setUpdateData((prev) => ({ ...prev, reason: '' }))
+      setUpdateData((prev) => ({ ...prev, reason_etc: '' }))
+    }
+    if (updateData.reportFlag === 'N') {
+      setUpdateData((prev) => ({ ...prev, incidentId: '' }))
+      setUpdateData((prev) => ({ ...prev, supportFlag: '' }))
+    }
+
+    if (!updateData.reason.includes('기타')) {
+      setUpdateData((prev) => ({ ...prev, reason_etc: '' }))
+    }
+  }, [updateData.reportFlag, updateData.reason])
 
   return (
     <ContentContainer>
@@ -363,6 +377,7 @@ const DamageTargetPage = () => {
                 placeholder={'사고번호를 입력하세요.'}
                 onChange={handleOnUpdateText}
                 required
+                disabled={updateData.reportFlag === 'N'}
               />
               <CustomSelect
                 label={'기술지원'}
@@ -375,15 +390,44 @@ const DamageTargetPage = () => {
                   handleUpdateOption('supportFlag', item.value.join(','))
                 }
                 required
+                disabled={updateData.reportFlag === 'N'}
               />
-              <CustomInput
-                id='update_reason'
-                value={updateData.reason || ''}
-                label='거부사유'
-                placeholder={'거부사유를 입력하세요.'}
-                onChange={handleOnUpdateText}
+              <CustomSelect
+                label={'거부사유'}
+                value={
+                  !updateData.reason.split(':')[1] ? updateData.reason : '기타'
+                }
+                options={[
+                  {
+                    value: '피해기업 확인불가',
+                    label: '피해기업 확인불가',
+                  },
+                  { value: '신뢰불가', label: '신뢰불가' },
+                  {
+                    value: '무응답',
+                    label: '무응답',
+                  },
+                  { value: '데이터불일치', label: '데이터불일치' },
+                  { value: '휴폐업', label: '휴폐업' },
+                  { value: '이관', label: '이관' },
+                  { value: '기타', label: '기타' },
+                ]}
+                onChange={(item: { items: any; value: string[] }) =>
+                  handleUpdateOption('reason', item.value.join(','))
+                }
                 required
+                disabled={updateData.reportFlag === 'Y'}
               />
+              {updateData.reason.includes('기타') && (
+                <CustomInput
+                  id='update_reason_etc'
+                  value={updateData.reason_etc || ''}
+                  label='기타사유'
+                  placeholder={'기타 사유를 입력하세요.'}
+                  onChange={handleOnUpdateText}
+                  required
+                />
+              )}
             </Flex>
             <ButtonWrapper>
               <CustomButton
