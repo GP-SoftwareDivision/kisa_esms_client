@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useMemo, useState } from 'react'
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { Box, SimpleGrid, Stack, HStack } from '@chakra-ui/react'
 import { InputGroup } from '@/components/ui/input-group'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -306,6 +312,13 @@ const DarkWebPage = () => {
       )
   }, [page, navigate, dtList, excelDownloadLoading])
 
+  useEffect(() => {
+    const tmpHistory = searchHistory.data?.data.find(
+      (history) => history.searchlog === location.search.split('?')[1]
+    )?.searchlog
+    if (tmpHistory) setSavedSearchCondition(tmpHistory)
+  }, [location.search])
+
   return (
     <ContentContainer>
       <PageTitle
@@ -328,11 +341,7 @@ const DarkWebPage = () => {
         <StyledLoad>
           <CustomSelect
             label={'불러오기'}
-            value={
-              searchHistory.data?.data.find(
-                (history) => history.searchlog === location.search.split('?')[1]
-              )?.searchlog || ''
-            }
+            value={savedSearchCondition || ''}
             options={
               searchHistory.isSuccess &&
               searchHistory.data?.message !== 'nodata'

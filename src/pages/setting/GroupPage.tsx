@@ -15,6 +15,7 @@ import { usePagination } from '@/hooks/common/usePagination.tsx'
 import { useGroupAddMutation } from '@/hooks/mutations/useGroupAddMutation.tsx'
 import { useGroupUpdateMutation } from '@/hooks/mutations/useGroupUpdateMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
+import { useState } from 'react'
 
 // 테이블 전체 리스트 타입
 interface GroupType {
@@ -32,17 +33,13 @@ interface GroupType {
 const GroupPage = () => {
   const { page, handlePageChange } = usePagination(1)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
+  const [kakaoFlag, setKakaoFlag] = useState<string>('')
+  const [emailFlag, setEmailFlag] = useState<string>('')
+  const [useFlag, setUseFlag] = useState<string>('')
 
   // 그룹 추가 hooks
-  const {
-    insertGroup,
-    insertGroupOpen,
-    openInsertGroup,
-    closeInsertGroup,
-    setUseFlag,
-    setEmailFlag,
-    setKakaoFlag,
-  } = useGroupAddMutation()
+  const { insertGroup, insertGroupOpen, openInsertGroup, closeInsertGroup } =
+    useGroupAddMutation()
 
   // 그룹 수정 hooks
   const {
@@ -67,13 +64,26 @@ const GroupPage = () => {
   // 그룹 추가 액션
   const handleInsertGroupAction = () => {
     const { groupname, comment } = fields
-    insertGroup.mutate({ groupname, comment })
+    insertGroup.mutate({
+      groupname,
+      comment,
+      kakaoflag: kakaoFlag,
+      useflag: useFlag,
+      emailflag: emailFlag,
+    })
+    handleOnCleanForm()
+    setEmailFlag('')
+    setUseFlag('')
+    setKakaoFlag('')
   }
 
   // 그룹 추가 취소 액션
   const handleOnCancelAction = () => {
     closeInsertGroup()
     handleOnCleanForm()
+    setEmailFlag('')
+    setUseFlag('')
+    setKakaoFlag('')
   }
 
   const columns = [
@@ -167,6 +177,7 @@ const GroupPage = () => {
               />
               <CustomSelect
                 label={'사용'}
+                value={useFlag}
                 options={[
                   { value: 'Y', label: '사용' },
                   { value: 'N', label: '미사용' },
@@ -178,6 +189,7 @@ const GroupPage = () => {
               />
               <CustomSelect
                 label={'카카오톡'}
+                value={kakaoFlag}
                 options={[
                   { value: 'Y', label: '발송' },
                   { value: 'N', label: '미발송' },
@@ -189,6 +201,7 @@ const GroupPage = () => {
               />
               <CustomSelect
                 label={'이메일'}
+                value={emailFlag}
                 options={[
                   { value: 'Y', label: '발송' },
                   { value: 'N', label: '미발송' },

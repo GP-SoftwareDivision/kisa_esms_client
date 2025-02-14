@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useMemo, useState } from 'react'
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { Box, HStack, SimpleGrid } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -273,7 +279,6 @@ const Telegram = () => {
     handleOnCleanForm()
     handleOnAddSearchCancel()
   }
-
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderTelegramList = useMemo(() => {
     if (ttList.isLoading || excelDownloadLoading) return <Loading />
@@ -318,6 +323,13 @@ const Telegram = () => {
       )
   }, [page, handlePageChange, navigate, ttList.data, excelDownloadLoading])
 
+  useEffect(() => {
+    const tmpHistory = searchHistory.data?.data.find(
+      (history) => history.searchlog === location.search.split('?')[1]
+    )?.searchlog
+    if (tmpHistory) setSavedSearchCondition(tmpHistory)
+  }, [location.search])
+
   return (
     <ContentContainer>
       <PageTitle
@@ -340,11 +352,7 @@ const Telegram = () => {
         <StyledLoad>
           <CustomSelect
             label={'불러오기'}
-            value={
-              searchHistory.data?.data.find(
-                (history) => history.searchlog === location.search.split('?')[1]
-              )?.searchlog || ''
-            }
+            value={savedSearchCondition || ''}
             options={
               searchHistory.isSuccess &&
               searchHistory.data?.message !== 'nodata'

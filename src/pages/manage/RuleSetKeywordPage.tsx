@@ -58,7 +58,7 @@ const RuleSetKeywordPage = () => {
   } = useRulesetUpdateMutation()
 
   const ruleList = useQueries<{ data: JudgmentListType[]; count: number }>({
-    queryKey: `judgmentList`,
+    queryKey: `ruleList`,
     method: 'POST',
     url: '/api/manage/rule',
     body: {
@@ -147,15 +147,20 @@ const RuleSetKeywordPage = () => {
   ]
 
   // 판단 키워드 추가 액션
-  const handleInsertKeywordAction = () => {
+  const handleInsertRuleAction = () => {
     const { rule } = fields
     insertRuleset.mutate({ rule, apitype, hackingflag })
+    handleOnCleanForm()
+    setApitype('')
+    setHackingflag('')
   }
 
   // 판단 키워드 추가 취소 액션
   const handleOnCancelAction = () => {
     closeInsertRuleset()
     handleOnCleanForm()
+    setApitype('')
+    setHackingflag('')
   }
 
   return (
@@ -218,6 +223,7 @@ const RuleSetKeywordPage = () => {
               />
               <CustomSelect
                 label={'타입'}
+                value={apitype}
                 options={[
                   { value: 'DT', label: '다크웹' },
                   { value: 'TT', label: '텔레그램' },
@@ -229,6 +235,7 @@ const RuleSetKeywordPage = () => {
               />
               <CustomSelect
                 label={'해킹여부'}
+                value={hackingflag}
                 options={[
                   { value: 'Y', label: '해킹' },
                   { value: 'N', label: '미해킹' },
@@ -248,7 +255,7 @@ const RuleSetKeywordPage = () => {
               <CustomButton
                 type='primary'
                 text='추가'
-                onClick={handleInsertKeywordAction}
+                onClick={handleInsertRuleAction}
               />
             </ButtonWrapper>
           </ModalContents>

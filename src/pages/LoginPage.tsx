@@ -177,6 +177,7 @@ const LoginPage = () => {
                 <Box fontSize={'sm'}>
                   <VerificationBox>
                     <VerificationInput
+                      autoFocus
                       type='number'
                       value={authNum}
                       onChange={(e) => setAuthNum(e.target.value)}
