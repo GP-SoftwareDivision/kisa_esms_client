@@ -7,7 +7,8 @@ import {
   ContentContainer,
   SelectContainer,
 } from '@/assets/styles/global.ts'
-import { Box } from '@chakra-ui/react'
+import { Box, Flex } from '@chakra-ui/react'
+import dayjs from 'dayjs'
 
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
@@ -18,15 +19,12 @@ import Button from '@/components/elements/Button.tsx'
 import CustomInput from '@/components/elements/Input.tsx'
 import queryToJson from '@/utils/queryToJson.ts'
 import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
-import dayjs from 'dayjs'
-
-interface ServerType {
-  ip: string
-  count: number
-  apitype: string
-  lastcrawl: string
-  servername: string
-}
+import CustomModal from '@/components/elements/Modal.tsx'
+import CustomButton from '@/components/elements/Button.tsx'
+import {
+  ChannelRowType,
+  useChannelUpdateMutation,
+} from '@/hooks/mutations/useChaanelUpdateMutation.tsx'
 
 const ChannelPage = () => {
   const navigate = useNavigate()
@@ -38,12 +36,21 @@ const ChannelPage = () => {
   const now = dayjs()
   const { excelDownload } = useExcelDownload()
 
-  // 채널명
-  const [domain, setDomain] = useState<string>(
-    queryParams.get('domain') || ''
-  )
+  // 채널 관리 수정 훅
+  const {
+    updateChannel,
+    openUpdateChannel,
+    closeUpdateChannel,
+    updateChannelOpen,
+    updateData,
+    setUpdateData,
+    handleOnUpdateText,
+  } = useChannelUpdateMutation()
 
-  const channelList = useQueries<{ data: ServerType[]; count: number }>({
+  // 채널명
+  const [domain, setDomain] = useState<string>(queryParams.get('domain') || '')
+
+  const channelList = useQueries<{ data: ChannelRowType[]; count: number }>({
     queryKey: `channelList`,
     method: 'POST',
     url: '/api/manage/channel/list',
@@ -57,6 +64,11 @@ const ChannelPage = () => {
       domain: domain,
     }).toString()
     navigate(`?${params}`)
+  }
+
+  // 채널 수정 취소 액션
+  const handleOnCancelAction = () => {
+    closeUpdateChannel()
   }
 
   const DomainColumns = [
@@ -75,14 +87,14 @@ const ChannelPage = () => {
     {
       header: '구분',
       accessorKey: 'channelType',
-      cell: ({ row }: any) =>
-        row.original?.channelType === 'DT' ? (
-          <span>다크웹</span>
-        ) : row.original?.channelType === 'TT' ? (
-          <span>텔레그램</span>
-        ) : (
-          ''
-        ),
+      // cell: ({ row }: any) =>
+      //   row.original?.channelType === 'DT' ? (
+      //     <span>다크웹</span>
+      //   ) : row.original?.channelType === 'TT' ? (
+      //     <span>텔레그램</span>
+      //   ) : (
+      //     ''
+      //   ),
     },
     {
       header: '채널명',
@@ -95,6 +107,23 @@ const ChannelPage = () => {
     {
       header: '비고',
       accessorKey: 'comment',
+    },
+    {
+      header: '',
+      accessorKey: '수정',
+      id: 'update',
+      cell: ({ row }: any) => (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Button
+            type={'secondary'}
+            text={'수정'}
+            onClick={() => {
+              openUpdateChannel()
+              setUpdateData(row.original)
+            }}
+          />
+        </div>
+      ),
     },
   ]
 
@@ -119,8 +148,8 @@ const ChannelPage = () => {
       <SelectContainer columns={[1, 2]}>
         <StyledBox>
           <CustomInput
-            id={'channel'}
-            label={'채널명'}
+            id={'domain'}
+            label={'사이트(도메인)'}
             placeholder={'내용을 입력하세요.'}
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
@@ -150,6 +179,59 @@ const ChannelPage = () => {
           </>
         )}
       </ContentBox>
+
+      {/*수집 채널 관리 수정 모달*/}
+      <CustomModal
+        isOpen={updateChannelOpen}
+        title='수집 채널 수정'
+        onCancel={closeUpdateChannel}
+        content={
+          <ModalContents>
+            <Flex direction='column' gap={4} padding={4}>
+              <CustomInput
+                id='channelType'
+                value={updateData.channelType || ''}
+                label='채널구분'
+                placeholder={'내용을 입력하세요.'}
+                onChange={handleOnUpdateText}
+              />
+              <CustomInput
+                id='channelName'
+                value={updateData.channelName || ''}
+                label='채널명'
+                placeholder={'내용을 입력하세요.'}
+                onChange={handleOnUpdateText}
+              />
+              <CustomInput
+                id='hackGroup'
+                value={updateData.hackGroup || ''}
+                label='채널구분'
+                placeholder={'내용을 입력하세요.'}
+                onChange={handleOnUpdateText}
+              />
+              <CustomInput
+                id='comment'
+                value={updateData.comment || ''}
+                label='비고'
+                placeholder={'내용을 입력하세요.'}
+                onChange={handleOnUpdateText}
+              />
+            </Flex>
+            <ButtonWrapper>
+              <CustomButton
+                type='outline'
+                text='취소'
+                onClick={handleOnCancelAction}
+              />
+              <CustomButton
+                type='primary'
+                text='수정'
+                onClick={updateChannel.mutate}
+              />
+            </ButtonWrapper>
+          </ModalContents>
+        }
+      />
     </ContentContainer>
   )
 }
@@ -159,4 +241,17 @@ const StyledBox = styled(Box)`
   input {
     max-width: 15rem;
   }
+`
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+  gap: 10px;
+`
+
+const ModalContents = styled.div`
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `
