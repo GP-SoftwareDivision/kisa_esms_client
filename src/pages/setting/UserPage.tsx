@@ -181,9 +181,9 @@ const UserPage = () => {
   ]
 
   // 사용자 추가 액션
-  const handleInsertUserAction = () => {
+  const handleInsertUserAction = async () => {
     const { name, email, id, password, passwordConfirm, phonenum } = fields
-    insertUser.mutate({
+    await insertUser.mutate({
       name,
       email,
       id,
@@ -191,6 +191,7 @@ const UserPage = () => {
       passwordConfirm,
       phonenum: phonenum && formatPhoneNumber(phonenum),
     })
+    handleOnCleanForm()
   }
 
   // 사용자 추가 취소 액션

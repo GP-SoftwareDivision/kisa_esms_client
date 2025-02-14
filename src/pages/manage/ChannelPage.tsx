@@ -205,7 +205,7 @@ const ChannelPage = () => {
               <CustomInput
                 id='hackGroup'
                 value={updateData.hackGroup || ''}
-                label='채널구분'
+                label='해커그룹'
                 placeholder={'내용을 입력하세요.'}
                 onChange={handleOnUpdateText}
               />
