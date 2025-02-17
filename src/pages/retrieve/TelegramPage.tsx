@@ -170,6 +170,7 @@ const Telegram = () => {
       queryParams.get('re_username') !== '&&:'
   )
 
+  //localhost:5173/retrieve/telegram?startdate=2024-12-07&enddate=2025-01-06&threatflag=Y&username=&channel=Viking&contents=&responseflag=&page=1&regex=&re_contents=&re_channel=&re_username=
   // 텔레그램 데이터 조회 API
   const ttList = useQueries<{ data: ttListType[]; count: number }>({
     queryKey: `ttList`,
@@ -239,9 +240,9 @@ const Telegram = () => {
       threatflag,
       username: writer,
       channel,
-      regex,
       contents,
       responseflag,
+      regex,
       page: '1',
       re_contents: `${resetContentsLogic}:${resetContents}`,
       re_channel: `${resetChannelLogic}:${resetChannel}`,
@@ -250,7 +251,7 @@ const Telegram = () => {
     navigate(`?${params}`)
   }
 
-  // 조회조건 저장
+  // 조회 조건 저장
   const handleOnAddSearchAction = () => {
     if (!fields.searchName) {
       notifyError('저장명을 입력해주세요')
@@ -267,8 +268,8 @@ const Telegram = () => {
         channel,
         contents,
         responseflag,
-        page: '1',
         regex,
+        page: '1',
         re_contents: `${reContentsLogic}:${reContents}`,
         re_channel: `${reChannelLogic}:${reChannel}`,
         re_username: `${reUsernameLogic}:${reUsername}`,
@@ -279,6 +280,15 @@ const Telegram = () => {
     handleOnCleanForm()
     handleOnAddSearchCancel()
   }
+
+  // 조회 조건 불러오기 set
+  useEffect(() => {
+    const tmpHistory = searchHistory.data?.data.find(
+      (history) => history.searchlog === location.search.split('?')[1]
+    )?.searchlog
+    if (tmpHistory) setSavedSearchCondition(tmpHistory)
+  }, [searchHistory.data, location.search])
+
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderTelegramList = useMemo(() => {
     if (ttList.isLoading || excelDownloadLoading) return <Loading />
@@ -322,13 +332,6 @@ const Telegram = () => {
         </>
       )
   }, [page, handlePageChange, navigate, ttList.data, excelDownloadLoading])
-
-  useEffect(() => {
-    const tmpHistory = searchHistory.data?.data.find(
-      (history) => history.searchlog === location.search.split('?')[1]
-    )?.searchlog
-    if (tmpHistory) setSavedSearchCondition(tmpHistory)
-  }, [location.search])
 
   return (
     <ContentContainer>

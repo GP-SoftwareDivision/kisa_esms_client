@@ -312,12 +312,13 @@ const DarkWebPage = () => {
       )
   }, [page, navigate, dtList, excelDownloadLoading])
 
+  // 조회 조건 불러오기 set
   useEffect(() => {
     const tmpHistory = searchHistory.data?.data.find(
       (history) => history.searchlog === location.search.split('?')[1]
     )?.searchlog
     if (tmpHistory) setSavedSearchCondition(tmpHistory)
-  }, [location.search])
+  }, [searchHistory.data, location.search])
 
   return (
     <ContentContainer>
