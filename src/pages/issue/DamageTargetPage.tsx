@@ -349,6 +349,7 @@ const DamageTargetPage = () => {
                 onChange={(item: { items: any; value: string[] }) =>
                   handleUpdateOption('targetType', item.value.join(','))
                 }
+                required
               />
               <CustomInput
                 id='update_institution'
@@ -368,7 +369,6 @@ const DamageTargetPage = () => {
                 onChange={(item: { items: any; value: string[] }) =>
                   handleUpdateOption('reportFlag', item.value.join(','))
                 }
-                required
               />
               <CustomInput
                 id='update_incidentId'
@@ -376,7 +376,6 @@ const DamageTargetPage = () => {
                 label='사고번호'
                 placeholder={'사고번호를 입력하세요.'}
                 onChange={handleOnUpdateText}
-                required
                 disabled={updateData.reportFlag === 'N'}
               />
               <CustomSelect
@@ -389,7 +388,6 @@ const DamageTargetPage = () => {
                 onChange={(item: { items: any; value: string[] }) =>
                   handleUpdateOption('supportFlag', item.value.join(','))
                 }
-                required
                 disabled={updateData.reportFlag === 'N'}
               />
               <CustomSelect
@@ -415,7 +413,6 @@ const DamageTargetPage = () => {
                 onChange={(item: { items: any; value: string[] }) =>
                   handleUpdateOption('reason', item.value.join(','))
                 }
-                required
                 disabled={updateData.reportFlag === 'Y'}
               />
               {updateData.reason.includes('기타') && (
@@ -425,7 +422,6 @@ const DamageTargetPage = () => {
                   label='기타사유'
                   placeholder={'기타 사유를 입력하세요.'}
                   onChange={handleOnUpdateText}
-                  required
                 />
               )}
             </Flex>

@@ -246,7 +246,10 @@ export const useTrackingDetailMutation = () => {
         ...data,
         indFlag: data.indFlag.includes('개인') ? 'Y' : 'N',
       }
+
+      // 기본 필수 정보 유효성 체크
       if (
+        data.indFlag.length === 0 ||
         data.registrationDate === '' ||
         data.incidentType.length === 0 ||
         data.channelId === '' ||
@@ -256,6 +259,13 @@ export const useTrackingDetailMutation = () => {
         notifyError('필수 사항을 모두 입력해주세요')
         throw new Error()
       }
+
+      // 대상구분 개인 외 일 때 필수 정보 유효성 검사
+      if (data.indFlag.includes('개인 외') && victims.length === 0) {
+        notifyError('피해 대상을 생성해주세요')
+        throw new Error()
+      }
+
       const response = await instance.post('/api/issue/history/upsert', request)
       return response.data
     },
