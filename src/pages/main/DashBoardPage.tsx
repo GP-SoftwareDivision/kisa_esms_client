@@ -9,7 +9,7 @@ import Pie from '@/components/charts/Pie.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomList from '@/components/charts/List.tsx'
 import CustomDatePicker from '@/components/elements/DatePicker.tsx'
-import { targetOptions } from '@/data/selectOptions.ts'
+import { targetIncludeIndOptions } from '@/data/selectOptions.ts'
 import { Loading } from '@/components/elements/Loading.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import Empty from '@/components/elements/Empty.tsx'
@@ -61,21 +61,21 @@ interface ResponseListType {
 }
 
 //대응 이력 현황 타입 정의
-  interface ResponseStatusType {
-    bar: { label: string; value: number }[]
-    pie: { label: string; value: number }[]
-    list: {
-      darkweb: {
-        hacking: number
-        response: number
-      }
-      telegram: {
-        hacking: number
-        response: number
-      }
+interface ResponseStatusType {
+  bar: { label: string; value: number }[]
+  pie: { label: string; value: number }[]
+  list: {
+    darkweb: {
+      hacking: number
+      response: number
     }
-    topChannelList: { label: string; value: number }[]
+    telegram: {
+      hacking: number
+      response: number
+    }
   }
+  topChannelList: { label: string; value: number }[]
+}
 
 const DashBoardPage = () => {
   // 조회기간
@@ -122,7 +122,7 @@ const DashBoardPage = () => {
       header: '대상구분',
       accessorKey: 'targetType',
       cell: ({ row }: any) => {
-        const matching = targetOptions
+        const matching = targetIncludeIndOptions
           .filter((item) =>
             row.original.targetType.split('/').includes(item.value)
           )
@@ -219,19 +219,27 @@ const DashBoardPage = () => {
                     <ListSubTitle>데이터 수집</ListSubTitle>
                     <CustomList
                       label={'다크웹 해킹 판단 건수'}
-                      value={responseStatus.data?.data.list.darkweb?.hacking || 0}
+                      value={
+                        responseStatus.data?.data.list.darkweb?.hacking || 0
+                      }
                     />
                     <CustomList
                       label={'텔레그램 해킹 판단 건수'}
-                      value={responseStatus.data?.data.list.telegram?.hacking  || 0}
+                      value={
+                        responseStatus.data?.data.list.telegram?.hacking || 0
+                      }
                     />
                     <CustomList
                       label={'다크웹 대응 건수'}
-                      value={responseStatus.data?.data.list.darkweb?.response || 0}
+                      value={
+                        responseStatus.data?.data.list.darkweb?.response || 0
+                      }
                     />
                     <CustomList
                       label={'텔레그램 대응 건수'}
-                      value={responseStatus.data?.data.list.telegram?.response || 0}
+                      value={
+                        responseStatus.data?.data.list.telegram?.response || 0
+                      }
                     />
                     <ListSubTitle>Top 10 채널</ListSubTitle>
                     {responseStatus.data?.data.topChannelList.map((v) => (

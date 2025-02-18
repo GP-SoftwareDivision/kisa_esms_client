@@ -25,7 +25,7 @@ import CustomModal from '@/components/elements/Modal.tsx'
 import useUploadMutation from '@/hooks/mutations/useUploadMutation.tsx'
 import { CloseButton } from '@/components/ui/close-button.tsx'
 import useFileDragDrop from '@/hooks/common/useFileDragDrop.tsx'
-import { targetOptions } from '@/data/selectOptions.ts'
+import { targetIncludeIndOptions } from '@/data/selectOptions.ts'
 import { Loading } from '@/components/elements/Loading.tsx'
 import Empty from '@/components/elements/Empty.tsx'
 import queryToJson from '@/utils/queryToJson.ts'
@@ -128,7 +128,15 @@ const TrackingPage = () => {
       header: '대상구분',
       accessorKey: 'targetType',
       cell: ({ row }: any) => {
-        const matching = targetOptions
+        console.log('row', row)
+        // row.original.targetType.split('/')
+      },
+    },
+    {
+      header: '피해대상',
+      accessorKey: 'targetType',
+      cell: ({ row }: any) => {
+        const matching = targetIncludeIndOptions
           .filter((item) =>
             row.original.targetType.split('/').includes(item.value)
           )
@@ -267,8 +275,8 @@ const TrackingPage = () => {
         </Box>
         <Box>
           <CustomSelect
-            label={'대상구분'}
-            options={[{ value: '', label: '전체' }, ...targetOptions]}
+            label={'피해대상'}
+            options={[{ value: '', label: '전체' }, ...targetIncludeIndOptions]}
             value={searchConditions.targetType}
             onChange={(item: { items: any; value: string[] }) =>
               updateSearchCondition(

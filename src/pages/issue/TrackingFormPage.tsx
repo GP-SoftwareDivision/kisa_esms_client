@@ -267,6 +267,7 @@ const TrackingFormPage = () => {
     updateState('SET_SOURCE_TYPE', detail?.sourceType ?? '')
   }, [responseInitDetail.data, responseInitDetail.isSuccess])
 
+  console.log(victims, state.indFlag)
   // 대응 이력 기존에 작성 O
   useEffect(() => {
     if (responseDetail.isSuccess && responseDetail.data?.data) {
@@ -857,6 +858,10 @@ const TrackingFormPage = () => {
               <CustomSelect
                 multiple
                 label={''}
+                onChange={(item: { items: any; value: string[] }) => {
+                  const joinedValue = item.value.filter(Boolean).join(',') // 빈 값 제거
+                  updateState('SET_COL_INFO', joinedValue)
+                }}
                 options={[
                   { value: '주민번호', label: '주민번호' },
                   { value: '운전면허증', label: '운전면허증' },
@@ -880,9 +885,6 @@ const TrackingFormPage = () => {
                   },
                 ]}
                 value={state.colInfo}
-                onChange={(item: { items: any; value: string[] }) =>
-                  updateState('SET_COL_INFO', item.value.join(','))
-                }
               />
             </Td>
             <LabelTd>이미지 유무</LabelTd>
