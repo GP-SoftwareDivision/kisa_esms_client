@@ -11,6 +11,7 @@ interface RulesetMutationType {
   rule: string
   apitype: string
   hackingflag: string
+  depth: number
 }
 
 export const useRulesetAddMutation = () => {

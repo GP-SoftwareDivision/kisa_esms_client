@@ -33,8 +33,14 @@ const RuleSetKeywordPage = () => {
   const { page, handlePageChange } = usePagination(1)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
+  // 추가 해킹 플래그
   const [hackingflag, setHackingflag] = useState<string>('')
+
+  // 추가 타입
   const [apitype, setApitype] = useState<string>('')
+
+  // 추가 범위
+  const [range, setRange] = useState<string>('')
 
   // 키워드 추가 hooks
   const {
@@ -146,21 +152,26 @@ const RuleSetKeywordPage = () => {
     },
   ]
 
+  // 셀렉트 박스 초기화
+  const handleOnCleanSelect = () => {
+    setApitype('')
+    setHackingflag('')
+    setRange('')
+  }
+
   // 판단 키워드 추가 액션
   const handleInsertRuleAction = () => {
     const { rule } = fields
-    insertRuleset.mutate({ rule, apitype, hackingflag })
+    insertRuleset.mutate({ rule, apitype, hackingflag, depth: Number(range) })
     handleOnCleanForm()
-    setApitype('')
-    setHackingflag('')
+    handleOnCleanSelect()
   }
 
   // 판단 키워드 추가 취소 액션
   const handleOnCancelAction = () => {
     closeInsertRuleset()
     handleOnCleanForm()
-    setApitype('')
-    setHackingflag('')
+    handleOnCleanSelect()
   }
 
   return (
@@ -242,6 +253,18 @@ const RuleSetKeywordPage = () => {
                 ]}
                 onChange={(item: { items: any; value: string[] }) =>
                   setHackingflag(item.value.join(','))
+                }
+                required
+              />
+              <CustomSelect
+                label={'범위'}
+                value={range}
+                options={[
+                  { value: '2', label: '본문' },
+                  { value: '3', label: '제목' },
+                ]}
+                onChange={(item: { items: any; value: string[] }) =>
+                  setRange(item.value.join(','))
                 }
                 required
               />

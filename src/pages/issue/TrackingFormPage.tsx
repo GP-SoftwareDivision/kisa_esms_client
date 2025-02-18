@@ -25,6 +25,11 @@ import CustomInput from '@/components/elements/Input.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useChannelAddMutation } from '@/hooks/mutations/useChannelAddMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
+import { useQuery } from '@tanstack/react-query'
+import instance from '@/apis/instance.ts'
+import { AxiosError } from 'axios'
+import { notifyError } from '@/utils/notify.ts'
+import { useNavigate } from 'react-router-dom'
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -201,6 +206,8 @@ export interface responseListType extends insertResponseType {
 
 const TrackingFormPage = () => {
   const queryParams = new URLSearchParams(location.search)
+  const navigate = useNavigate()
+
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
   const {
@@ -222,17 +229,57 @@ const TrackingFormPage = () => {
     insertChannelOpen,
   } = useChannelAddMutation()
 
-  // 이력 대응 상세 조회 API
-  const responseDetail = useQueries<{ data: responseListType }>({
-    queryKey: `responseDetail`,
-    method: 'POST',
-    url: '/api/issue/history/detail',
-    body: {
-      seqidx: Number(queryParams.get('seqidx')),
+  // 이력 대응 상세 조회 API : select 때문에 모듈 사용 X
+  const responseDetail = useQuery({
+    queryKey: ['responseDetail'],
+    queryFn: async () => {
+      try {
+        const response = await instance.post('/api/issue/history/detail', {
+          seqidx: Number(queryParams.get('seqidx')),
+        })
+        return response.data
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          const status = error.response?.status
+          switch (status) {
+            case 400:
+              notifyError(`검색 결과가 없습니다.`)
+              break
+            case 401:
+              notifyError(`세션이 만료되었습니다. 다시 로그인 후 이용해주세요.`)
+              setTimeout(() => {
+                navigate('/login')
+              }, 2000)
+              break
+            case 403:
+              notifyError('페이지에 접근 권한이 없습니다.')
+              setTimeout(() => {
+                navigate(-1)
+              }, 2000)
+              break
+            default:
+              notifyError(
+                `일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`
+              )
+            // navigate('/error')
+          }
+        }
+        throw new AxiosError()
+      }
     },
+    retry: 0,
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     enabled:
       Number(queryParams.get('seqidx')) !== 0 &&
       queryParams.get('type') === null,
+    select: (data: { data: responseListType }) => {
+      const { institutions, ...rest } = data.data
+
+      if (institutions.filter((v) => v.targetType !== 'ind').length === 0) {
+        return { ...rest, institutions: [] }
+      } else return data.data
+    },
   })
 
   // 이력 대응 최초 기입 - 데이터 조회 url 받아오기 위함
@@ -267,11 +314,10 @@ const TrackingFormPage = () => {
     updateState('SET_SOURCE_TYPE', detail?.sourceType ?? '')
   }, [responseInitDetail.data, responseInitDetail.isSuccess])
 
-  console.log(victims, state.indFlag)
   // 대응 이력 기존에 작성 O
   useEffect(() => {
-    if (responseDetail.isSuccess && responseDetail.data?.data) {
-      const detail = responseDetail.data?.data
+    if (responseDetail.isSuccess && responseDetail.data) {
+      const detail = responseDetail.data
       const institutionsLength = detail?.institutions.length || 0
 
       const hasIndFlag = detail?.indFlag.includes('Y')

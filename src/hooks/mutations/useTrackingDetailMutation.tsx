@@ -329,31 +329,31 @@ export const useTrackingDetailMutation = () => {
       state.indFlag.length === 1 && state.indFlag[0] === '개인'
 
     // 대상 구분이 개인 및 개인 외일경우
-    // const includesIndividual = state.indFlag.includes('개인')
+    const includesIndividual = state.indFlag.includes('개인')
 
     if (isOnlyIndividual) {
       setVictims([])
     }
     // 대상구분이 오직 개인일 경우 빈 리스트 추가
-    // if (isOnlyIndividual) {
-    //   setVictims([
-    //     {
-    //       id: 0,
-    //       seqidx: 0,
-    //       registrationDate: state.registrationDate,
-    //       targetType: 'ind',
-    //       institution: '',
-    //       reportFlag: '',
-    //       incidentId: '',
-    //       supportFlag: '',
-    //       reason: '',
-    //     },
-    //   ])
-    // }
+    if (isOnlyIndividual) {
+      setVictims([
+        {
+          id: 0,
+          seqidx: 0,
+          registrationDate: state.registrationDate,
+          targetType: 'ind',
+          institution: '',
+          reportFlag: '',
+          incidentId: '',
+          supportFlag: '',
+          reason: '',
+        },
+      ])
+    }
 
     // 대상구분이 개인 및 개인 외 둘 다일 경우 빈 리스트 필요 없음
-    // else if (includesIndividual)
-    //   setVictims((prev) => prev.filter((v) => v.id !== 0))
+    else if (includesIndividual)
+      setVictims((prev) => prev.filter((v) => v.id !== 0))
   }, [state])
 
   return {

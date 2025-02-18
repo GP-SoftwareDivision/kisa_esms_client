@@ -124,14 +124,14 @@ const TrackingPage = () => {
       header: '등록일시',
       accessorKey: 'registrationDate',
     },
-    {
-      header: '대상구분',
-      accessorKey: 'targetType',
-      cell: ({ row }: any) => {
-        console.log('row', row)
-        // row.original.targetType.split('/')
-      },
-    },
+    // {
+    //   header: '대상구분',
+    //   accessorKey: 'targetType',
+    //   cell: ({ row }: any) => {
+    //     console.log('row', row)
+    //     // row.original.targetType.split('/')
+    //   },
+    // },
     {
       header: '피해대상',
       accessorKey: 'targetType',
@@ -184,7 +184,7 @@ const TrackingPage = () => {
     },
   ]
 
-  // 파일 업로드
+  // 파일 업로드 시작
   const accountUpload = async () => {
     await startUpload()
     try {
