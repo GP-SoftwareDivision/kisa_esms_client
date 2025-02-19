@@ -118,7 +118,9 @@ const Telegram = () => {
   )
 
   // 작성자
-  const [writer, setWriter] = useState<string>(queryParams.get('writer') || '')
+  const [username, setUserName] = useState<string>(
+    queryParams.get('username') || ''
+  )
 
   // 대화방
   const [channel, setChannel] = useState<string>(
@@ -170,7 +172,6 @@ const Telegram = () => {
       queryParams.get('re_username') !== '&&:'
   )
 
-  //localhost:5173/retrieve/telegram?startdate=2024-12-07&enddate=2025-01-06&threatflag=Y&username=&channel=Viking&contents=&responseflag=&page=1&regex=&re_contents=&re_channel=&re_username=
   // 텔레그램 데이터 조회 API
   const ttList = useQueries<{ data: ttListType[]; count: number }>({
     queryKey: `ttList`,
@@ -208,18 +209,20 @@ const Telegram = () => {
       })
       setThreatFlag(jsonSavedData.threatflag as string)
       setResponseFlag(jsonSavedData.responseflag as string)
-      setWriter(jsonSavedData.writer as string)
+      setUserName(jsonSavedData.username as string)
       setChannel(jsonSavedData.channel as string)
       setContents(jsonSavedData.contents as string)
-      setReContents(jsonSavedData.re_contents as string)
-      setReChannel(jsonSavedData.re_channel as string)
-      setReUsername(jsonSavedData.re_username as string)
+
+      setReContents((jsonSavedData.re_contents as string).split(':')[1])
+      setReChannel((jsonSavedData.re_channel as string).split(':')[1])
+      setReUsername((jsonSavedData.re_username as string).split(':')[1])
+
       setRegex(jsonSavedData.regex as string)
 
       setIsReSearch(
-        jsonSavedData.re_contents !== '' ||
-          jsonSavedData.re_channel !== '' ||
-          jsonSavedData.re_username !== ''
+        (jsonSavedData.re_contents as string).split(':')[1] !== '' ||
+          (jsonSavedData.re_channel as string).split(':')[1] !== '' ||
+          (jsonSavedData.re_username as string).split(':')[1] !== ''
       )
     }
   }
@@ -238,7 +241,7 @@ const Telegram = () => {
       startdate: date.startdate,
       enddate: date.enddate,
       threatflag,
-      username: writer,
+      username,
       channel,
       contents,
       responseflag,
@@ -264,7 +267,7 @@ const Telegram = () => {
         startdate: date.startdate,
         enddate: date.enddate,
         threatflag,
-        username: writer,
+        username,
         channel,
         contents,
         responseflag,
@@ -408,11 +411,11 @@ const Telegram = () => {
           </Box>
           <Box>
             <CustomInput
-              id={'writer'}
+              id={'username'}
               label={'작성자'}
               placeholder={'내용을 입력하세요.'}
-              value={writer}
-              onChange={(e) => setWriter(e.target.value)}
+              value={username}
+              onChange={(e) => setUserName(e.target.value)}
               disabled={isReSearch}
             />
           </Box>

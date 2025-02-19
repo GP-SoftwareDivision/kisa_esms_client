@@ -47,6 +47,11 @@ export const useDamageTargetUpdateMutation = () => {
       req.reason = reason_etc ? `${req.reason}:${reason_etc}` : req.reason
       req.supportFlag = req.supportFlag ?? ''
 
+      if (!req.institution) {
+        notifyError('필수 항목을 모두 입력해주세요.')
+        throw new Error()
+      }
+
       const response = await instance.post('/api/issue/victims/update', req)
       return response.data
     },

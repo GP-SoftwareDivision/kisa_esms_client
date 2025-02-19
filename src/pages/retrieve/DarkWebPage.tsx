@@ -260,13 +260,14 @@ const DarkWebPage = () => {
       setResponseFlag(jsonSavedData.responseflag as string)
       setTitle(jsonSavedData.title as string)
       setWriter(jsonSavedData.writer as string)
-      setReTitle(jsonSavedData.re_title as string)
       setKeyword(jsonSavedData.keyword as string)
-      setReKeyword(jsonSavedData.re_keyword as string)
+      setReTitle((jsonSavedData.re_title as string).split(':')[1])
+      setReKeyword((jsonSavedData.re_keyword as string).split(':')[1])
       setUrl(jsonSavedData.url as string)
       setRegex(jsonSavedData.regex as string)
       setIsReSearch(
-        jsonSavedData.re_title !== '' || jsonSavedData.re_keyword !== ''
+        (jsonSavedData.re_title as string).split(':')[1] !== '' ||
+          (jsonSavedData.re_keyword as string).split(':')[1] !== ''
       )
     }
   }
@@ -317,6 +318,7 @@ const DarkWebPage = () => {
     const tmpHistory = searchHistory.data?.data.find(
       (history) => history.searchlog === location.search.split('?')[1]
     )?.searchlog
+
     if (tmpHistory) setSavedSearchCondition(tmpHistory)
   }, [searchHistory.data, location.search])
 

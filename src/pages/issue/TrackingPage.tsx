@@ -33,6 +33,7 @@ import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import { updateSearchCondition } from '@/utils/stateHandlers.ts'
 import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
 import dayjs from 'dayjs'
+import { useQueryClient } from '@tanstack/react-query'
 
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
@@ -50,6 +51,7 @@ interface ResponseListType {
 const TrackingPage = () => {
   const now = dayjs()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const queryParams = new URLSearchParams(location.search)
   const { page, setPage, handlePageChange } = usePagination(
     Number(queryParams.get('page')) || 1
@@ -206,6 +208,9 @@ const TrackingPage = () => {
               '파일 업로드가 완료되었습니다.\n 검증 소요 시간은 수분 이상 걸릴 수 있으며, 결과는 유출정보관리에서 확인 바랍니다.'
             )
             closeInsertUpload()
+            await queryClient?.invalidateQueries({
+              queryKey: ['detectionList'],
+            })
           }
         }
       }

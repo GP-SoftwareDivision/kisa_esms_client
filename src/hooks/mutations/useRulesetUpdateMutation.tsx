@@ -6,6 +6,7 @@ import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import useModal from '@/hooks/common/useModal.tsx'
 import { ChangeEvent, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { hasEmptyValue } from '@/utils/hasEmptyValue.ts'
 
 // 테이블 개별 리스트 타입
 interface RulesetRowType {
@@ -33,13 +34,14 @@ export const useRulesetUpdateMutation = () => {
   const updateRuleset = useMutation({
     mutationKey: ['updateRuleset'],
     mutationFn: async () => {
-      const request = {
-        seqidx: updateData.seqidx,
-        apitype: updateData.type,
-        rule: updateData.rule,
-        useflag: updateData.useflag,
-        hackingflag: updateData.hackingflag,
+      const isRequestValid = hasEmptyValue(updateData)
+      if (isRequestValid) {
+        notifyError('모든 항목을 전부 입력해주세요.')
+        throw new Error()
       }
+      const { type, ...rest } = updateData
+      const request = { apitype: type, ...rest }
+
       const response = await instance.post('/api/manage/rule/update', request)
       return response.data
     },
