@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { convertXlsxToCsv, getFileName } from '@/utils/fileHelpers.ts'
+// import { convertXlsxToCsv, getFileName } from '@/utils/fileHelpers.ts'
 import { notifyError } from '@/utils/notify.ts'
 
 const useFileDragDrop = () => {
@@ -9,7 +9,8 @@ const useFileDragDrop = () => {
 
   const dragFile = useCallback((Files: any) => {
     const drag_file = Files[0]
-    const name = getFileName(drag_file.name)
+    // const name = getFileName(drag_file.name)
+    const name = drag_file.name
     const fileName = drag_file.name.split('.')
     const fileExtension = fileName[fileName.length - 1].toLowerCase()
     const isCorrectType = ['xlsx', 'csv', 'txt'].includes(fileExtension)
@@ -31,15 +32,18 @@ const useFileDragDrop = () => {
       notifyError('파일을 선택해주세요.')
       return false
     }
-    const type = uploadFile.name.split('.').pop()
-    const csvFile = await convertXlsxToCsv(uploadFile)
-    if (type === 'xlsx')
-      formData.append(
-        'file',
-        new Blob([csvFile], { type: 'text/csv' }),
-        `${uploadFileName}`
-      )
-    else formData.append('file', uploadFile, `${uploadFileName}`)
+    // const type = uploadFile.name.split('.').pop()
+    // const csvFile = await convertXlsxToCsv(uploadFile)
+
+    // if (type === 'xlsx')
+    //   formData.append(
+    //     'file',
+    //     new Blob([csvFile], { type: 'text/csv' }),
+    //     `${uploadFileName}`
+    //   )
+    // else
+
+    formData.append('file', uploadFile, `${uploadFileName}`)
   }
 
   // 업로드 취소
@@ -51,6 +55,8 @@ const useFileDragDrop = () => {
 
   return {
     uploadFile,
+    setUploadFile,
+    setUploadFileName,
     uploadFileName,
     dragFile,
     formData,

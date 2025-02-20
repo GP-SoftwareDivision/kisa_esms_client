@@ -64,6 +64,8 @@ const TrackingPage = () => {
   const {
     uploadFile,
     uploadFileName,
+    setUploadFile,
+    setUploadFileName,
     formData,
     dragFile,
     startUpload,
@@ -189,29 +191,40 @@ const TrackingPage = () => {
   // 파일 업로드 시작
   const accountUpload = async () => {
     await startUpload()
+    console.log('formData 상태 확인:', formData) // formData 값 확인
+
+    if (
+      !formData ||
+      !(formData instanceof FormData) ||
+      formData.entries().next().done
+    ) {
+      notifyError('파일을 선택해주세요')
+      return
+    }
+
     try {
-      if (formData) {
-        const uploadResponse = await instance.post('/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          withCredentials: true,
-        })
-        if (uploadResponse.status === 200) {
-          const response = await instance.post(
-            `/api/issue/detection/file/upload`,
-            {
-              seqidx,
-              filename: uploadFile?.name,
-            }
-          )
-          if (response.status === 200) {
-            notifySuccess(
-              '파일 업로드가 완료되었습니다.\n 검증 소요 시간은 수분 이상 걸릴 수 있으며, 결과는 유출정보관리에서 확인 바랍니다.'
-            )
-            closeInsertUpload()
-            await queryClient?.invalidateQueries({
-              queryKey: ['detectionList'],
-            })
+      const uploadResponse = await instance.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true,
+      })
+      if (uploadResponse.status === 200) {
+        const response = await instance.post(
+          `/api/issue/detection/file/upload`,
+          {
+            seqidx,
+            filename: uploadFile?.name,
           }
+        )
+        if (response.status === 200) {
+          notifySuccess(
+            '파일 업로드가 완료되었습니다.\n 검증 소요 시간은 수분 이상 걸릴 수 있으며, 결과는 유출정보관리에서 확인 바랍니다.'
+          )
+          closeInsertUpload()
+          await queryClient?.invalidateQueries({
+            queryKey: ['detectionList'],
+          })
+          setUploadFile(null)
+          setUploadFileName(null)
         }
       }
     } catch (error) {
@@ -479,7 +492,7 @@ const StyledButton = styled.button`
 `
 
 const ModalContents = styled.div`
-  padding: 16px;
+  //padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -492,7 +505,7 @@ const UploadContainer = styled.div`
 `
 
 const StyledFileUpload = styled.div`
-  width: 100%;
+  width: 78%;
   display: flex;
   border-width: 1px;
   border-style: solid;
@@ -503,6 +516,10 @@ const StyledFileUpload = styled.div`
 
   p {
     ${({ theme }) => theme.typography.body2};
+    overflow: hidden;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 `
 
