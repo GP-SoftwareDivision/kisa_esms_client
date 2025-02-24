@@ -1,13 +1,16 @@
 import ReactApexChart from 'react-apexcharts'
 import { ApexOptions } from 'apexcharts'
+import { CustomSkeleton } from '@/components/elements/Skeleton.tsx'
+import Empty from '@/components/elements/Empty.tsx'
 
 interface PieProps {
-  series: number[]
-  categories: string[]
+  series: number[] | undefined
+  categories: string[] | undefined
+  loading: boolean
 }
 
 const Pie = (props: PieProps) => {
-  const { series, categories } = props
+  const { series, categories, loading } = props
 
   const options: ApexOptions = {
     chart: {
@@ -56,6 +59,17 @@ const Pie = (props: PieProps) => {
     },
   }
 
+  // 로딩 중일 때
+  if (loading)
+    return (
+      <>
+        <CustomSkeleton lines={1} height={100} />
+        <CustomSkeleton lines={4} height={5} />
+      </>
+    )
+
+  // 데이터 존재하지 않을때
+  if (series?.every((num) => num === 0)) return <Empty />
   return (
     <ReactApexChart
       options={options}

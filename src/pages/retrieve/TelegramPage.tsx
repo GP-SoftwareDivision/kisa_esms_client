@@ -143,14 +143,14 @@ const Telegram = () => {
   )
 
   // 재검색 대화방
-  const [reChannel, setReChannel] = useState<string>(
-    queryParams.get('re_channel')?.split(':')[1] || ''
-  )
-
-  // 재검색 대화방 논리연산자
-  const [reChannelLogic, setReChannelLogic] = useState<string>(
-    queryParams.get('re_channel')?.split(':')[0] || '&&'
-  )
+  // const [reChannel, setReChannel] = useState<string>(
+  //   queryParams.get('re_channel')?.split(':')[1] || ''
+  // )
+  //
+  // // 재검색 대화방 논리연산자
+  // const [reChannelLogic, setReChannelLogic] = useState<string>(
+  //   queryParams.get('re_channel')?.split(':')[0] || '&&'
+  // )
 
   // 재검색 작성자
   const [reUsername, setReUsername] = useState<string>(
@@ -214,7 +214,7 @@ const Telegram = () => {
       setContents(jsonSavedData.contents as string)
 
       setReContents((jsonSavedData.re_contents as string).split(':')[1])
-      setReChannel((jsonSavedData.re_channel as string).split(':')[1])
+      // setReChannel((jsonSavedData.re_channel as string).split(':')[1])
       setReUsername((jsonSavedData.re_username as string).split(':')[1])
 
       setRegex(jsonSavedData.regex as string)
@@ -232,8 +232,8 @@ const Telegram = () => {
     setPage(1)
     const resetContents = !isReSearch ? '' : reContents
     const resetContentsLogic = !isReSearch ? '&&' : reContentsLogic
-    const resetChannel = !isReSearch ? '' : reChannel
-    const resetChannelLogic = !isReSearch ? '&&' : reChannelLogic
+    // const resetChannel = !isReSearch ? '' : reChannel
+    // const resetChannelLogic = !isReSearch ? '&&' : reChannelLogic
     const resetUsername = !isReSearch ? '' : reUsername
     const resetUsernameLogic = !isReSearch ? '&&' : reUsernameLogic
 
@@ -248,7 +248,7 @@ const Telegram = () => {
       regex,
       page: '1',
       re_contents: `${resetContentsLogic}:${resetContents}`,
-      re_channel: `${resetChannelLogic}:${resetChannel}`,
+      // re_channel: `${resetChannelLogic}:${resetChannel}`,
       re_username: `${resetUsernameLogic}:${resetUsername}`,
     }).toString()
     navigate(`?${params}`)
@@ -274,7 +274,7 @@ const Telegram = () => {
         regex,
         page: '1',
         re_contents: `${reContentsLogic}:${reContents}`,
-        re_channel: `${reChannelLogic}:${reChannel}`,
+        // re_channel: `${reChannelLogic}:${reChannel}`,
         re_username: `${reUsernameLogic}:${reUsername}`,
       }).toString(),
       title: fields.searchName,
@@ -422,7 +422,7 @@ const Telegram = () => {
           <Box>
             <CustomInput
               id={'channel'}
-              label={'대화방'}
+              label={'채널 URL'}
               placeholder={'내용을 입력하세요.'}
               value={channel}
               onChange={(e) => setChannel(e.target.value)}
@@ -500,27 +500,26 @@ const Telegram = () => {
                   />
                 </InputGroup>
               </HStack>
-
-              <HStack gap='10' width='full'>
-                <InputGroup
-                  flex='1'
-                  endElement={
-                    <RenderLogicalSelect
-                      value={reChannelLogic}
-                      setValue={setReChannelLogic}
-                    />
-                  }
-                >
-                  <CustomInput
-                    id={'channel'}
-                    label={'대화방'}
-                    placeholder={'내용을 입력하세요.'}
-                    value={reChannel}
-                    onChange={(e) => setReChannel(e.target.value)}
-                    tooltip={`여러 값을 입력하려면 쉼표( , )로 구분하세요.`}
-                  />
-                </InputGroup>
-              </HStack>
+              {/*<HStack gap='10' width='full'>*/}
+              {/*  <InputGroup*/}
+              {/*    flex='1'*/}
+              {/*    endElement={*/}
+              {/*      <RenderLogicalSelect*/}
+              {/*        value={reChannelLogic}*/}
+              {/*        setValue={setReChannelLogic}*/}
+              {/*      />*/}
+              {/*    }*/}
+              {/*  >*/}
+              {/*    <CustomInput*/}
+              {/*      id={'channel'}*/}
+              {/*      label={'대화방'}*/}
+              {/*      placeholder={'내용을 입력하세요.'}*/}
+              {/*      value={reChannel}*/}
+              {/*      onChange={(e) => setReChannel(e.target.value)}*/}
+              {/*      tooltip={`여러 값을 입력하려면 쉼표( , )로 구분하세요.`}*/}
+              {/*    />*/}
+              {/*  </InputGroup>*/}
+              {/*</HStack>*/}
               <HStack gap='10' width='full'>
                 <InputGroup
                   flex='1'
@@ -541,6 +540,8 @@ const Telegram = () => {
                   />
                 </InputGroup>
               </HStack>
+              <Box></Box>
+
               <Box display={'flex'} justifyContent={'flex-end'}>
                 <Button
                   type={'primary'}

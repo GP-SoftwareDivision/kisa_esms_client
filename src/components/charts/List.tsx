@@ -1,18 +1,25 @@
 import styled from '@emotion/styled'
+import { CustomSkeleton } from '@/components/elements/Skeleton.tsx'
 interface ListType {
   label: string
   value: string | number
   loading?: boolean
 }
 const CustomList = (props: ListType) => {
-  const { label, value } = props
+  const { label, value, loading } = props
 
   return (
     <StyledList>
-      <StyledLabel>{label}</StyledLabel>
-      <StyledValue>
-        <span>{value.toLocaleString()}</span>
-      </StyledValue>
+      {loading ? (
+        <CustomSkeleton loading={loading} lines={1} height={5} />
+      ) : (
+        <>
+          <StyledLabel>{label}</StyledLabel>
+          <StyledValue>
+            <span>{value.toLocaleString()}</span>
+          </StyledValue>
+        </>
+      )}
     </StyledList>
   )
 }

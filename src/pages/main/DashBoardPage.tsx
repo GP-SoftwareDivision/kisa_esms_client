@@ -1,18 +1,21 @@
-import { useMemo, useState } from 'react'
-import dayjs from 'dayjs'
+import { useState } from 'react'
+import dayjs, { type Dayjs } from 'dayjs'
 import styled from '@emotion/styled'
 import { Box, Grid, GridItem, Flex, VStack } from '@chakra-ui/react'
+import ConfigProvider from 'antd/es/config-provider'
+import DatePicker, { type RangePickerProps } from 'antd/es/date-picker'
+import ko_KR from 'antd/es/locale/ko_KR'
+import 'dayjs/locale/ko'
 
 import PageTitle from '@/components/elements/PageTitle.tsx'
 import Bar from '@/components/charts/Bar.tsx'
 import Pie from '@/components/charts/Pie.tsx'
 import CustomTable from '@/components/charts/Table.tsx'
 import CustomList from '@/components/charts/List.tsx'
-import CustomDatePicker from '@/components/elements/DatePicker.tsx'
 import { targetIncludeIndOptions } from '@/data/selectOptions.ts'
-import { Loading } from '@/components/elements/Loading.tsx'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
-import Empty from '@/components/elements/Empty.tsx'
+import Button from '@/components/elements/Button.tsx'
+const { RangePicker } = DatePicker
 
 const ListSubTitle = styled.p`
   padding: 0.3rem 0;
@@ -23,8 +26,10 @@ const ChartBox = styled(Box)`
   border: 1px solid ${({ theme }) => theme.color.gray200};
   border-radius: 4px;
   padding: 12px;
-  display: flex;
-  flex-wrap: wrap;
+  //display: flex;
+  //flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   width: 100%;
   gap: 1rem;
   justify-content: space-between;
@@ -38,6 +43,7 @@ const ListBox = styled(Box)`
   height: -webkit-fill-available;
 `
 const ChartWrapper = styled.div`
+  //width: 45%;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -48,6 +54,11 @@ const ChartWrapper = styled.div`
   }
 `
 
+const StyledCalendarButton = styled.div`
+  display: flex;
+  padding: 0.5rem 0;
+  justify-content: flex-end;
+`
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
   seqidx: number
@@ -78,8 +89,16 @@ interface ResponseStatusType {
 }
 
 const DashBoardPage = () => {
-  // 조회기간
+  const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false)
+
+  // 조회기간 (화면상)
   const [date, setDate] = useState({
+    startdate: dayjs().startOf('year').format('YYYY-MM-DD'),
+    enddate: dayjs().format('YYYY-MM-DD'),
+  })
+
+  // 조회기간 (API REQUEST)
+  const [reqDate, setReqDate] = useState({
     startdate: dayjs().subtract(6, 'M').format('YYYY-MM-DD'),
     enddate: dayjs().format('YYYY-MM-DD'),
   })
@@ -89,7 +108,7 @@ const DashBoardPage = () => {
     queryKey: `responseList`,
     method: 'POST',
     url: `/api/main/dashboard`,
-    body: date,
+    body: reqDate,
   })
 
   // 대응 이력 현황 데이터 조회 API
@@ -100,8 +119,8 @@ const DashBoardPage = () => {
     body: {
       type: 'M',
       page: 1,
-      startdate: date.startdate,
-      enddate: date.enddate,
+      startdate: reqDate.startdate,
+      enddate: reqDate.enddate,
       institution: '',
       channelName: '',
       targetType: '',
@@ -156,135 +175,143 @@ const DashBoardPage = () => {
     },
   ]
 
-  const renderResponseStatus = useMemo(() => {
-    if (responseStatus.isLoading) return <Loading />
+  const rangePresets: RangePickerProps['presets'] = [
+    { label: '최근 7일', value: [dayjs().add(-7, 'd'), dayjs()] },
+    { label: '최근 30일', value: [dayjs().add(-30, 'd'), dayjs()] },
+    { label: '최근 90일', value: [dayjs().add(-90, 'd'), dayjs()] },
+  ]
 
-    return (
-      <>
-        <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap={4}>
-          <GridItem>
-            <Flex direction='column' height='100%'>
-              <PageTitle
-                text={'대응현황'}
-                children={
-                  <div>
-                    <CustomDatePicker
-                      label={''}
-                      date={date}
-                      setDate={setDate}
-                    />
-                  </div>
-                }
-              />
-              {responseStatus.isSuccess && responseStatus.data.data.pie ? (
-                <ChartBox>
-                  <ChartWrapper>
-                    <h3>사고 유형</h3>
-                    <Bar
-                      series={responseStatus.data?.data.bar?.map(
-                        (v) => v.value
-                      )}
-                      categories={responseStatus.data?.data.bar?.map(
-                        (v) => v.label
-                      )}
-                    />
-                  </ChartWrapper>
-                  <ChartWrapper>
-                    <h3>대응 현황</h3>
-                    <Pie
-                      series={responseStatus.data?.data.pie?.map(
-                        (v) => v.value
-                      )}
-                      categories={responseStatus.data?.data.pie?.map(
-                        (v) => v.label
-                      )}
-                    />
-                  </ChartWrapper>
-                </ChartBox>
-              ) : (
-                <Empty />
-              )}
-            </Flex>
-          </GridItem>
-          <GridItem>
-            <Flex direction='column' height='100%' paddingTop={'0.5rem'}>
-              <PageTitle text={'이슈 내역'} />
-              {responseStatus.isSuccess && responseStatus.data.data.list ? (
-                <ListBox>
-                  <VStack
-                    align='stretch'
-                    height='-webkit-fill-available'
-                    gap={'0.3rem'}
-                  >
-                    <ListSubTitle>데이터 수집</ListSubTitle>
-                    <CustomList
-                      label={'다크웹 해킹 판단 건수'}
-                      value={
-                        responseStatus.data?.data.list.darkweb?.hacking || 0
-                      }
-                    />
-                    <CustomList
-                      label={'텔레그램 해킹 판단 건수'}
-                      value={
-                        responseStatus.data?.data.list.telegram?.hacking || 0
-                      }
-                    />
-                    <CustomList
-                      label={'다크웹 대응 건수'}
-                      value={
-                        responseStatus.data?.data.list.darkweb?.response || 0
-                      }
-                    />
-                    <CustomList
-                      label={'텔레그램 대응 건수'}
-                      value={
-                        responseStatus.data?.data.list.telegram?.response || 0
-                      }
-                    />
-                    <ListSubTitle>Top 10 채널</ListSubTitle>
-                    {responseStatus.data?.data.topChannelList.map((v) => (
-                      <CustomList label={v.label} value={v.value} />
-                    ))}
-                  </VStack>
-                </ListBox>
-              ) : (
-                <Empty />
-              )}
-            </Flex>
-          </GridItem>
-        </Grid>
-      </>
-    )
-  }, [responseStatus.isLoading, responseStatus.isSuccess, responseStatus.data])
+  // 기간 선택 체인지 핸들러
+  const onRangeChange = (
+    dates: null | (Dayjs | null)[],
+    dateStrings: string[]
+  ) => {
+    if (dates) {
+      setDate({ startdate: dateStrings[0], enddate: dateStrings[1] })
+    }
+  }
 
-  const renderResponseList = useMemo(() => {
-    if (responseList.isLoading) return <Loading />
-
-    if (responseList.isSuccess)
-      return (
-        <Box mt={4}>
-          <PageTitle text={'대응 이력 현황'} />
-          {responseList.data.data.length > 0 ? (
-            <ChartBox>
-              <CustomTable
-                loading={false}
-                data={responseList.data?.data ? responseList.data?.data : []}
-                columns={responseListColumns}
-                maxHeight={400}
-                detailIdx={'seqidx'}
-              />
-            </ChartBox>
-          ) : (
-            <Empty />
-          )}
-        </Box>
-      )
-  }, [responseList.isLoading, responseList.isSuccess, responseList.data])
+  // 오늘 이후 선택 못하게
+  const disabledDate: RangePickerProps['disabledDate'] = (current) => {
+    return current && current > dayjs().endOf('day')
+  }
 
   return (
     <>
-      {renderResponseStatus}
-      {renderResponseList}
+      <Grid templateColumns={{ base: '1fr', md: '3fr 1fr' }} gap={4}>
+        <GridItem>
+          <Flex direction='column' height='100%'>
+            <PageTitle
+              text={'대응현황'}
+              children={
+                <div>
+                  <ConfigProvider locale={ko_KR}>
+                    <RangePicker
+                      presets={rangePresets}
+                      onChange={onRangeChange}
+                      disabledDate={disabledDate}
+                      value={
+                        date
+                          ? [dayjs(date.startdate), dayjs(date.enddate)]
+                          : [dayjs().subtract(7, 'd'), dayjs()]
+                      }
+                      renderExtraFooter={() => (
+                        <StyledCalendarButton>
+                          <Button
+                            type='primary'
+                            text='적용'
+                            onClick={() => {
+                              setReqDate(date)
+                              setIsCalendarOpen(false)
+                            }} // 🔹 버튼을 눌러야 닫힘
+                          />
+                        </StyledCalendarButton>
+                      )}
+                      open={isCalendarOpen}
+                      onOpenChange={() => setIsCalendarOpen(true)}
+                    />
+                  </ConfigProvider>
+                </div>
+              }
+            />
+            <ChartBox>
+              <ChartWrapper>
+                <h3>사고 유형</h3>
+                <Bar
+                  series={responseStatus.data?.data.bar?.map((v) => v.value)}
+                  categories={responseStatus.data?.data.bar?.map(
+                    (v) => v.label
+                  )}
+                  loading={responseStatus.isLoading}
+                />
+              </ChartWrapper>
+              <ChartWrapper>
+                <h3>대응 현황</h3>
+                <Pie
+                  series={responseStatus.data?.data.pie?.map((v) => v.value)}
+                  categories={responseStatus.data?.data.pie?.map(
+                    (v) => v.label
+                  )}
+                  loading={responseStatus.isLoading}
+                />
+              </ChartWrapper>
+            </ChartBox>
+          </Flex>
+        </GridItem>
+        <GridItem>
+          <Flex direction='column' height='100%' paddingTop={'0.5rem'}>
+            <PageTitle text={'이슈 내역'} />
+            <ListBox>
+              <VStack
+                align='stretch'
+                height='-webkit-fill-available'
+                gap={'0.3rem'}
+              >
+                <ListSubTitle>데이터 수집</ListSubTitle>
+                <CustomList
+                  label={'다크웹 해킹 판단 건수'}
+                  value={responseStatus.data?.data.list.darkweb?.hacking || 0}
+                  loading={responseStatus.isLoading}
+                />
+                <CustomList
+                  label={'텔레그램 해킹 판단 건수'}
+                  value={responseStatus.data?.data.list.telegram?.hacking || 0}
+                  loading={responseStatus.isLoading}
+                />
+                <CustomList
+                  label={'다크웹 대응 건수'}
+                  value={responseStatus.data?.data.list.darkweb?.response || 0}
+                  loading={responseStatus.isLoading}
+                />
+                <CustomList
+                  label={'텔레그램 대응 건수'}
+                  value={responseStatus.data?.data.list.telegram?.response || 0}
+                  loading={responseStatus.isLoading}
+                />
+                <ListSubTitle>Top 10 채널</ListSubTitle>
+                {responseStatus.data?.data.topChannelList.map((v, index) => (
+                  <CustomList
+                    key={index}
+                    label={v.label}
+                    value={v.value}
+                    loading={responseStatus.isLoading}
+                  />
+                ))}
+              </VStack>
+            </ListBox>
+          </Flex>
+        </GridItem>
+      </Grid>
+      <Box mt={4}>
+        <PageTitle text={'대응 이력 현황'} />
+        <CustomTable
+          loading={responseList.isLoading}
+          data={responseList.data?.data ? responseList.data?.data : []}
+          columns={responseListColumns}
+          maxHeight={400}
+          detailIdx={'seqidx'}
+        />
+      </Box>
     </>
   )
 }
