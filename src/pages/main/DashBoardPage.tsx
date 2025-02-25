@@ -99,7 +99,7 @@ const DashBoardPage = () => {
 
   // 조회기간 (API REQUEST)
   const [reqDate, setReqDate] = useState({
-    startdate: dayjs().subtract(6, 'M').format('YYYY-MM-DD'),
+    startdate: dayjs().startOf('year').format('YYYY-MM-DD'),
     enddate: dayjs().format('YYYY-MM-DD'),
   })
 

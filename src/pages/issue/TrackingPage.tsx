@@ -64,12 +64,11 @@ const TrackingPage = () => {
   const {
     uploadFile,
     uploadFileName,
-    setUploadFile,
-    setUploadFileName,
     formData,
     dragFile,
     startUpload,
     abortUpload,
+    cleanUploadState,
   } = useFileDragDrop()
 
   // 엑셀 다운로드
@@ -191,7 +190,6 @@ const TrackingPage = () => {
   // 파일 업로드 시작
   const accountUpload = async () => {
     await startUpload()
-    console.log('formData 상태 확인:', formData) // formData 값 확인
 
     if (
       !formData ||
@@ -202,17 +200,20 @@ const TrackingPage = () => {
       return
     }
 
+    // 서버에 업로드
     try {
       const uploadResponse = await instance.post('/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         withCredentials: true,
       })
+
+      // 업로드가 정상적으로 끝나면 파일 이름만 한 번 더 보냄. 백엔드쪽에서 업로드한 파일을 찾기 위해서임
       if (uploadResponse.status === 200) {
         const response = await instance.post(
           `/api/issue/detection/file/upload`,
           {
             seqidx,
-            filename: uploadFile?.name,
+            filename: uploadFileName,
           }
         )
         if (response.status === 200) {
@@ -223,8 +224,7 @@ const TrackingPage = () => {
           await queryClient?.invalidateQueries({
             queryKey: ['detectionList'],
           })
-          setUploadFile(null)
-          setUploadFileName(null)
+          cleanUploadState()
         }
       }
     } catch (error) {
@@ -257,6 +257,7 @@ const TrackingPage = () => {
         </ContentBox>
       )
   }, [responseList.data, responseList.isLoading, responseList.isSuccess])
+
   return (
     <ContentContainer>
       <PageTitle
@@ -432,7 +433,10 @@ const TrackingPage = () => {
       <CustomModal
         isOpen={insertUploadOpen}
         title='업로드'
-        onCancel={closeInsertUpload}
+        onCancel={() => {
+          closeInsertUpload()
+          cleanUploadState()
+        }}
         content={
           <ModalContents>
             <Flex direction='column' gap={4} padding={4}>
@@ -448,8 +452,8 @@ const TrackingPage = () => {
                       />
                       <StyledFileIcon />
                       <p>
-                        {uploadFileName
-                          ? uploadFileName
+                        {uploadFile
+                          ? uploadFile.name
                           : '업로드할 파일 놓기 또는 파일 선택'}
                       </p>
                       {uploadFile && (

@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx'
 
+// csv의 처리 속도가 빠른 이유로 xlsx => csv로 바꾸는 함수들
 export const convertXlsxToCsv = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -31,12 +32,11 @@ const getExtensionType = (name: string): string | null => {
 }
 
 export const getFileName = (name: string) => {
-  const fileNameParts = name.split('.')
-
-  const fileExtension = fileNameParts.pop() || ''
-  const fileNameWithoutExtension = fileNameParts.join('.')
-
+  // ex) test.xlsx
+  const file = name.split('.')
+  file.pop()
+  const fileName = file.join('')
   const fileType = getExtensionType(name)
-  const sanitizedFileName = fileNameWithoutExtension.replace(/[^\w\s-]/g, '')
-  return `${sanitizedFileName}.${fileType || fileExtension}`
+
+  return `${fileName}.${fileType || file[file.length - 1]}`
 }
