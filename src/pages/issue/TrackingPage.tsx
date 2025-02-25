@@ -234,7 +234,7 @@ const TrackingPage = () => {
   }
 
   const renderTable = useMemo(() => {
-    if (responseList.isLoading || excelDownloadLoading) return <Loading />
+    if (responseList.isLoading) return <Loading />
     if (!responseList.data) return <Empty />
     if (responseList.isSuccess)
       return (
@@ -256,12 +256,7 @@ const TrackingPage = () => {
           />
         </ContentBox>
       )
-  }, [
-    responseList.data,
-    responseList.isLoading,
-    responseList.isSuccess,
-    excelDownloadLoading,
-  ])
+  }, [responseList.data, responseList.isLoading, responseList.isSuccess])
   return (
     <ContentContainer>
       <PageTitle
@@ -427,7 +422,13 @@ const TrackingPage = () => {
           <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
         </ButtonContainer>
       </SelectContainer>
+
+      {/*테이블 렌더링*/}
       {renderTable}
+
+      {/*엑셀 다운로드시 로딩*/}
+      {excelDownloadLoading && <Loading />}
+
       <CustomModal
         isOpen={insertUploadOpen}
         title='업로드'

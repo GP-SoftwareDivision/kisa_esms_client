@@ -273,7 +273,7 @@ const DarkWebPage = () => {
   }
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderDarkwebList = useMemo(() => {
-    if (dtList.isLoading || excelDownloadLoading) return <Loading />
+    if (dtList.isLoading) return <Loading />
     if (!dtList.data || dtList.data.count === 0) return <Empty />
     if (!dtList.data || dtList.data.count > 0)
       return (
@@ -311,7 +311,7 @@ const DarkWebPage = () => {
           />
         </>
       )
-  }, [page, navigate, dtList, excelDownloadLoading])
+  }, [page, navigate, dtList])
 
   // 조회 조건 불러오기 set
   useEffect(() => {
@@ -541,7 +541,13 @@ const DarkWebPage = () => {
           }
         />
       </Stack>
+
+      {/*데이터 렌더링*/}
       {renderDarkwebList}
+
+      {/*엑셀 다운로드시 로딩*/}
+      {excelDownloadLoading && <Loading />}
+
       <CustomModal
         isOpen={insertSearchOpen}
         title='조회 조건 저장'

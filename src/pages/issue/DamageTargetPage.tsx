@@ -27,6 +27,7 @@ import queryToJson from '@/utils/queryToJson.ts'
 import { updateSearchCondition } from '@/utils/stateHandlers.ts'
 import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
 import dayjs from 'dayjs'
+import { Loading } from '@/components/elements/Loading.tsx'
 
 const ButtonWrapper = styled.div`
   display: flex;
@@ -201,7 +202,7 @@ const DamageTargetPage = () => {
   ]
 
   const renderTable = useMemo(() => {
-    if (!damageTargetList.data || excelDownloadLoading) return <Empty />
+    if (!damageTargetList.data) return <Empty />
     if (damageTargetList.isSuccess)
       return (
         <>
@@ -221,7 +222,7 @@ const DamageTargetPage = () => {
           />
         </>
       )
-  }, [damageTargetList.data, excelDownloadLoading])
+  }, [damageTargetList.data])
 
   // 신고 여부에 따른 종속된 상태 초기화 처리 및 거부 사유 기타 취소로 인한 초기화
   useEffect(() => {
@@ -332,7 +333,12 @@ const DamageTargetPage = () => {
           <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
         </ButtonContainer>
       </SelectContainer>
+
+      {/*데이터 렌더링*/}
       <ContentBox>{renderTable}</ContentBox>
+
+      {/*엑셀 다운로드시 로딩*/}
+      {excelDownloadLoading && <Loading />}
 
       {/*판단 키워드 수정 모달*/}
       <CustomModal

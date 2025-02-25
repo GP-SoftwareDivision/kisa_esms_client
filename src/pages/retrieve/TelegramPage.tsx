@@ -294,7 +294,7 @@ const Telegram = () => {
 
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderTelegramList = useMemo(() => {
-    if (ttList.isLoading || excelDownloadLoading) return <Loading />
+    if (ttList.isLoading) return <Loading />
     if (!ttList.data || ttList.data.count === 0) {
       return <Empty />
     }
@@ -334,7 +334,7 @@ const Telegram = () => {
           </Stack>
         </>
       )
-  }, [page, handlePageChange, navigate, ttList.data, excelDownloadLoading])
+  }, [page, handlePageChange, navigate, ttList.data])
 
   return (
     <ContentContainer>
@@ -553,7 +553,13 @@ const Telegram = () => {
           }
         />
       </Stack>
+
+      {/*데이터 렌더링*/}
       {renderTelegramList}
+
+      {/*엑셀 다운로드시 로딩*/}
+      {excelDownloadLoading && <Loading />}
+
       <CustomModal
         isOpen={insertSearchOpen}
         title='조회 조건 저장'
