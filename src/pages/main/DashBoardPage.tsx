@@ -289,7 +289,7 @@ const DashBoardPage = () => {
                   loading={responseStatus.isLoading}
                 />
                 <ListSubTitle>Top 10 채널</ListSubTitle>
-                {responseStatus.data?.data.topChannelList.map((v, index) => (
+                {responseStatus.data?.data?.topChannelList?.map((v, index) => (
                   <CustomList
                     key={index}
                     label={v.label}

@@ -14,11 +14,7 @@ const useFileDragDrop = () => {
     const drag_file = Files[0]
     const name = getFileName(drag_file.name)
 
-    const fileName = drag_file.name.split('.')
-    const fileExtension = fileName[fileName.length - 1].toLowerCase()
-    const isCorrectType = ['xlsx', 'csv', 'txt'].includes(fileExtension)
-
-    if (!isCorrectType) {
+    if (!name) {
       notifyError(
         '지원하는 형식이 아닙니다. xlsx, csv, txt의 파일 형식만 가능합니다.'
       )
