@@ -15,6 +15,8 @@ import CustomList from '@/components/charts/List.tsx'
 import { targetIncludeIndOptions } from '@/data/selectOptions.ts'
 import { useQueries } from '@/hooks/queries/useQueries.tsx'
 import Button from '@/components/elements/Button.tsx'
+import { CustomSkeleton } from '@/components/elements/Skeleton.tsx'
+import Empty from '@/components/elements/Empty.tsx'
 const { RangePicker } = DatePicker
 
 const ListSubTitle = styled.p`
@@ -72,8 +74,7 @@ interface ResponseListType {
 }
 
 //대응 이력 현황 타입 정의
-interface ResponseStatusType {
-  bar: { label: string; value: number }[]
+interface ResponseAll {
   pie: { label: string; value: number }[]
   list: {
     darkweb: {
@@ -85,11 +86,16 @@ interface ResponseStatusType {
       response: number
     }
   }
+  bar: { label: string; value: number }[]
+}
+
+interface ResponseTop10 {
   topChannelList: { label: string; value: number }[]
 }
 
 const DashBoardPage = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false)
+  const dummySkeletons = [...Array(10)]
 
   // 조회기간 (화면상)
   const [date, setDate] = useState({
@@ -103,16 +109,16 @@ const DashBoardPage = () => {
     enddate: dayjs().format('YYYY-MM-DD'),
   })
 
-  //대응 현황 데이터 조회 API
-  const responseStatus = useQueries<{ data: ResponseStatusType }>({
-    queryKey: `responseList`,
+  // 바 차트, 파이 차트 대응 건수
+  const getResponseAll = useQueries<{ data: ResponseAll }>({
+    queryKey: `responseAll`,
     method: 'POST',
-    url: `/api/main/dashboard`,
+    url: `/api/main/dashboard/all`,
     body: reqDate,
   })
 
   // 대응 이력 현황 데이터 조회 API
-  const responseList = useQueries<{ data: ResponseListType[] }>({
+  const getResponseList = useQueries<{ data: ResponseListType[] }>({
     queryKey: `responseList`,
     method: 'POST',
     url: `/api/issue/history`,
@@ -129,6 +135,14 @@ const DashBoardPage = () => {
       apiType: '',
       originType: '',
     },
+  })
+
+  const getResponseTop10 = useQueries<{ data: ResponseTop10 }>({
+    queryKey: `responseTop10`,
+    method: 'POST',
+    url: `/api/main/dashboard/top10`,
+    body: reqDate,
+    enabled: getResponseAll.isSuccess,
   })
 
   // 테이블 컬럼
@@ -238,21 +252,21 @@ const DashBoardPage = () => {
               <ChartWrapper>
                 <h3>사고 유형</h3>
                 <Bar
-                  series={responseStatus.data?.data.bar?.map((v) => v.value)}
-                  categories={responseStatus.data?.data.bar?.map(
+                  series={getResponseAll.data?.data.bar?.map((v) => v.value)}
+                  categories={getResponseAll.data?.data.bar?.map(
                     (v) => v.label
                   )}
-                  loading={responseStatus.isLoading}
+                  loading={getResponseAll.isLoading}
                 />
               </ChartWrapper>
               <ChartWrapper>
                 <h3>대응 현황</h3>
                 <Pie
-                  series={responseStatus.data?.data.pie?.map((v) => v.value)}
-                  categories={responseStatus.data?.data.pie?.map(
+                  series={getResponseAll.data?.data.pie?.map((v) => v.value)}
+                  categories={getResponseAll.data?.data.pie?.map(
                     (v) => v.label
                   )}
-                  loading={responseStatus.isLoading}
+                  loading={getResponseAll.isLoading}
                 />
               </ChartWrapper>
             </ChartBox>
@@ -270,33 +284,41 @@ const DashBoardPage = () => {
                 <ListSubTitle>데이터 수집</ListSubTitle>
                 <CustomList
                   label={'다크웹 해킹 판단 건수'}
-                  value={responseStatus.data?.data.list.darkweb?.hacking || 0}
-                  loading={responseStatus.isLoading}
+                  value={getResponseAll.data?.data.list.darkweb?.hacking || 0}
+                  loading={getResponseAll.isLoading}
                 />
                 <CustomList
                   label={'텔레그램 해킹 판단 건수'}
-                  value={responseStatus.data?.data.list.telegram?.hacking || 0}
-                  loading={responseStatus.isLoading}
+                  value={getResponseAll.data?.data.list.telegram?.hacking || 0}
+                  loading={getResponseAll.isLoading}
                 />
                 <CustomList
                   label={'다크웹 대응 건수'}
-                  value={responseStatus.data?.data.list.darkweb?.response || 0}
-                  loading={responseStatus.isLoading}
+                  value={getResponseAll.data?.data.list.darkweb?.response || 0}
+                  loading={getResponseAll.isLoading}
                 />
                 <CustomList
                   label={'텔레그램 대응 건수'}
-                  value={responseStatus.data?.data.list.telegram?.response || 0}
-                  loading={responseStatus.isLoading}
+                  value={getResponseAll.data?.data.list.telegram?.response || 0}
+                  loading={getResponseAll.isLoading}
                 />
                 <ListSubTitle>Top 10 채널</ListSubTitle>
-                {responseStatus.data?.data?.topChannelList?.map((v, index) => (
-                  <CustomList
-                    key={index}
-                    label={v.label}
-                    value={v.value}
-                    loading={responseStatus.isLoading}
-                  />
-                ))}
+                {getResponseTop10.isSuccess
+                  ? getResponseTop10.data?.data?.topChannelList?.map(
+                      (v, index) => (
+                        <CustomList
+                          key={index}
+                          label={v.label}
+                          value={v.value}
+                        />
+                      )
+                    )
+                  : dummySkeletons.map((index) => (
+                      <CustomSkeleton key={index} lines={1} height={5} />
+                    ))}
+                {getResponseTop10.data?.data.topChannelList.length === 0 && (
+                  <Empty />
+                )}
               </VStack>
             </ListBox>
           </Flex>
@@ -305,8 +327,8 @@ const DashBoardPage = () => {
       <Box mt={4}>
         <PageTitle text={'대응 이력 현황'} />
         <CustomTable
-          loading={responseList.isLoading}
-          data={responseList.data?.data ? responseList.data?.data : []}
+          loading={getResponseList.isLoading}
+          data={getResponseList.data?.data ? getResponseList.data?.data : []}
           columns={responseListColumns}
           maxHeight={400}
           detailIdx={'seqidx'}
