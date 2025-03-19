@@ -29,11 +29,19 @@ const StyledList = styled.div`
   display: flex;
   justify-content: space-between;
 `
-const StyledLabel = styled.div`
-  display: flex;
+const StyledLabel = styled.p`
+  display: -webkit-box;
+  overflow: hidden;
+  white-space: normal;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: keep-all;
+  max-width: 250px;
+  min-width: 50px;
   ${({ theme }) => theme.typography.body3};
 `
-const StyledValue = styled.div`
+const StyledValue = styled.p`
   display: flex;
   ${({ theme }) => theme.typography.body3};
 

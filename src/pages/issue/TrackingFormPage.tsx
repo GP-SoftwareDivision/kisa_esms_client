@@ -207,6 +207,7 @@ export interface responseListType extends insertResponseType {
 const TrackingFormPage = () => {
   const queryParams = new URLSearchParams(location.search)
   const navigate = useNavigate()
+  const id = Number(queryParams.get('seqidx'))
 
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
@@ -231,11 +232,11 @@ const TrackingFormPage = () => {
 
   // 이력 대응 상세 조회 API : select 때문에 모듈 사용 X
   const responseDetail = useQuery({
-    queryKey: ['responseDetail'],
+    queryKey: ['responseDetail', id],
     queryFn: async () => {
       try {
         const response = await instance.post('/api/issue/history/detail', {
-          seqidx: Number(queryParams.get('seqidx')),
+          seqidx: id,
         })
         return response.data
       } catch (error) {
