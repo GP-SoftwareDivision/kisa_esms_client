@@ -19,7 +19,7 @@
 
 ```bash
 1. 프로젝트 클론
- git clone git@gitlab.com:kisa_dev/kisa_dahsboard.git
+ git clone git@github.com:GP-SoftwareDivision/kisa_esms_client.git
 
 2.패키지 설치
 yarn install
