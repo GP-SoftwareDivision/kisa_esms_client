@@ -1,11 +1,11 @@
+
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { AxiosError } from 'axios'
 import { useMutation } from '@tanstack/react-query'
 
+import { useAuthMutation } from './useAuthMutation'
 import instance from '@/apis/instance.ts'
-import useModal from '@/hooks/common/useModal.tsx'
-import useTimer from '@/hooks/common/useTimer.tsx'
 import { notifyError } from '@/utils/notify.ts'
 
 interface LoginMutationType {
@@ -16,21 +16,17 @@ interface LoginMutationType {
 export const useLoginMutation = () => {
   const navigate = useNavigate()
   const [phoneNum, setPhoneNum] = useState<string>('')
-  const { timeLeft, startTimer, resetTimer } = useTimer(180)
-  const { openModal, closeModal, isOpen } = useModal()
+  const { checkAuth } = useAuthMutation()
 
   // 로그인 취소
   const handleOnCancel = () => {
-    closeModal('login')
     setPhoneNum('')
-    resetTimer()
   }
 
   // 로그인 API 통신
   const login = useMutation({
     mutationKey: ['login'],
     mutationFn: async (data: LoginMutationType) => {
-      resetTimer()
       const response = await instance.post('/api/login/selectMember', data)
       return response.data
     },
@@ -49,15 +45,13 @@ export const useLoginMutation = () => {
       }
     },
     onSuccess: (response) => {
-      setPhoneNum(response.data.phonenum)
-      openModal('login')
-      startTimer()
+      const { phonenum, code } = response.data
+      checkAuth.mutate({ phonenum: phonenum, authnum: code }) // 인증번호 체크
     },
   })
   const logout = useMutation({
     mutationKey: ['logout'],
     mutationFn: async () => {
-      resetTimer()
       const response = await instance.delete('/auth')
       return response.data
     },
@@ -73,8 +67,6 @@ export const useLoginMutation = () => {
   return {
     login,
     phoneNum,
-    timeLeft,
-    isOpen: isOpen('login'),
     handleOnCancel,
     logout,
   }

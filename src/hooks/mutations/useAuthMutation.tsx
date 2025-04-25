@@ -1,4 +1,4 @@
-import { useState } from 'react'
+
 import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
@@ -7,24 +7,20 @@ import instance from '@/apis/instance.ts'
 import { notifyError } from '@/utils/notify.ts'
 
 interface AuthMutationType {
-  phoneNum: string
+  phonenum: string
+  authnum: string
 }
 
 export const useAuthMutation = () => {
   const navigate = useNavigate()
-  const [authNum, setAuthNum] = useState<string>('')
 
   // 인번호 체크 API 통신
   const checkAuth = useMutation({
     mutationKey: ['checkAuth'],
     mutationFn: async (data: AuthMutationType) => {
-      if (!authNum) {
-        notifyError('인증번호를 입력해주세요.')
-        return
-      }
       const response = await instance.post('/auth', {
-        phonenum: data.phoneNum,
-        authnum: authNum,
+        phonenum: data.phonenum,
+        authnum: data.authnum,
       })
       return response.data
     },
@@ -51,8 +47,9 @@ export const useAuthMutation = () => {
       }
     },
     onSuccess: () => {
+      console.log('인증번호 체크 성공')
       navigate('/main/dashboard')
     },
   })
-  return { checkAuth, authNum, setAuthNum }
+  return { checkAuth }
 }

@@ -1,13 +1,8 @@
 import React, { FormEvent } from 'react'
-import { Flex, Box, Grid } from '@chakra-ui/react'
 import styled from '@emotion/styled'
 
-import CustomModal from '@/components/elements/Modal.tsx'
-import CustomButton from '@/components/elements/Button.tsx'
-import { useAuthMutation } from '@/hooks/mutations/useAuthMutation.tsx'
 import { useLoginMutation } from '@/hooks/mutations/useLoginMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
-import { FormatTimer } from '@/utils/formatTimer.ts'
 
 const LoginContainer = styled.div`
   background-image: url('/background.png');
@@ -61,52 +56,8 @@ const StyledButton = styled.button`
   ${({ theme }) => theme.typography.body2};
 `
 
-const ModalContents = styled.div`
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`
-
-const ModalDescription = styled.p`
-  font-size: 0.825rem;
-  padding: 0 8px;
-`
-
-const VerificationBox = styled.div`
-  display: flex;
-  gap: 5px;
-`
-
-const VerificationInput = styled.input`
-  outline: none;
-  max-width: 100px;
-  border: 1px solid #c7c7c7;
-  padding-left: 4px;
-`
-
-const VerificationButton = styled.button`
-  background-color: #061f5c;
-  color: #fff;
-  border: none;
-  margin-left: 15px;
-  border-radius: 2px;
-  font-size: 0.725rem;
-  cursor: pointer;
-  padding: 4px;
-`
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-`
-
 const LoginPage = () => {
-  const { login, phoneNum, timeLeft, isOpen, handleOnCancel } =
-    useLoginMutation()
-  const { checkAuth, authNum, setAuthNum } = useAuthMutation()
+  const { login } = useLoginMutation()
   const { fields, warning, handleOnChange, validateForm } = useForm({
     id: '',
     password: '',
@@ -152,71 +103,6 @@ const LoginPage = () => {
           </StyledButton>
         </StyledForm>
       </LoginContent>
-      <CustomModal
-        isOpen={isOpen}
-        title='사용자 인증'
-        onCancel={handleOnCancel}
-        content={
-          <ModalContents>
-            <ModalDescription>
-              번호가 변경되었을 경우 관리자에게 문의해주세요 (관리자 : 박현진)
-            </ModalDescription>
-            <Flex direction='column' gap={4} padding={4}>
-              <Grid
-                templateColumns={{ base: '1fr', md: '1fr 2fr' }}
-                alignItems='center'
-              >
-                <Box fontSize={'sm'}>핸드폰 번호</Box>
-                <Box fontSize={'sm'}>{phoneNum ? phoneNum : ''}</Box>
-              </Grid>
-              <Grid
-                templateColumns={{ base: '1fr', md: '1fr 2fr' }}
-                alignItems='center'
-              >
-                <Box fontSize={'sm'}>인증 번호 입력</Box>
-                <Box fontSize={'sm'}>
-                  <VerificationBox>
-                    <VerificationInput
-                      autoFocus
-                      type='number'
-                      value={authNum}
-                      onChange={(e) => setAuthNum(e.target.value)}
-                      onKeyDown={(e) =>
-                        e.key === 'Enter'
-                          ? checkAuth.mutate({ phoneNum })
-                          : null
-                      }
-                    />
-                    <span>{FormatTimer(timeLeft)}</span>
-                    <VerificationButton onClick={handleLoginAction}>
-                      재전송
-                    </VerificationButton>
-                  </VerificationBox>
-                </Box>
-              </Grid>
-            </Flex>
-            <ModalDescription>
-              전송 받으신 인증번호를 빈칸에 기입하신 후, [확인] 버튼을 누르시면
-              다음으로 진행됩니다.
-              <br />
-              [재전송]을 클릭하여도 인증번호가 핸드폰으로 수신되지 않으면
-              관리자에게 문의하세요.
-            </ModalDescription>
-            <ButtonWrapper>
-              <CustomButton
-                type='outline'
-                text='취소'
-                onClick={handleOnCancel}
-              />
-              <CustomButton
-                type='primary'
-                text='확인'
-                onClick={() => checkAuth.mutate({ phoneNum })}
-              />
-            </ButtonWrapper>
-          </ModalContents>
-        }
-      />
     </LoginContainer>
   )
 }
