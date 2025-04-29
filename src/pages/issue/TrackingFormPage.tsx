@@ -1,6 +1,12 @@
 import React, { useEffect, useMemo } from 'react'
 import Creatable, { SingleValue } from 'react-select'
-import { FixedSizeList as List } from 'react-window'
+// import { FixedSizeList as List } from 'react-window'
+import {
+  FixedSizeList,
+  FixedSizeListProps,
+  ListChildComponentProps,
+} from 'react-window' // ListChildComponentProps 임포트 추가
+import type { ComponentType } from 'react' // ComponentType 임포트
 import styled from '@emotion/styled'
 import { IoMdClose } from 'react-icons/io'
 
@@ -208,6 +214,9 @@ const TrackingFormPage = () => {
   const queryParams = new URLSearchParams(location.search)
   const navigate = useNavigate()
   const id = Number(queryParams.get('seqidx'))
+  const TypedFixedSizeList = FixedSizeList as ComponentType<
+    FixedSizeListProps<any> & { ref?: React.Ref<FixedSizeList<any>> }
+  >
 
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
@@ -442,19 +451,20 @@ const TrackingFormPage = () => {
     const [value] = getValue()
     const initialOffset =
       options.findIndex((option: any) => option.value === value?.value) * height
+    const itemCount = React.Children.count(children)
 
     return (
-      <List
+      <TypedFixedSizeList
         width={'100%'}
         height={250}
-        itemCount={children.length}
+        itemCount={itemCount}
         itemSize={height}
         initialScrollOffset={initialOffset}
       >
-        {({ index, style }: { index: any; style: any }) => (
+        {({ index, style }: ListChildComponentProps) => (
           <div style={{ ...style, overflow: 'hidden' }}>{children[index]}</div>
         )}
-      </List>
+      </TypedFixedSizeList>
     )
   }
 
