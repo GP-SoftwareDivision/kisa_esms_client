@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import Creatable, { SingleValue } from 'react-select'
-// import { FixedSizeList as List } from 'react-window'
-import { ListWrapper as List } from '@/components/elements/ListWrapper.tsx'
+import { FixedSizeList as List } from 'react-window'
 import styled from '@emotion/styled'
 import { IoMdClose } from 'react-icons/io'
 
