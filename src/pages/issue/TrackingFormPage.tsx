@@ -3,10 +3,10 @@ import Creatable, { SingleValue } from 'react-select'
 // import { FixedSizeList as List } from 'react-window'
 import {
   FixedSizeList,
-  FixedSizeListProps,
+  // FixedSizeListProps,
   ListChildComponentProps,
 } from 'react-window' // ListChildComponentProps 임포트 추가
-import type { ComponentType } from 'react' // ComponentType 임포트
+// import type { ComponentType } from 'react' // ComponentType 임포트
 import styled from '@emotion/styled'
 import { IoMdClose } from 'react-icons/io'
 
