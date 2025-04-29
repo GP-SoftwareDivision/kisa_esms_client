@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { AxiosError } from 'axios'
 import { useEffect, useReducer, useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import instance from '@/apis/instance.ts'
 import { targetOptions } from '@/data/selectOptions.ts'
@@ -159,6 +159,7 @@ const reducer = (
 
 export const useTrackingDetailMutation = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const initialState: VictimAndResponseType = {
     registrationDate: '', // 등록일시
@@ -229,6 +230,11 @@ export const useTrackingDetailMutation = () => {
     onSuccess: (_response: any, variables) => {
       notifySuccess('저장되었습니다.')
       navigate(`/issue/tracking/detail?seqidx=${variables.issueIdx}`)
+      // 대응 이력 전체 리스트 조회
+      queryClient?.invalidateQueries({ queryKey: ['responseList'] })
+
+      // 대응 이력 상세 조회
+      queryClient?.invalidateQueries({ queryKey: ['responseDetail'] })
     },
   })
 
@@ -240,7 +246,10 @@ export const useTrackingDetailMutation = () => {
         ...data,
         indFlag: data.indFlag.includes('개인') ? 'Y' : 'N',
       }
+
+      // 기본 필수 정보 유효성 체크
       if (
+        data.indFlag.length === 0 ||
         data.registrationDate === '' ||
         data.incidentType.length === 0 ||
         data.channelId === '' ||
@@ -250,6 +259,13 @@ export const useTrackingDetailMutation = () => {
         notifyError('필수 사항을 모두 입력해주세요')
         throw new Error()
       }
+
+      // 대상구분 개인 외 일 때 필수 정보 유효성 검사
+      if (data.indFlag.includes('개인 외') && victims.length === 0) {
+        notifyError('피해 대상을 생성해주세요')
+        throw new Error()
+      }
+
       const response = await instance.post('/api/issue/history/upsert', request)
       return response.data
     },
@@ -310,16 +326,26 @@ export const useTrackingDetailMutation = () => {
 
     updateState('SET_TARGET_TYPE', '')
     updateState('SET_INSTITUTION', '')
-    updateState('SET_REPORT_FLAG', ' ')
+    updateState('SET_REPORT_FLAG', '')
     updateState('SET_INCIDENT_ID', '')
-    updateState('SET_SUPPORT_FLAG', ' ')
-    updateState('SET_REASON', ' ')
+    updateState('SET_SUPPORT_FLAG', '')
+    updateState('SET_REASON', '')
     updateState('SET_REASON_ETC', '')
   }
 
-  // 대상구분이 개인일 경우 빈 리스트 추가
   useEffect(() => {
-    if (state.indFlag[0] === '개인') {
+    // 대상 구분이 오직 개인일 경우
+    const isOnlyIndividual =
+      state.indFlag.length === 1 && state.indFlag[0] === '개인'
+
+    // 대상 구분이 개인 및 개인 외일경우
+    const includesIndividual = state.indFlag.includes('개인')
+
+    if (isOnlyIndividual) {
+      setVictims([])
+    }
+    // 대상구분이 오직 개인일 경우 빈 리스트 추가
+    if (isOnlyIndividual) {
       setVictims([
         {
           id: 0,
@@ -334,7 +360,9 @@ export const useTrackingDetailMutation = () => {
         },
       ])
     }
-    if (!state.indFlag.includes('개인') || state.indFlag.length > 1)
+
+    // 대상구분이 개인 및 개인 외 둘 다일 경우 빈 리스트 필요 없음
+    else if (includesIndividual)
       setVictims((prev) => prev.filter((v) => v.id !== 0))
   }, [state])
 

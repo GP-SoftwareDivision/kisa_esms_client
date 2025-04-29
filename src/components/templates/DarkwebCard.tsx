@@ -19,7 +19,7 @@ interface dtListType {
   title: string
   url: string
   writer: string
-  writetime: string
+  writetimes: string
   regdate: string
   onClick?: () => void
 }
@@ -39,7 +39,7 @@ const DarkwebCard = (props: dtListType) => {
     url,
     regdate,
     writer,
-    writetime,
+    writetimes,
     onClick,
   } = props
 
@@ -59,7 +59,7 @@ const DarkwebCard = (props: dtListType) => {
           <StyledNavContainer>
             <StyledCaptionBox>
               <StyledLabel>작성시간</StyledLabel>
-              <Caption text={writetime} type={'blue'} />
+              <Caption text={writetimes} type={'blue'} />
             </StyledCaptionBox>
             <StyledCaptionBox>
               <StyledLabel>작성자</StyledLabel>

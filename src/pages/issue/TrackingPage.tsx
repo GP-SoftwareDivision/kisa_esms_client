@@ -25,7 +25,7 @@ import CustomModal from '@/components/elements/Modal.tsx'
 import useUploadMutation from '@/hooks/mutations/useUploadMutation.tsx'
 import { CloseButton } from '@/components/ui/close-button.tsx'
 import useFileDragDrop from '@/hooks/common/useFileDragDrop.tsx'
-import { targetOptions } from '@/data/selectOptions.ts'
+import { targetIncludeIndOptions } from '@/data/selectOptions.ts'
 import { Loading } from '@/components/elements/Loading.tsx'
 import Empty from '@/components/elements/Empty.tsx'
 import queryToJson from '@/utils/queryToJson.ts'
@@ -33,6 +33,7 @@ import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import { updateSearchCondition } from '@/utils/stateHandlers.ts'
 import { useExcelDownload } from '@/hooks/common/useExcelDownload.tsx'
 import dayjs from 'dayjs'
+import { useQueryClient } from '@tanstack/react-query'
 
 // 대응 이력 현황 타입 정의
 interface ResponseListType {
@@ -50,6 +51,7 @@ interface ResponseListType {
 const TrackingPage = () => {
   const now = dayjs()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const queryParams = new URLSearchParams(location.search)
   const { page, setPage, handlePageChange } = usePagination(
     Number(queryParams.get('page')) || 1
@@ -66,6 +68,7 @@ const TrackingPage = () => {
     dragFile,
     startUpload,
     abortUpload,
+    cleanUploadState,
   } = useFileDragDrop()
 
   // 엑셀 다운로드
@@ -124,11 +127,19 @@ const TrackingPage = () => {
       header: '등록일시',
       accessorKey: 'registrationDate',
     },
+    // {
+    //   header: '대상구분',
+    //   accessorKey: 'targetType',
+    //   cell: ({ row }: any) => {
+    //     console.log('row', row)
+    //     // row.original.targetType.split('/')
+    //   },
+    // },
     {
-      header: '대상구분',
+      header: '피해대상',
       accessorKey: 'targetType',
       cell: ({ row }: any) => {
-        const matching = targetOptions
+        const matching = targetIncludeIndOptions
           .filter((item) =>
             row.original.targetType.split('/').includes(item.value)
           )
@@ -176,29 +187,44 @@ const TrackingPage = () => {
     },
   ]
 
-  // 파일 업로드
+  // 파일 업로드 시작
   const accountUpload = async () => {
     await startUpload()
+
+    if (
+      !formData ||
+      !(formData instanceof FormData) ||
+      formData.entries().next().done
+    ) {
+      notifyError('파일을 선택해주세요')
+      return
+    }
+
+    // 서버에 업로드
     try {
-      if (formData) {
-        const uploadResponse = await instance.post('/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          withCredentials: true,
-        })
-        if (uploadResponse.status === 200) {
-          const response = await instance.post(
-            `/api/issue/detection/file/upload`,
-            {
-              seqidx,
-              filename: uploadFile?.name,
-            }
-          )
-          if (response.status === 200) {
-            notifySuccess(
-              '파일 업로드가 완료되었습니다.\n 검증 소요 시간은 수분 이상 걸릴 수 있으며, 결과는 유출정보관리에서 확인 바랍니다.'
-            )
-            closeInsertUpload()
+      const uploadResponse = await instance.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true,
+      })
+
+      // 업로드가 정상적으로 끝나면 파일 이름만 한 번 더 보냄. 백엔드쪽에서 업로드한 파일을 찾기 위해서임
+      if (uploadResponse.status === 200) {
+        const response = await instance.post(
+          `/api/issue/detection/file/upload`,
+          {
+            seqidx,
+            filename: uploadFileName,
           }
+        )
+        if (response.status === 200) {
+          notifySuccess(
+            '파일 업로드가 완료되었습니다.\n 검증 소요 시간은 수분 이상 걸릴 수 있으며, 결과는 유출정보관리에서 확인 바랍니다.'
+          )
+          closeInsertUpload()
+          await queryClient?.invalidateQueries({
+            queryKey: ['detectionList'],
+          })
+          cleanUploadState()
         }
       }
     } catch (error) {
@@ -208,7 +234,7 @@ const TrackingPage = () => {
   }
 
   const renderTable = useMemo(() => {
-    if (responseList.isLoading || excelDownloadLoading) return <Loading />
+    if (responseList.isLoading) return <Loading />
     if (!responseList.data) return <Empty />
     if (responseList.isSuccess)
       return (
@@ -230,12 +256,7 @@ const TrackingPage = () => {
           />
         </ContentBox>
       )
-  }, [
-    responseList.data,
-    responseList.isLoading,
-    responseList.isSuccess,
-    excelDownloadLoading,
-  ])
+  }, [responseList.data, responseList.isLoading, responseList.isSuccess])
 
   return (
     <ContentContainer>
@@ -268,8 +289,8 @@ const TrackingPage = () => {
         </Box>
         <Box>
           <CustomSelect
-            label={'대상구분'}
-            options={[{ value: '', label: '전체' }, ...targetOptions]}
+            label={'피해대상'}
+            options={[{ value: '', label: '전체' }, ...targetIncludeIndOptions]}
             value={searchConditions.targetType}
             onChange={(item: { items: any; value: string[] }) =>
               updateSearchCondition(
@@ -402,11 +423,20 @@ const TrackingPage = () => {
           <Button type={'primary'} onClick={handleOnSearch} text={'조회'} />
         </ButtonContainer>
       </SelectContainer>
+
+      {/*테이블 렌더링*/}
       {renderTable}
+
+      {/*엑셀 다운로드시 로딩*/}
+      {excelDownloadLoading && <Loading />}
+
       <CustomModal
         isOpen={insertUploadOpen}
         title='업로드'
-        onCancel={closeInsertUpload}
+        onCancel={() => {
+          closeInsertUpload()
+          cleanUploadState()
+        }}
         content={
           <ModalContents>
             <Flex direction='column' gap={4} padding={4}>
@@ -422,8 +452,8 @@ const TrackingPage = () => {
                       />
                       <StyledFileIcon />
                       <p>
-                        {uploadFileName
-                          ? uploadFileName
+                        {uploadFile
+                          ? uploadFile.name
                           : '업로드할 파일 놓기 또는 파일 선택'}
                       </p>
                       {uploadFile && (
@@ -467,7 +497,7 @@ const StyledButton = styled.button`
 `
 
 const ModalContents = styled.div`
-  padding: 16px;
+  //padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -480,7 +510,7 @@ const UploadContainer = styled.div`
 `
 
 const StyledFileUpload = styled.div`
-  width: 100%;
+  width: 78%;
   display: flex;
   border-width: 1px;
   border-style: solid;
@@ -491,6 +521,10 @@ const StyledFileUpload = styled.div`
 
   p {
     ${({ theme }) => theme.typography.body2};
+    overflow: hidden;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 `
 

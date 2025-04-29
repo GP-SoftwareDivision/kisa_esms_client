@@ -1,11 +1,10 @@
 import { AxiosError } from 'axios'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 
 import instance from '@/apis/instance.ts'
 import { notifyError, notifySuccess } from '@/utils/notify.ts'
 import useModal from '@/hooks/common/useModal.tsx'
-import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 import { hasEmptyValue } from '@/utils/hasEmptyValue.ts'
 import { isValidEmail, isValidPassword } from '@/utils/regexChecks.ts'
 
@@ -16,9 +15,6 @@ interface UserMutationType {
   password: string
   passwordConfirm: string
   phonenum: string
-}
-
-interface RequestType extends UserMutationType {
   usertype: string
   groupcode: string
 }
@@ -27,15 +23,12 @@ export const useUserAddMutation = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { openModal, closeModal, isOpen } = useModal()
-  const [usertype, setUserType] = useState<string>('')
-  const [groupcode, setGroupCode] = useState<string>('')
 
   // 그룹 수정 API
   const insertUser = useMutation({
     mutationKey: ['insertUser'],
     mutationFn: async (data: UserMutationType) => {
-      const request: RequestType = { ...data, usertype, groupcode }
-      const isRequestValid = hasEmptyValue(request)
+      const isRequestValid = hasEmptyValue(data)
       if (isRequestValid) {
         notifyError('모든 항목을 전부 입력해주세요.')
         throw new Error()
@@ -54,7 +47,7 @@ export const useUserAddMutation = () => {
         notifyError('비밀번호와 비밀번호 확인이 일치하지 않습니다.')
         throw new Error()
       }
-      const response = await instance.post('/api/setting/user/insert', request)
+      const response = await instance.post('/api/setting/user/insert', data)
       return response.data
     },
     onError: (error) => {
@@ -80,11 +73,11 @@ export const useUserAddMutation = () => {
         }
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       notifySuccess('추가되었습니다.')
 
       closeModal('insert_user')
-      queryClient?.invalidateQueries({ queryKey: ['userList'] })
+      await queryClient?.invalidateQueries({ queryKey: ['userList'] })
     },
   })
 
@@ -103,7 +96,5 @@ export const useUserAddMutation = () => {
     handleOnAddUser,
     handleOnAddUserCancel,
     insertUserOpen: isOpen('insert_user'),
-    setUserType,
-    setGroupCode,
   }
 }

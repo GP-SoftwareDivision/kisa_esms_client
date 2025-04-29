@@ -41,7 +41,7 @@ p {
 }
 
 /*토스트 알림*/
-.Toastify__toast {
+.toast {
   font-size: .825rem
 }
 

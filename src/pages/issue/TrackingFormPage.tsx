@@ -1,6 +1,12 @@
 import React, { useEffect, useMemo } from 'react'
 import Creatable, { SingleValue } from 'react-select'
-import { FixedSizeList as List } from 'react-window'
+// import { FixedSizeList as List } from 'react-window'
+import {
+  FixedSizeList,
+  // FixedSizeListProps,
+  ListChildComponentProps,
+} from 'react-window' // ListChildComponentProps 임포트 추가
+// import type { ComponentType } from 'react' // ComponentType 임포트
 import styled from '@emotion/styled'
 import { IoMdClose } from 'react-icons/io'
 
@@ -25,6 +31,11 @@ import CustomInput from '@/components/elements/Input.tsx'
 import CustomButton from '@/components/elements/Button.tsx'
 import { useChannelAddMutation } from '@/hooks/mutations/useChannelAddMutation.tsx'
 import { useForm } from '@/hooks/common/useForm.tsx'
+import { useQuery } from '@tanstack/react-query'
+import instance from '@/apis/instance.ts'
+import { AxiosError } from 'axios'
+import { notifyError } from '@/utils/notify.ts'
+import { useNavigate } from 'react-router-dom'
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -201,6 +212,13 @@ export interface responseListType extends insertResponseType {
 
 const TrackingFormPage = () => {
   const queryParams = new URLSearchParams(location.search)
+  const navigate = useNavigate()
+  const id = Number(queryParams.get('seqidx'))
+  // const TypedFixedSizeList = FixedSizeList as ComponentType<
+  //   FixedSizeListProps<any> & { ref?: React.Ref<FixedSizeList<any>> }
+  // >
+  const TypedFixedSizeList: any = FixedSizeList // any로 직접 지정 시도
+
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
   const {
@@ -222,17 +240,57 @@ const TrackingFormPage = () => {
     insertChannelOpen,
   } = useChannelAddMutation()
 
-  // 이력 대응 상세 조회 API
-  const responseDetail = useQueries<{ data: responseListType }>({
-    queryKey: `responseDetail`,
-    method: 'POST',
-    url: '/api/issue/history/detail',
-    body: {
-      seqidx: Number(queryParams.get('seqidx')),
+  // 이력 대응 상세 조회 API : select 때문에 모듈 사용 X
+  const responseDetail = useQuery({
+    queryKey: ['responseDetail', id],
+    queryFn: async () => {
+      try {
+        const response = await instance.post('/api/issue/history/detail', {
+          seqidx: id,
+        })
+        return response.data
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          const status = error.response?.status
+          switch (status) {
+            case 400:
+              notifyError(`검색 결과가 없습니다.`)
+              break
+            case 401:
+              notifyError(`세션이 만료되었습니다. 다시 로그인 후 이용해주세요.`)
+              setTimeout(() => {
+                navigate('/login')
+              }, 2000)
+              break
+            case 403:
+              notifyError('페이지에 접근 권한이 없습니다.')
+              setTimeout(() => {
+                navigate(-1)
+              }, 2000)
+              break
+            default:
+              notifyError(
+                `일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.`
+              )
+            // navigate('/error')
+          }
+        }
+        throw new AxiosError()
+      }
     },
+    retry: 0,
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     enabled:
       Number(queryParams.get('seqidx')) !== 0 &&
       queryParams.get('type') === null,
+    select: (data: { data: responseListType }) => {
+      const { institutions, ...rest } = data.data
+
+      if (institutions.filter((v) => v.targetType !== 'ind').length === 0) {
+        return { ...rest, institutions: [] }
+      } else return data.data
+    },
   })
 
   // 이력 대응 최초 기입 - 데이터 조회 url 받아오기 위함
@@ -269,8 +327,8 @@ const TrackingFormPage = () => {
 
   // 대응 이력 기존에 작성 O
   useEffect(() => {
-    if (responseDetail.isSuccess && responseDetail.data?.data) {
-      const detail = responseDetail.data?.data
+    if (responseDetail.isSuccess && responseDetail.data) {
+      const detail = responseDetail.data
       const institutionsLength = detail?.institutions.length || 0
 
       const hasIndFlag = detail?.indFlag.includes('Y')
@@ -310,8 +368,8 @@ const TrackingFormPage = () => {
         const firstInstitution = detail?.institutions[0]
         updateState('SET_TARGET_TYPE', firstInstitution?.targetType ?? '')
         updateState('SET_INSTITUTION', firstInstitution?.institution ?? '')
-        updateState('SET_REPORT_FLAG', firstInstitution?.reportFlag ?? ' ')
-        updateState('SET_SUPPORT_FLAG', firstInstitution?.supportFlag ?? ' ')
+        updateState('SET_REPORT_FLAG', firstInstitution?.reportFlag ?? '')
+        updateState('SET_SUPPORT_FLAG', firstInstitution?.supportFlag ?? '')
         updateState('SET_REASON', firstInstitution?.reason ?? '')
         updateState('SET_INCIDENT_ID', firstInstitution?.incidentId ?? '')
       }
@@ -394,21 +452,40 @@ const TrackingFormPage = () => {
     const [value] = getValue()
     const initialOffset =
       options.findIndex((option: any) => option.value === value?.value) * height
+    const itemCount = React.Children.count(children)
 
     return (
-      <List
+      <TypedFixedSizeList
         width={'100%'}
         height={250}
-        itemCount={children.length}
+        itemCount={itemCount}
         itemSize={height}
         initialScrollOffset={initialOffset}
       >
-        {({ index, style }: { index: any; style: any }) => (
+        {({ index, style }: ListChildComponentProps) => (
           <div style={{ ...style, overflow: 'hidden' }}>{children[index]}</div>
         )}
-      </List>
+      </TypedFixedSizeList>
     )
   }
+
+  // 피해 대상 신고 여부에 따른 종속된 상태 초기화 처리 및 거부 사유 기타 취소로 인한 초기화
+  useEffect(() => {
+    if (state.reportFlag === 'Y') {
+      updateState('SET_REASON', '')
+      updateState('SET_REASON_ETC', '')
+    }
+
+    if (state.reportFlag === 'N') {
+      updateState('SET_INCIDENT_ID', '')
+      updateState('SET_SUPPORT_FLAG', '')
+    }
+
+    if (state.reason !== '기타') {
+      updateState('SET_REASON_ETC', '')
+    }
+  }, [state.reportFlag, state.reason])
+
   return (
     <ContentContainer>
       <PageTitle text={'국내 정보 유출 이력 대응'} />
@@ -567,24 +644,20 @@ const TrackingFormPage = () => {
                               updateState('SET_INSTITUTION', victim.institution)
                               updateState(
                                 'SET_REPORT_FLAG',
-                                victim.reportFlag ?? ' '
+                                victim.reportFlag ?? ''
                               )
                               updateState('SET_INCIDENT_ID', victim.incidentId)
                               updateState(
                                 'SET_SUPPORT_FLAG',
-                                victim.supportFlag ?? ' '
+                                victim.supportFlag ?? ''
                               )
                               updateState(
                                 'SET_REASON',
-                                victim.reason
-                                  ? victim.reason.split(':')[0]
-                                  : ' '
+                                victim.reason ? victim.reason.split(':')[0] : ''
                               )
                               updateState(
                                 'SET_REASON_ETC',
-                                victim.reason
-                                  ? victim.reason.split(':')[1]
-                                  : ' '
+                                victim.reason ? victim.reason.split(':')[1] : ''
                               )
                             }}
                           >
@@ -816,6 +889,7 @@ const TrackingFormPage = () => {
                   '공공',
                   '교육',
                   '금융',
+                  '의료',
                   '국방',
                   '민간',
                   '개보위',
@@ -842,6 +916,10 @@ const TrackingFormPage = () => {
               <CustomSelect
                 multiple
                 label={''}
+                onChange={(item: { items: any; value: string[] }) => {
+                  const joinedValue = item.value.filter(Boolean).join(',') // 빈 값 제거
+                  updateState('SET_COL_INFO', joinedValue)
+                }}
                 options={[
                   { value: '주민번호', label: '주민번호' },
                   { value: '운전면허증', label: '운전면허증' },
@@ -865,9 +943,6 @@ const TrackingFormPage = () => {
                   },
                 ]}
                 value={state.colInfo}
-                onChange={(item: { items: any; value: string[] }) =>
-                  updateState('SET_COL_INFO', item.value.join(','))
-                }
               />
             </Td>
             <LabelTd>이미지 유무</LabelTd>

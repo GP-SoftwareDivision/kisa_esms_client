@@ -12,7 +12,6 @@ import {
   useQuery,
   QueryClientProvider,
 } from '@tanstack/react-query'
-import { ToastContainer } from 'react-toastify'
 
 import { routeConfig } from './routes/routeConfig.tsx'
 import instance from '@/apis/instance.ts'
@@ -22,6 +21,7 @@ import Wrapper from '@/layouts/Wrapper'
 import ErrorPage from '@/pages/ErrorPage.tsx'
 import LoginPage from '@/pages/LoginPage.tsx'
 import NotFoundPage from '@/pages/NotFoundPage.tsx'
+import { Toaster } from 'react-hot-toast'
 
 const queryClient = new QueryClient()
 
@@ -58,7 +58,28 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <ToastContainer />
+        <Toaster
+          position='bottom-center'
+          reverseOrder={false}
+          gutter={16}
+          containerStyle={{ bottom: '50px' }}
+
+          toastOptions={{
+            // Define default options
+            className: 'toast',
+            duration: 5000,
+            removeDelay: 10000,
+
+            // Default options for specific types
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#5bac73',
+                secondary: 'white',
+              },
+            },
+          }}
+        />
         <ThemeProvider theme={theme}>
           <Suspense fallback={<Loading />}>
             <Routes>

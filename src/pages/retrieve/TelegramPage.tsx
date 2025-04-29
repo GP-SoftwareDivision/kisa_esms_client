@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useMemo, useState } from 'react'
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { Box, HStack, SimpleGrid } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -52,7 +58,7 @@ export interface ttListType {
   threatflag: string
   threatlog: string
   username: string
-  writetime: string
+  writetimes: string
   regdate: string
 }
 
@@ -112,7 +118,9 @@ const Telegram = () => {
   )
 
   // 작성자
-  const [writer, setWriter] = useState<string>(queryParams.get('writer') || '')
+  const [username, setUserName] = useState<string>(
+    queryParams.get('username') || ''
+  )
 
   // 대화방
   const [channel, setChannel] = useState<string>(
@@ -140,7 +148,7 @@ const Telegram = () => {
   )
 
   // 재검색 대화방 논리연산자
-  const [reChannelLogic, setReChannelLogic] = useState<string>(
+  const [reChannelLogic, _setReChannelLogic] = useState<string>(
     queryParams.get('re_channel')?.split(':')[0] || '&&'
   )
 
@@ -188,6 +196,7 @@ const Telegram = () => {
         console.error(error)
       }
     },
+    gcTime: 60 * 60 * 1000,
   })
 
   // 불러오기 후 적용 클릭 이벤트
@@ -200,18 +209,20 @@ const Telegram = () => {
       })
       setThreatFlag(jsonSavedData.threatflag as string)
       setResponseFlag(jsonSavedData.responseflag as string)
-      setWriter(jsonSavedData.writer as string)
+      setUserName(jsonSavedData.username as string)
       setChannel(jsonSavedData.channel as string)
       setContents(jsonSavedData.contents as string)
-      setReContents(jsonSavedData.re_contents as string)
-      setReChannel(jsonSavedData.re_channel as string)
-      setReUsername(jsonSavedData.re_username as string)
+
+      setReContents((jsonSavedData.re_contents as string).split(':')[1])
+      setReChannel((jsonSavedData.re_channel as string).split(':')[1])
+      setReUsername((jsonSavedData.re_username as string).split(':')[1])
+
       setRegex(jsonSavedData.regex as string)
 
       setIsReSearch(
-        jsonSavedData.re_contents !== '' ||
-          jsonSavedData.re_channel !== '' ||
-          jsonSavedData.re_username !== ''
+        (jsonSavedData.re_contents as string).split(':')[1] !== '' ||
+          (jsonSavedData.re_channel as string).split(':')[1] !== '' ||
+          (jsonSavedData.re_username as string).split(':')[1] !== ''
       )
     }
   }
@@ -230,10 +241,11 @@ const Telegram = () => {
       startdate: date.startdate,
       enddate: date.enddate,
       threatflag,
-      username: writer,
+      username,
       channel,
       contents,
       responseflag,
+      regex,
       page: '1',
       re_contents: `${resetContentsLogic}:${resetContents}`,
       re_channel: `${resetChannelLogic}:${resetChannel}`,
@@ -242,7 +254,7 @@ const Telegram = () => {
     navigate(`?${params}`)
   }
 
-  // 조회조건 저장
+  // 조회 조건 저장
   const handleOnAddSearchAction = () => {
     if (!fields.searchName) {
       notifyError('저장명을 입력해주세요')
@@ -255,12 +267,12 @@ const Telegram = () => {
         startdate: date.startdate,
         enddate: date.enddate,
         threatflag,
-        username: writer,
+        username,
         channel,
         contents,
         responseflag,
-        page: '1',
         regex,
+        page: '1',
         re_contents: `${reContentsLogic}:${reContents}`,
         re_channel: `${reChannelLogic}:${reChannel}`,
         re_username: `${reUsernameLogic}:${reUsername}`,
@@ -272,9 +284,17 @@ const Telegram = () => {
     handleOnAddSearchCancel()
   }
 
+  // 조회 조건 불러오기 set
+  useEffect(() => {
+    const tmpHistory = searchHistory.data?.data.find(
+      (history) => history.searchlog === location.search.split('?')[1]
+    )?.searchlog
+    if (tmpHistory) setSavedSearchCondition(tmpHistory)
+  }, [searchHistory.data, location.search])
+
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderTelegramList = useMemo(() => {
-    if (ttList.isLoading || excelDownloadLoading) return <Loading />
+    if (ttList.isLoading) return <Loading />
     if (!ttList.data || ttList.data.count === 0) {
       return <Empty />
     }
@@ -297,7 +317,7 @@ const Telegram = () => {
                 threatlog={v.threatlog}
                 username={v.username}
                 title={v.title}
-                writetime={v.writetime}
+                writetimes={v.writetimes}
                 regdate={v.regdate}
                 onClick={() => navigate(`detail?id=${v.seqidx}`)}
               />
@@ -314,7 +334,7 @@ const Telegram = () => {
           </Stack>
         </>
       )
-  }, [page, handlePageChange, navigate, ttList.data, excelDownloadLoading])
+  }, [page, handlePageChange, navigate, ttList.data])
 
   return (
     <ContentContainer>
@@ -338,11 +358,7 @@ const Telegram = () => {
         <StyledLoad>
           <CustomSelect
             label={'불러오기'}
-            value={
-              searchHistory.data?.data.find(
-                (history) => history.searchlog === location.search.split('?')[1]
-              )?.searchlog || ''
-            }
+            value={savedSearchCondition || ''}
             options={
               searchHistory.isSuccess &&
               searchHistory.data?.message !== 'nodata'
@@ -365,7 +381,7 @@ const Telegram = () => {
         <SelectContainer columns={[1, 2, 3, 4]}>
           <Box>
             <CustomDatePicker
-              label={'수집 기간'}
+              label={'작성기간'}
               date={date}
               setDate={setDate}
               disabled={isReSearch}
@@ -395,18 +411,18 @@ const Telegram = () => {
           </Box>
           <Box>
             <CustomInput
-              id={'writer'}
+              id={'username'}
               label={'작성자'}
               placeholder={'내용을 입력하세요.'}
-              value={writer}
-              onChange={(e) => setWriter(e.target.value)}
+              value={username}
+              onChange={(e) => setUserName(e.target.value)}
               disabled={isReSearch}
             />
           </Box>
           <Box>
             <CustomInput
               id={'channel'}
-              label={'대화방'}
+              label={'채널 URL'}
               placeholder={'내용을 입력하세요.'}
               value={channel}
               onChange={(e) => setChannel(e.target.value)}
@@ -484,27 +500,26 @@ const Telegram = () => {
                   />
                 </InputGroup>
               </HStack>
-
-              <HStack gap='10' width='full'>
-                <InputGroup
-                  flex='1'
-                  endElement={
-                    <RenderLogicalSelect
-                      value={reChannelLogic}
-                      setValue={setReChannelLogic}
-                    />
-                  }
-                >
-                  <CustomInput
-                    id={'channel'}
-                    label={'대화방'}
-                    placeholder={'내용을 입력하세요.'}
-                    value={reChannel}
-                    onChange={(e) => setReChannel(e.target.value)}
-                    tooltip={`여러 값을 입력하려면 쉼표( , )로 구분하세요.`}
-                  />
-                </InputGroup>
-              </HStack>
+              {/*<HStack gap='10' width='full'>*/}
+              {/*  <InputGroup*/}
+              {/*    flex='1'*/}
+              {/*    endElement={*/}
+              {/*      <RenderLogicalSelect*/}
+              {/*        value={reChannelLogic}*/}
+              {/*        setValue={setReChannelLogic}*/}
+              {/*      />*/}
+              {/*    }*/}
+              {/*  >*/}
+              {/*    <CustomInput*/}
+              {/*      id={'channel'}*/}
+              {/*      label={'대화방'}*/}
+              {/*      placeholder={'내용을 입력하세요.'}*/}
+              {/*      value={reChannel}*/}
+              {/*      onChange={(e) => setReChannel(e.target.value)}*/}
+              {/*      tooltip={`여러 값을 입력하려면 쉼표( , )로 구분하세요.`}*/}
+              {/*    />*/}
+              {/*  </InputGroup>*/}
+              {/*</HStack>*/}
               <HStack gap='10' width='full'>
                 <InputGroup
                   flex='1'
@@ -525,6 +540,8 @@ const Telegram = () => {
                   />
                 </InputGroup>
               </HStack>
+              <Box></Box>
+
               <Box display={'flex'} justifyContent={'flex-end'}>
                 <Button
                   type={'primary'}
@@ -536,7 +553,13 @@ const Telegram = () => {
           }
         />
       </Stack>
+
+      {/*데이터 렌더링*/}
       {renderTelegramList}
+
+      {/*엑셀 다운로드시 로딩*/}
+      {excelDownloadLoading && <Loading />}
+
       <CustomModal
         isOpen={insertSearchOpen}
         title='조회 조건 저장'

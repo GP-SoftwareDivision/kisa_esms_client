@@ -8,11 +8,12 @@ import { ChangeEvent, useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // 테이블 개별 리스트 타입
-interface DamageTargetRowType {
+export interface DamageTargetRowType {
   incidentId: string
   institution: string
   issueIdx: number
   reason: string
+  reason_etc: string
   registrationDate: string
   reportFlag: string
   seqidx: number
@@ -30,6 +31,7 @@ export const useDamageTargetUpdateMutation = () => {
     institution: '',
     issueIdx: 0,
     reason: '',
+    reason_etc: '',
     registrationDate: '',
     reportFlag: '',
     seqidx: 0,
@@ -41,10 +43,16 @@ export const useDamageTargetUpdateMutation = () => {
   const updateDamageTarget = useMutation({
     mutationKey: ['updateDamageTarget'],
     mutationFn: async () => {
-      const response = await instance.post(
-        '/api/issue/victims/update',
-        updateData
-      )
+      const { reason_etc, ...req } = updateData
+      req.reason = reason_etc ? `${req.reason}:${reason_etc}` : req.reason
+      req.supportFlag = req.supportFlag ?? ''
+
+      if (!req.institution) {
+        notifyError('필수 항목을 모두 입력해주세요.')
+        throw new Error()
+      }
+
+      const response = await instance.post('/api/issue/victims/update', req)
       return response.data
     },
     onError: (error) => {
@@ -99,8 +107,8 @@ export const useDamageTargetUpdateMutation = () => {
         setUpdateData((prev) => ({ ...prev, institution: value }))
       if (id === 'update_incidentId')
         setUpdateData((prev) => ({ ...prev, incidentId: value }))
-      if (id === 'update_reason')
-        setUpdateData((prev) => ({ ...prev, reason: value }))
+      if (id === 'update_reason_etc')
+        setUpdateData((prev) => ({ ...prev, reason_etc: value }))
     },
     []
   )

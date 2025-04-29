@@ -1,5 +1,4 @@
 import { AxiosError } from 'axios'
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
@@ -11,9 +10,6 @@ import { hasEmptyValue } from '@/utils/hasEmptyValue.ts'
 interface GroupMutationType {
   groupname: string
   comment?: string
-}
-
-interface RequestType extends GroupMutationType {
   kakaoflag: string
   emailflag: string
   useflag: string
@@ -25,28 +21,24 @@ export const useGroupAddMutation = () => {
   const queryClient = useQueryClient()
   const { openModal, closeModal, isOpen } = useModal()
 
-  const [kakaoFlag, setKakaoFlag] = useState<string>('')
-  const [emailFlag, setEmailFlag] = useState<string>('')
-  const [useFlag, setUseFlag] = useState<string>('')
-
   // 그룹 추가 API
   const insertGroup = useMutation({
     mutationKey: ['insertGroup'],
     mutationFn: async (data: GroupMutationType) => {
-      const request: RequestType = {
-        groupname: data.groupname,
-        kakaoflag: kakaoFlag,
-        emailflag: emailFlag,
-        useflag: useFlag,
-      }
-      const isRequestValid = hasEmptyValue(request)
+      const { comment, ...req } = data
+
+      // 필수 값 유효성 검사
+      const isRequestValid = hasEmptyValue(req)
+      data.comment = comment ?? ''
+
       if (isRequestValid) {
         notifyError('모든 항목을 전부 입력해주세요.')
         throw new Error()
       }
+
       const response = await instance.post('/api/setting/group/insert', {
-        ...request,
-        comment: data.comment ? data.comment : '',
+        ...data,
+        autosendflag: 'Y',
       })
       return response.data
     },
@@ -95,8 +87,5 @@ export const useGroupAddMutation = () => {
     openInsertGroup,
     closeInsertGroup,
     insertGroupOpen: isOpen('insert_group'),
-    setUseFlag,
-    setEmailFlag,
-    setKakaoFlag,
   }
 }

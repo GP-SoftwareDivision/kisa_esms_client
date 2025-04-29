@@ -38,7 +38,10 @@ const CustomTable = ({
   return (
     <TableWrapper>
       {loading ? (
-        <CustomSkeleton lines={3} height={5} />
+        <StyledSkeletonWrapper>
+          <CustomSkeleton lines={3} height={5} />
+          <CustomSkeleton lines={2} height={100} />
+        </StyledSkeletonWrapper>
       ) : (
         <TableContainer $maxHeight={maxHeight ? maxHeight : 'none'}>
           <StyledTable>
@@ -129,4 +132,10 @@ const TableRow = styled.tr`
   &:hover {
     background-color: #fafafa;
   }
+`
+
+const StyledSkeletonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 `

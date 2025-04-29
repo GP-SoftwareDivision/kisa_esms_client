@@ -1,4 +1,10 @@
-import React, { Dispatch, SetStateAction, useMemo, useState } from 'react'
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 import { Box, SimpleGrid, Stack, HStack } from '@chakra-ui/react'
 import { InputGroup } from '@/components/ui/input-group'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -42,7 +48,7 @@ export interface dtListType {
   seqidx: number
   target: string
   keyword: string
-  writetime: string
+  writetimes: string
   url: string
   writer: string
   title: string
@@ -121,7 +127,7 @@ const DarkWebPage = () => {
   // 작성자
   const [writer, setWriter] = useState<string>(queryParams.get('writer') || '')
 
-  // 재검색 제목 shs
+  // 재검색 제목
   const [reTitle, setReTitle] = useState<string>(
     queryParams.get('re_title')?.split(':')[1] || ''
   )
@@ -182,6 +188,7 @@ const DarkWebPage = () => {
         console.error(error)
       }
     },
+    gcTime: 60 * 60 * 1000,
   })
 
   // 검색 조건 적용 후 파라미터 변경
@@ -253,19 +260,20 @@ const DarkWebPage = () => {
       setResponseFlag(jsonSavedData.responseflag as string)
       setTitle(jsonSavedData.title as string)
       setWriter(jsonSavedData.writer as string)
-      setReTitle(jsonSavedData.re_title as string)
       setKeyword(jsonSavedData.keyword as string)
-      setReKeyword(jsonSavedData.re_keyword as string)
+      setReTitle((jsonSavedData.re_title as string).split(':')[1])
+      setReKeyword((jsonSavedData.re_keyword as string).split(':')[1])
       setUrl(jsonSavedData.url as string)
       setRegex(jsonSavedData.regex as string)
       setIsReSearch(
-        jsonSavedData.re_title !== '' || jsonSavedData.re_keyword !== ''
+        (jsonSavedData.re_title as string).split(':')[1] !== '' ||
+          (jsonSavedData.re_keyword as string).split(':')[1] !== ''
       )
     }
   }
   // 로딩 중 경우 | 데이터 없는 경우 | 데이터 렌더링 경우 처리
   const renderDarkwebList = useMemo(() => {
-    if (dtList.isLoading || excelDownloadLoading) return <Loading />
+    if (dtList.isLoading) return <Loading />
     if (!dtList.data || dtList.data.count === 0) return <Empty />
     if (!dtList.data || dtList.data.count > 0)
       return (
@@ -285,7 +293,7 @@ const DarkWebPage = () => {
                 title={v.title}
                 url={v.url}
                 writer={v.writer}
-                writetime={v.writetime}
+                writetimes={v.writetimes}
                 target={v.target}
                 regdate={v.regdate}
                 htmlpath={v.htmlpath}
@@ -303,7 +311,16 @@ const DarkWebPage = () => {
           />
         </>
       )
-  }, [page, navigate, dtList, excelDownloadLoading])
+  }, [page, navigate, dtList])
+
+  // 조회 조건 불러오기 set
+  useEffect(() => {
+    const tmpHistory = searchHistory.data?.data.find(
+      (history) => history.searchlog === location.search.split('?')[1]
+    )?.searchlog
+
+    if (tmpHistory) setSavedSearchCondition(tmpHistory)
+  }, [searchHistory.data, location.search])
 
   return (
     <ContentContainer>
@@ -327,11 +344,7 @@ const DarkWebPage = () => {
         <StyledLoad>
           <CustomSelect
             label={'불러오기'}
-            value={
-              searchHistory.data?.data.find(
-                (history) => history.searchlog === location.search.split('?')[1]
-              )?.searchlog || ''
-            }
+            value={savedSearchCondition || ''}
             options={
               searchHistory.isSuccess &&
               searchHistory.data?.message !== 'nodata'
@@ -354,7 +367,7 @@ const DarkWebPage = () => {
         <SelectContainer columns={[1, 2, 3, 4]}>
           <Box>
             <CustomDatePicker
-              label={'수집 기간'}
+              label={'작성기간'}
               date={date}
               setDate={setDate}
               disabled={isReSearch}
@@ -528,7 +541,13 @@ const DarkWebPage = () => {
           }
         />
       </Stack>
+
+      {/*데이터 렌더링*/}
       {renderDarkwebList}
+
+      {/*엑셀 다운로드시 로딩*/}
+      {excelDownloadLoading && <Loading />}
+
       <CustomModal
         isOpen={insertSearchOpen}
         title='조회 조건 저장'

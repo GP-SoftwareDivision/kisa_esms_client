@@ -42,16 +42,12 @@ interface UserGroupType {
 const UserPage = () => {
   const { page, handlePageChange } = usePagination(1)
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
+  const [usertype, setUserType] = useState<string>('')
+  const [groupcode, setGroupCode] = useState<string>('')
 
   // 사용자 추가 hooks
-  const {
-    insertUser,
-    handleOnAddUser,
-    handleOnAddUserCancel,
-    insertUserOpen,
-    setUserType,
-    setGroupCode,
-  } = useUserAddMutation()
+  const { insertUser, handleOnAddUser, handleOnAddUserCancel, insertUserOpen } =
+    useUserAddMutation()
 
   // 사용자 수정 hooks
   const {
@@ -83,6 +79,7 @@ const UserPage = () => {
     method: 'POST',
     url: '/api/setting/user',
     gcTime: 0,
+    staleTime: 0,
   })
 
   // 추가 시 그룹 리스트
@@ -92,6 +89,7 @@ const UserPage = () => {
     url: '/api/setting/user/groups',
     enabled: userList.isSuccess && !!userList.data.data?.length,
     gcTime: 0,
+    staleTime: 0,
   })
 
   const columns = [
@@ -179,7 +177,7 @@ const UserPage = () => {
   ]
 
   // 사용자 추가 액션
-  const handleInsertUserAction = () => {
+  const handleInsertUserAction = async () => {
     const { name, email, id, password, passwordConfirm, phonenum } = fields
     insertUser.mutate({
       name,
@@ -188,7 +186,10 @@ const UserPage = () => {
       password,
       passwordConfirm,
       phonenum: phonenum && formatPhoneNumber(phonenum),
+      usertype,
+      groupcode,
     })
+    handleOnCleanForm()
   }
 
   // 사용자 추가 취소 액션
@@ -310,6 +311,7 @@ const UserPage = () => {
                   { label: '사용자', value: 'user' },
                   { label: '관리자', value: 'administrator' },
                 ]}
+                value={usertype}
                 onChange={(item: { items: any; value: string[] }) =>
                   setUserType(item.value.join(','))
                 }
@@ -320,10 +322,12 @@ const UserPage = () => {
                 options={
                   userGroupList.isSuccess ? userGroupList.data?.data : []
                 }
+                value={groupcode}
                 multiple
-                onChange={(item: { items: any; value: string[] }) =>
+                onChange={(item: { items: any; value: string[] }) => {
+                  console.log(item.value.join(','))
                   setGroupCode(item.value.join(','))
-                }
+                }}
                 required
               />
             </Flex>
