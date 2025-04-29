@@ -54,3 +54,7 @@ http://localhost:5173/
 브랜치 용도
 main 운영(배포) 브랜치
 develop 개발 통합 브랜치
+
+### HISORY
+
+2025.04.29 인수인계 gp-hklee
