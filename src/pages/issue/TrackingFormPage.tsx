@@ -214,9 +214,10 @@ const TrackingFormPage = () => {
   const queryParams = new URLSearchParams(location.search)
   const navigate = useNavigate()
   const id = Number(queryParams.get('seqidx'))
-  const TypedFixedSizeList = FixedSizeList as ComponentType<
-    FixedSizeListProps<any> & { ref?: React.Ref<FixedSizeList<any>> }
-  >
+  // const TypedFixedSizeList = FixedSizeList as ComponentType<
+  //   FixedSizeListProps<any> & { ref?: React.Ref<FixedSizeList<any>> }
+  // >
+  const TypedFixedSizeList: any = FixedSizeList // any로 직접 지정 시도
 
   const { fields, handleOnChange, handleOnCleanForm } = useForm()
 
